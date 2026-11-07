@@ -137,46 +137,73 @@ mod tests {
         }
     }
 
+    /// Builds an absolute path with the host platform's rules.
+    fn absolute(parts: &[&str]) -> String {
+        let mut path = if cfg!(windows) {
+            PathBuf::from(r"C:\")
+        } else {
+            PathBuf::from("/")
+        };
+        for part in parts {
+            path.push(part);
+        }
+        path.to_string_lossy().into_owned()
+    }
+
     #[test]
     fn macos_uses_application_support() {
-        let dir = data_dir_for(HostOs::MacOs, &env(&[("HOME", "/Users/test")])).expect("dir");
+        let home = absolute(&["Users", "test"]);
+        let dir = data_dir_for(HostOs::MacOs, &env(&[("HOME", &home)])).expect("dir");
         assert_eq!(
             dir,
-            PathBuf::from("/Users/test/Library/Application Support/EQwec")
+            PathBuf::from(absolute(&[
+                "Users",
+                "test",
+                "Library",
+                "Application Support",
+                "EQwec"
+            ]))
         );
     }
 
     #[test]
     fn windows_uses_local_app_data() {
-        let dir = data_dir_for(
-            HostOs::Windows,
-            &env(&[("LOCALAPPDATA", "/Users/test/AppData/Local")]),
-        )
-        .expect("dir");
-        assert_eq!(dir, PathBuf::from("/Users/test/AppData/Local/EQwec"));
+        let local = absolute(&["Users", "test", "AppData", "Local"]);
+        let dir = data_dir_for(HostOs::Windows, &env(&[("LOCALAPPDATA", &local)])).expect("dir");
+        assert_eq!(
+            dir,
+            PathBuf::from(absolute(&["Users", "test", "AppData", "Local", "EQwec"]))
+        );
     }
 
     #[test]
     fn linux_prefers_xdg_data_home() {
+        let xdg = absolute(&["xdg"]);
+        let home = absolute(&["home", "test"]);
         let dir = data_dir_for(
             HostOs::Linux,
-            &env(&[("XDG_DATA_HOME", "/xdg"), ("HOME", "/home/test")]),
+            &env(&[("XDG_DATA_HOME", &xdg), ("HOME", &home)]),
         )
         .expect("dir");
-        assert_eq!(dir, PathBuf::from("/xdg/eqwec"));
+        assert_eq!(dir, PathBuf::from(absolute(&["xdg", "eqwec"])));
     }
 
     #[test]
     fn linux_falls_back_to_home() {
-        let dir = data_dir_for(HostOs::Linux, &env(&[("HOME", "/home/test")])).expect("dir");
-        assert_eq!(dir, PathBuf::from("/home/test/.local/share/eqwec"));
+        let home = absolute(&["home", "test"]);
+        let dir = data_dir_for(HostOs::Linux, &env(&[("HOME", &home)])).expect("dir");
+        assert_eq!(
+            dir,
+            PathBuf::from(absolute(&["home", "test", ".local", "share", "eqwec"]))
+        );
     }
 
     #[test]
     fn override_wins_on_every_platform() {
+        let custom = absolute(&["custom", "data"]);
         for os in [HostOs::MacOs, HostOs::Windows, HostOs::Linux] {
-            let dir = data_dir_for(os, &env(&[("EQWEC_DATA_DIR", "/custom/data")])).expect("dir");
-            assert_eq!(dir, PathBuf::from("/custom/data"));
+            let dir = data_dir_for(os, &env(&[("EQWEC_DATA_DIR", &custom)])).expect("dir");
+            assert_eq!(dir, PathBuf::from(&custom));
         }
     }
 
@@ -189,11 +216,17 @@ mod tests {
 
     #[test]
     fn unnormalized_override_is_rejected() {
-        let error = data_dir_for(
-            HostOs::Linux,
-            &env(&[("EQWEC_DATA_DIR", "/custom/../data")]),
-        )
-        .expect_err("must fail");
+        let mut path = if cfg!(windows) {
+            PathBuf::from(r"C:\")
+        } else {
+            PathBuf::from("/")
+        };
+        path.push("custom");
+        path.push("..");
+        path.push("data");
+        let unnormalized = path.to_string_lossy().into_owned();
+        let error = data_dir_for(HostOs::Linux, &env(&[("EQWEC_DATA_DIR", &unnormalized)]))
+            .expect_err("must fail");
         assert!(matches!(error, LauncherError::UnnormalizedDataDir { .. }));
     }
 
