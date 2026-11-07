@@ -47,6 +47,6 @@ python3 -m venv .venv-skillcheck
   --validator ~/.agents/skills/skill-creator/scripts/quick_validate.py
 ```
 
-The Cargo workspace exists. The verified local commands are `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo build --workspace --all-targets --locked`, and `cargo test --workspace --all-features --locked`. CI has not executed because the repository has no remote.
+The Cargo workspace exists. The verified local commands are `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo build --workspace --all-targets --locked`, and `cargo test --workspace --all-features --locked`. CI is configured on GitHub Actions; the first run is pending.
 
 If this file and `AGENTS.md` disagree, `AGENTS.md` wins. Report the conflict and fix this file.

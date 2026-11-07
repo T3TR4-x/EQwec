@@ -8,7 +8,7 @@ EQwec is an independent ecosystem of professional desktop applications and a uni
 
 **Phase 3 — Hub MVP.** The project is at version `0.0.0`. No product has a usable release yet, and nothing in this repository should be treated as production-ready.
 
-The Cargo workspace, pinned toolchain, `eqwec-core` shared crate, and CI workflow exist on `integration`. Hub verification, durable state, activation, rollback, recovery, bounded package staging, and a non-production v1/v2 fixture workflow are implemented on `dev-hub`. The mandatory skills, research, architecture, and security gates have passed for the planning scope. Download transport, uninstall, the launcher UI, installer packaging, platform fixture runs, and every other product remain `BLOCKED`; CI has not executed because no remote exists.
+The Cargo workspace, pinned toolchain, `eqwec-core` shared crate, and CI workflow exist on `integration`. Hub verification, durable state, activation, rollback, recovery, bounded package staging, and a non-production v1/v2 fixture workflow are implemented on `dev-hub`. The mandatory skills, research, architecture, and security gates have passed for the planning scope. Download transport, uninstall, the launcher UI, installer packaging, platform fixture runs, and every other product remain `BLOCKED`. The GitHub remote is connected and the first CI run is pending; record its result before calling CI verified.
 
 ## Products
 
