@@ -101,15 +101,15 @@
 - Test: `apps/eqwec-hub/tests/launcher_actions.rs`
 
 **Interfaces:**
-- Produces: `actions::install_bundle(...)`, `actions::update_bundle(...)`, `actions::rollback(...)`, `actions::uninstall(...)`, `launch::resolve_entry(layout, record, pointer) -> Result<PathBuf, LauncherError>`, `launch::health_check(tree, product_id) -> Result<(), LauncherError>`.
+- Produces: `actions::install_bundle(data_dir, bundle_dir)` (install and update), `actions::rollback(data_dir, product_id, version)`, `actions::uninstall_product(data_dir, product_id)`, `actions::resolve_installed_entry(...) -> Result<(PathBuf, PathBuf), LauncherError>`, `actions::launch_product(...) -> Result<u32, LauncherError>`, `launch::resolve_entry(layout, record, pointer) -> Result<ResolvedEntry, LauncherError>`, `launch::health_check(tree, product_id) -> Result<(), LauncherError>`.
 
-- [ ] Test bundle validation: missing `manifest.json`/`package.zip`, extra files, relative path.
-- [ ] Test `resolve_entry`: missing pointer, pointer/record mismatch, symlink, missing file, path escape → typed errors; valid tree → `bin/<id>`.
-- [ ] Test health check: fixture v1 tree passes; tree with missing payload fails; timeout kills the child.
-- [ ] Implement install/update/rollback with disk preflight → verify → stage → health check → activate; worker thread + channel.
-- [ ] Implement uninstall with confirmation modal and launch with `Command`.
-- [ ] Integration test: install v1 → launch → update v2 → rollback v1 → uninstall against temp layout.
-- [ ] Run `cargo test -p eqwec-hub`; commit `feat(hub): підключити встановлення, оновлення, відкат і запуск`.
+- [x] Test bundle validation: missing `manifest.json`/`package.zip`, extra files, relative path.
+- [x] Test `resolve_entry`: missing pointer, pointer/record mismatch, symlink tree, symlink entry, missing file, path escape → typed errors; valid tree → `bin/<id>`.
+- [x] Test health check: fixture v1 tree passes; tree with missing payload fails; timeout kills the child.
+- [x] Implement install/update/rollback with disk preflight → verify → stage → health check → activate; worker thread + channel.
+- [x] Implement uninstall with confirmation modal and launch with `Command`.
+- [x] Integration test: install v1 → launch → update v2 → rollback v1 → uninstall against temp layout.
+- [x] Run `cargo test -p eqwec-hub`; commit `feat(hub): підключити встановлення, оновлення, відкат і запуск`.
 
 ### Task 6: Fixture entry point and demo bundle
 

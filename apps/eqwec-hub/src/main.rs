@@ -1,24 +1,21 @@
 //! EQwec Hub developer-preview launcher.
 //!
 //! `--self-check` validates the profile without opening a window. Any other
-//! invocation opens the launcher.
+//! invocation recovers an interrupted transaction and opens the launcher.
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
-mod app;
-mod error;
-mod paths;
-mod state;
-mod trust;
-
+use std::path::Path;
 use std::process::ExitCode;
 
-use eqwec_updater::{ProfileLock, read_journal};
-
-use crate::error::LauncherError;
-use crate::paths::HostOs;
-use crate::state::{LaunchState, LauncherState, LockState, RegistryState};
+use eqwec_hub::error::LauncherError;
+use eqwec_hub::paths::{self, HostOs};
+use eqwec_hub::state::{LaunchState, LauncherState, LockState, RecoveryState, RegistryState};
+use eqwec_hub::{app, trust};
+use eqwec_updater::{
+    InstallLayout, ProfileLock, RecoveryOutcome, Registry, Timestamp, read_journal, recover,
+};
 
 fn main() -> ExitCode {
     if std::env::args()
@@ -53,7 +50,13 @@ fn run_gui() -> Result<(), LauncherError> {
     } else {
         LockState::Unavailable("another EQwec process holds the profile lock".to_owned())
     };
-    let state = LauncherState::load(data_dir, lock_state);
+    let recovery = if _lock.is_some() {
+        recover_profile(&data_dir)
+    } else {
+        RecoveryState::Clean
+    };
+    let mut state = LauncherState::load(data_dir, lock_state);
+    state.recovery = recovery;
 
     let options = eframe::NativeOptions {
         viewport: eframe::egui::ViewportBuilder::default()
@@ -70,6 +73,41 @@ fn run_gui() -> Result<(), LauncherError> {
     .map_err(|error| LauncherError::Launch {
         detail: error.to_string(),
     })
+}
+
+fn recover_profile(data_dir: &Path) -> RecoveryState {
+    let layout = match InstallLayout::new(data_dir) {
+        Ok(layout) => layout,
+        Err(error) => return RecoveryState::Failed(error.to_string()),
+    };
+    let mut registry = match Registry::load(&layout.registry_path()) {
+        Ok(Some(registry)) => registry,
+        Ok(None) => return RecoveryState::Clean,
+        Err(error) => return RecoveryState::Failed(error.to_string()),
+    };
+    if let Err(error) = registry.validate_against_layout(&layout) {
+        return RecoveryState::Failed(error.to_string());
+    }
+    let now = match Timestamp::now_utc() {
+        Ok(now) => now,
+        Err(error) => return RecoveryState::Failed(error.to_string()),
+    };
+    match recover(&layout, &mut registry, now) {
+        Ok(RecoveryOutcome::NothingToRecover) => RecoveryState::Clean,
+        Ok(RecoveryOutcome::Discarded { operation_id }) => {
+            RecoveryState::Recovered(format!("discarded interrupted operation {operation_id}"))
+        }
+        Ok(RecoveryOutcome::Committed { operation_id }) => {
+            RecoveryState::Recovered(format!("completed interrupted activation {operation_id}"))
+        }
+        Ok(RecoveryOutcome::RolledBack { operation_id }) => {
+            RecoveryState::Recovered(format!("completed interrupted rollback {operation_id}"))
+        }
+        Ok(RecoveryOutcome::Uninstalled { operation_id }) => {
+            RecoveryState::Recovered(format!("completed interrupted uninstall {operation_id}"))
+        }
+        Err(error) => RecoveryState::Failed(error.to_string()),
+    }
 }
 
 fn self_check() -> ExitCode {
@@ -132,7 +170,7 @@ fn self_check_report() -> Result<String, LauncherError> {
         }
     }
 
-    let layout = eqwec_updater::InstallLayout::new(&data_dir)?;
+    let layout = InstallLayout::new(&data_dir)?;
     if let Some(unfinished) = read_journal(&layout.journal_path())?.unfinished_operation() {
         report.push_str(&format!(
             "journal: unfinished operation {} at {}\n",
@@ -144,5 +182,9 @@ fn self_check_report() -> Result<String, LauncherError> {
         ));
     }
     report.push_str("journal: clean\n");
+    match trust::trust_store() {
+        Ok(_) => report.push_str("trust: developer-preview key loaded\n"),
+        Err(error) => report.push_str(&format!("trust: {error}\n")),
+    }
     Ok(report)
 }

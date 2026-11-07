@@ -38,12 +38,27 @@ pub enum LauncherError {
         /// Bounded diagnostic detail.
         detail: String,
     },
+    /// A release bundle is invalid.
+    #[error("release bundle is invalid: {detail}")]
+    Bundle {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
+    /// A staged product failed its health check.
+    #[error("health check failed: {detail}")]
+    HealthCheck {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
     /// A product could not be launched.
     #[error("launch failed: {detail}")]
     Launch {
         /// Bounded diagnostic detail.
         detail: String,
     },
+    /// The requested operation is not valid for the current state.
+    #[error("operation rejected: {0}")]
+    Rejected(String),
     /// An updater operation failed.
     #[error("updater error: {0}")]
     Updater(String),

@@ -57,6 +57,17 @@ pub enum LockState {
     Unavailable(String),
 }
 
+/// Startup journal-recovery state.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum RecoveryState {
+    /// No interrupted operation was found.
+    Clean,
+    /// An interrupted operation was completed or discarded.
+    Recovered(String),
+    /// Recovery failed; mutating actions are disabled.
+    Failed(String),
+}
+
 /// Everything the window needs to render.
 #[derive(Clone, Debug)]
 pub struct LauncherState {
@@ -66,6 +77,8 @@ pub struct LauncherState {
     pub lock: LockState,
     /// Registry state.
     pub registry: RegistryState,
+    /// Startup recovery state.
+    pub recovery: RecoveryState,
 }
 
 impl LauncherState {
@@ -77,6 +90,7 @@ impl LauncherState {
             data_dir,
             lock,
             registry,
+            recovery: RecoveryState::Clean,
         }
     }
 
@@ -90,6 +104,7 @@ impl LauncherState {
     pub const fn can_mutate(&self) -> bool {
         matches!(self.lock, LockState::Acquired)
             && !matches!(self.registry, RegistryState::Error(_))
+            && !matches!(self.recovery, RecoveryState::Failed(_))
     }
 }
 

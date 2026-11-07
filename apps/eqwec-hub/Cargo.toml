@@ -16,3 +16,6 @@ thiserror.workspace = true
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+eqwec-hub-fixture = { path = "../../tests/fixtures/eqwec-hub" }

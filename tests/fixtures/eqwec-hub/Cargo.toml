@@ -14,10 +14,7 @@ path = "src/bin/fixture_v1.rs"
 name = "fixture-v2"
 path = "src/bin/fixture_v2.rs"
 
-[lints]
-workspace = true
-
-[dev-dependencies]
+[dependencies]
 ed25519-dalek.workspace = true
 eqwec-core.workspace = true
 eqwec-security.workspace = true
@@ -25,3 +22,6 @@ eqwec-updater = { version = "0.0.0", path = "../../../crates/eqwec-updater" }
 semver.workspace = true
 serde_json.workspace = true
 zip.workspace = true
+
+[lints]
+workspace = true
