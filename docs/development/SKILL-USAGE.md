@@ -180,7 +180,7 @@ Gate decision: workspace baseline `PASS` locally. The Phase 2 gate is not closed
 | Verification | PASS locally; install acceptance `BLOCKED` | `cargo test --workspace --all-features --locked`: 76 passed, 0 failed; fmt, clippy, build, audit, deny exit 0; docs gate 0 failures; skills 10/10 |
 | Performance | NOT_APPLICABLE | No runtime product workload or benchmark |
 | Security | PASS for implemented boundary | Fixed OpenSSL vector, tampered payload/signature, wrong channel/target/key/epoch, revoked key, expired key, sequence regression, truncation, size and hash mismatch all rejected |
-| Merge | PENDING | Commit not yet created at the time of writing |
+| Merge | PASS | Scoped Ukrainian Conventional Commit `2a47df8` created on `dev-hub`; no unrelated files staged |
 | Release | NOT_APPLICABLE | No artifact; versions remain `0.0.0` |
 
 Findings:
