@@ -55,6 +55,59 @@ Findings:
 
 Gate decision: `PASS` for the bootstrap scope. Runtime product scenarios remain `BLOCKED` and are release prerequisites.
 
+## Task: research, technology selection, and ADRs 0002–0010
+
+**Date:** 2026-11-07
+**Branch:** `integration`
+**Scope:** browser/GUI/media/audio research, competitor and legal review, feasibility synthesis, technology selection, and architecture decision records. **No product code, no Cargo workspace.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Evidence labels, gate honesty, branch rules, security and documentation policy applied across all research and ADR files |
+| `eqwec-quality-control` | APPLIED | PASS/FAIL/BLOCKED separation enforced; unverified prototype and legal claims marked `BLOCKED`; see report below |
+| `eqwec-browser` | APPLIED | `BROWSER-ENGINE-FEASIBILITY.md`, ADR-0003, ADR-0010; CEF boundary, sandbox/site isolation, profile isolation, extension limits |
+| `eqwec-hub` | APPLIED | ADR-0007 packaging/signing; Hub trust chain, rollback, offline install, key custody |
+| `eqwec-photocraft` | APPLIED | ADR-0004 image/RAW/color path; PhotoCraft feasibility and color/tile constraints |
+| `eqwec-vectorcraft` | APPLIED | ADR-0002 geometry/text stack; VectorCraft feasibility and first-proof criteria |
+| `eqwec-filmcraft` | APPLIED | ADR-0004 media path; FilmCraft feasibility, A/V sync, export and legal gates |
+| `eqwec-effectcraft` | APPLIED | ADR-0004 and ADR-0010; EffectCraft feasibility, cache, compositing and plugin trust |
+| `eqwec-craftanything` | APPLIED | ADR-0006 interchange and provenance; CraftAnything feasibility and ownership boundary |
+| `eqwec-audiocraft` | APPLIED | ADR-0005 and ADR-0010; real-time callback rules, CLAP/VST3 hosting, crash isolation |
+| `skill-creator` | AVAILABLE_NOT_RELEVANT | No skill created or edited in this task; validation was not re-run because skill files did not change |
+| `research` | APPLIED | Primary-source research method used for browser, competitor, and legal reviews; sources and access dates recorded |
+| `code-review` (Matt Pocock) | AVAILABLE_NOT_RELEVANT | No code diff; documents were reviewed against ADR and evidence requirements instead |
+| `security-audit` | APPLIED | Threat boundaries, trust tiers, plugin isolation, crash-data sensitivity, and update-chain controls reviewed in ADRs 0003/0007/0009/0010 |
+| `ui-ux-pro-max` | AVAILABLE_NOT_RELEVANT | Technology evaluation only; no interface designed |
+| `frontend-design` | AVAILABLE_NOT_RELEVANT | No UI implemented |
+| `unslop` | AVAILABLE_NOT_RELEVANT | No UI implemented |
+| `playwright` | AVAILABLE_NOT_RELEVANT | No browser test executed; CLI remains unverified |
+| `superpowers`, `ponytail`, `karpathy-guidelines`, `caveman` | AVAILABLE_NOT_RELEVANT | No implementation plan, refactor, code change, or terse-voice request |
+
+## Quality-control report for the research and ADR task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | Branch and worktree inspected; existing research read before writing; no product code touched |
+| Implementation | PASS | 4 research docs, 1 technology-selection doc, 9 ADRs; each ADR has context, alternatives, evidence, decision, consequences, and reconsideration criteria |
+| Verification | PASS with blockers | `python3 scripts/check-docs.py --gate` run; structural checks pass. Prototype, legal, and runtime claims remain `BLOCKED` |
+| Performance | NOT_APPLICABLE | No runtime code or benchmark; numeric targets remain hypotheses |
+| Security | PASS for planning | Threat model and security baseline reconciled; plugin trust, update signing, and crash-data sensitivity covered |
+| Merge | PASS | Diff reviewed; scoped Ukrainian Conventional Commits created on `integration`; no unrelated files staged |
+| Release | NOT_APPLICABLE | No product release; versions remain `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| High | Codec and DRM licensing requires counsel; H.264/AAC/HEVC/ProRes/DNxHR and DRM are not approved | Open; `BLOCKED` |
+| High | Project license is `PROPOSED`; redistribution remains unauthorized until ADR-0008 is accepted | Open; `BLOCKED` on owner |
+| High | Browser engine maintenance, GUI accessibility/IME, and audio real-time behavior are unproven | Open; `BLOCKED` on prototypes |
+| Medium | Windows and Linux were not exercised; platform claims are unverified | Open; `BLOCKED` |
+| Medium | Competitor analysis is documentation-based; no product was benchmarked or used | Accepted limitation; stated in the document |
+| Low | Some third-party license versions require admission-time verification | Open; dependency admission policy covers it |
+
+Gate decision: `PASS` for the planning scope. Product implementation remains `BLOCKED` until the workspace and prototype gates exist.
+
 ## Template for future tasks
 
 | Skill | State | Evidence |

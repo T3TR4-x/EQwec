@@ -18,7 +18,7 @@ Gate: `SKILLS_GATE = PASS` for bootstrap. See `docs/development/SKILLS-AUDIT.md`
 
 ## Phase 1 — Technical research and feasibility
 
-**State:** in progress.
+**State:** complete for the planning scope. Runtime product feasibility remains `BLOCKED` until prototypes exist.
 
 Deliverables:
 
@@ -27,13 +27,15 @@ Deliverables:
 - `docs/research/LEGAL-LICENSE-REVIEW.md`
 - `docs/research/BROWSER-ENGINE-FEASIBILITY.md`
 - `docs/architecture/TECHNOLOGY-SELECTION.md`
-- Draft ADRs for GUI/rendering, browser engine, media/codecs, audio/plugins, project format, packaging, and licensing.
+- ADRs 0002–0010 for GUI/rendering, browser engine, media/codecs, audio/plugins, project format, packaging/signing, licensing, diagnostics, and plugin trust.
 
 Gate: high-risk choices have credible implementation paths, known blockers, and a fallback. Unresolved legal or security blockers stop the affected workstream.
 
+Outcome: `PASS` for planning. ADR-0004 and ADR-0008 remain `PROPOSED`; codec/DRM licensing, GUI accessibility, audio real-time behavior, and browser integration are `BLOCKED` until their stated prototype or legal gates run. See `docs/research/FEASIBILITY.md`.
+
 ## Phase 2 — Architecture and repository baseline
 
-**State:** not started.
+**State:** next. Not started.
 
 Deliverables:
 
@@ -165,8 +167,9 @@ Products release independently. The ecosystem is not "finished" until each produ
 
 ## Current blockers
 
-- Technology decisions are not yet accepted.
+- ADR-0004 (media/codecs) and ADR-0008 (project license) are `PROPOSED`, not normative. Codec/patent and DRM decisions require counsel; the project license requires owner approval.
 - No Cargo workspace, CI, or product code exists.
-- Browser engine, codec, and plugin licensing require research and, where necessary, counsel.
+- GUI accessibility, text input, browser integration, and audio real-time behavior are `UNVERIFIED` until their prototypes run.
 - No remote, signing infrastructure, or release channel exists.
 - Windows and Linux are planned targets but have not been tested in this environment.
+- The competitor, legal, and feasibility reviews are planning evidence, not implementation approval.

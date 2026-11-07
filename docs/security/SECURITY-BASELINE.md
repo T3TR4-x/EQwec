@@ -1,6 +1,6 @@
 # Security Baseline
 
-**Status:** approved baseline for planning. The product-specific threat model is not yet written; this document defines the controls every product must inherit.
+**Status:** approved baseline for planning. The ecosystem threat model exists (`docs/security/THREAT-MODEL.md`); product-specific runtime controls are not implemented. No product, Cargo workspace, or test harness exists, so every runtime security claim is `BLOCKED` until implementation evidence exists.
 
 ## 1. Security principles
 

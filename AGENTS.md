@@ -179,10 +179,12 @@ A task is complete only when:
 
 ## 11. Current gate status
 
-- **SKILLS_GATE:** open. All 10 packages must exist, validate, be discoverable, and pass trigger/scenario tests before closure.
-- **DOCUMENTATION_GATE:** open. Research, architecture, security, performance, and development plans are not yet written.
-- **ARCHITECTURE_GATE:** open. No ADRs or approved system architecture yet.
-- **SECURITY_GATE:** open. No threat model or security baseline yet.
-- **PRODUCT_IMPLEMENTATION:** prohibited until the gates above pass.
+- **SKILLS_GATE:** PASS for the bootstrap scope. All 10 packages exist, validate, and are discoverable; trigger and scenario evidence is recorded in `docs/development/SKILLS-AUDIT.md`. Runtime product end-to-end scenarios are `BLOCKED` until the Cargo workspace exists.
+- **DOCUMENTATION_GATE:** PASS for the planning scope. `python3 scripts/check-docs.py --gate` returned 0 failures on 2026-11-07. Research, architecture, security, performance, and development documents exist.
+- **ARCHITECTURE_GATE:** PASS for the planning baseline. ADR-0001 through ADR-0010 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. Runtime verification is `BLOCKED` until the workspace and prototypes exist.
+- **SECURITY_GATE:** PASS for the planning baseline. `docs/security/THREAT-MODEL.md` and `SECURITY-BASELINE.md` exist. Product-specific runtime controls, isolation tests, and fuzzing are `BLOCKED` until implementation.
+- **PRODUCT_IMPLEMENTATION:** `BLOCKED` until the Cargo workspace, CI baseline, and the Phase 2 gate exist. Planning documents are not product code.
+- **PLATFORM VERIFICATION:** `BLOCKED` for Windows and Linux; only macOS on Apple silicon has been exercised.
+- **RELEASE_GATE:** `BLOCKED`. No remote, signing keys, certificates, notarization account, installer, or release channel exists.
 
 Report blockers as `BLOCKED` with the exact missing precondition. Do not fabricate progress.
