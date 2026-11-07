@@ -222,6 +222,10 @@ mod tests {
             .unwrap()
     }
 
+    fn test_base() -> PathBuf {
+        std::env::temp_dir().join("eqwec-layout-tests")
+    }
+
     #[test]
     fn builds_a_tree_id() {
         let tree = tree_id(&Version::parse("0.1.0").unwrap(), digest()).unwrap();
@@ -231,11 +235,12 @@ mod tests {
 
     #[test]
     fn rejects_invalid_bases() {
-        for value in [
-            PathBuf::from("relative/path"),
-            PathBuf::from(""),
-            PathBuf::from("/"),
-        ] {
+        let root = std::env::temp_dir()
+            .ancestors()
+            .last()
+            .map(Path::to_path_buf)
+            .expect("the temp directory has a filesystem root");
+        for value in [PathBuf::from("relative/path"), PathBuf::new(), root] {
             assert!(
                 InstallLayout::new(value.clone()).is_err(),
                 "{value:?} should be rejected"
@@ -245,72 +250,61 @@ mod tests {
 
     #[test]
     fn rejects_unnormalized_bases() {
-        assert!(InstallLayout::new("/tmp/a/../b").is_err());
-        assert!(InstallLayout::new("/tmp/a/./b").is_err());
+        let base = test_base();
+        assert!(InstallLayout::new(base.join("a").join("..").join("b")).is_err());
+        assert!(InstallLayout::new(base.join("a").join(".").join("b")).is_err());
     }
 
     #[test]
     fn builds_the_documented_layout() {
-        let layout = InstallLayout::new("/home/user/.local/share/eqwec").unwrap();
+        let base = test_base();
+        let layout = InstallLayout::new(base.clone()).unwrap();
         let product = ProductId::new("eqwec-hub").unwrap();
         let operation = OperationId::parse("0123456789abcdef0123456789abcdef").unwrap();
+        let product_root = base.join("installations").join("eqwec-hub");
 
-        assert_eq!(
-            layout.registry_path(),
-            PathBuf::from("/home/user/.local/share/eqwec/registry.json")
-        );
+        assert_eq!(layout.registry_path(), base.join("registry.json"));
         assert_eq!(
             layout.journal_path(),
-            PathBuf::from("/home/user/.local/share/eqwec/journal/operations.jsonl")
+            base.join("journal").join("operations.jsonl")
         );
-        assert_eq!(
-            layout.product_root(&product),
-            PathBuf::from("/home/user/.local/share/eqwec/installations/eqwec-hub")
-        );
+        assert_eq!(layout.product_root(&product), product_root);
         assert_eq!(
             layout.active_pointer_path(&product),
-            PathBuf::from("/home/user/.local/share/eqwec/installations/eqwec-hub/active.json")
+            product_root.join("active.json")
         );
         assert_eq!(
             layout.staging_dir(&product, &operation),
-            PathBuf::from(
-                "/home/user/.local/share/eqwec/installations/eqwec-hub/staging/0123456789abcdef0123456789abcdef"
-            )
+            product_root
+                .join("staging")
+                .join("0123456789abcdef0123456789abcdef")
         );
         assert_eq!(
             layout.downloads_dir(&operation),
-            PathBuf::from(
-                "/home/user/.local/share/eqwec/downloads/0123456789abcdef0123456789abcdef"
-            )
+            base.join("downloads")
+                .join("0123456789abcdef0123456789abcdef")
         );
         assert_eq!(
             layout.download_package_path(&operation),
-            PathBuf::from(
-                "/home/user/.local/share/eqwec/downloads/0123456789abcdef0123456789abcdef/package.zip"
-            )
+            base.join("downloads")
+                .join("0123456789abcdef0123456789abcdef")
+                .join("package.zip")
         );
     }
 
     #[test]
     fn validates_install_root_containment() {
-        let layout = InstallLayout::new("/home/user/.local/share/eqwec").unwrap();
-        assert!(
-            layout
-                .validate_install_root(Path::new(
-                    "/home/user/.local/share/eqwec/installations/eqwec-hub"
-                ))
-                .is_ok()
-        );
+        let base = test_base();
+        let layout = InstallLayout::new(base.clone()).unwrap();
+        let product_root = base.join("installations").join("eqwec-hub");
+        assert!(layout.validate_install_root(&product_root).is_ok());
+        let outside = base.parent().unwrap().join("eqwec-other").join("eqwec-hub");
         assert_eq!(
-            layout
-                .validate_install_root(Path::new("/home/user/.local/share/other/eqwec-hub"))
-                .unwrap_err(),
+            layout.validate_install_root(&outside).unwrap_err(),
             UpdaterError::InstallRootOutsideBase
         );
         assert_eq!(
-            layout
-                .validate_install_root(Path::new("/home/user/.local/share/eqwec"))
-                .unwrap_err(),
+            layout.validate_install_root(&base).unwrap_err(),
             UpdaterError::InstallRootOutsideBase
         );
     }

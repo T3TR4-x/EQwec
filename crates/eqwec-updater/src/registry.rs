@@ -691,6 +691,18 @@ mod tests {
         }
     }
 
+    fn test_base() -> PathBuf {
+        std::env::temp_dir().join("eqwec-registry-tests")
+    }
+
+    fn install_root(product: &str) -> String {
+        test_base()
+            .join("installations")
+            .join(product)
+            .to_string_lossy()
+            .into_owned()
+    }
+
     fn digest() -> Sha256Digest {
         Sha256Digest::parse_hex("53bd9dc21b205305c958c14f672d19214d5af9157ef66d9c9091b14837fe42a3")
             .unwrap()
@@ -709,9 +721,7 @@ mod tests {
             ProductId::new(product).unwrap(),
             Version::parse(version).unwrap(),
             Channel::Stable,
-            PathBuf::from(format!(
-                "/home/user/.local/share/eqwec/installations/{product}"
-            )),
+            PathBuf::from(install_root(product)),
             tree(version),
             Vec::new(),
             KeyId::new("release-2026-01").unwrap(),
@@ -769,7 +779,7 @@ mod tests {
             product_id: product.to_owned(),
             product_version: "0.1.0".to_owned(),
             channel: "stable".to_owned(),
-            install_root: format!("/home/user/.local/share/eqwec/installations/{product}"),
+            install_root: install_root(product),
             active_tree: "versions/0.1.0-53bd9dc21b20".to_owned(),
             retained: Vec::new(),
             signer_key_id: "release-2026-01".to_owned(),
@@ -823,16 +833,16 @@ mod tests {
             UpdaterError::InvalidInstallRoot { .. }
         ));
 
-        let traversal = base("/home/user/../etc", "versions/0.1.0-53bd9dc21b20");
+        let traversal = base(
+            &format!("{}/../etc", install_root("eqwec-hub")),
+            "versions/0.1.0-53bd9dc21b20",
+        );
         assert!(matches!(
             parse_installation(traversal).unwrap_err(),
             UpdaterError::InvalidInstallRoot { .. }
         ));
 
-        let bad_tree = base(
-            "/home/user/.local/share/eqwec/installations/eqwec-hub",
-            "../escape",
-        );
+        let bad_tree = base(&install_root("eqwec-hub"), "../escape");
         assert!(matches!(
             parse_installation(bad_tree).unwrap_err(),
             UpdaterError::InvalidRegistry { .. }
@@ -862,7 +872,7 @@ mod tests {
         registry.write_atomic(&path, &operation).unwrap();
         assert_eq!(Registry::load(&path).unwrap().unwrap(), registry);
 
-        let layout = InstallLayout::new("/home/user/.local/share/eqwec").unwrap();
+        let layout = InstallLayout::new(test_base()).unwrap();
         registry.validate_against_layout(&layout).unwrap();
     }
 }
