@@ -6,7 +6,7 @@
 
 use std::fs::{self, OpenOptions};
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::error::UpdaterError;
 
@@ -67,10 +67,7 @@ fn write_and_rename(temp_path: &Path, target: &Path, bytes: &[u8]) -> std::io::R
 
 #[cfg(unix)]
 fn sync_parent(path: &Path) -> std::io::Result<()> {
-    let parent: PathBuf = path
-        .parent()
-        .unwrap_or_else(|| Path::new("."))
-        .to_path_buf();
+    let parent = path.parent().unwrap_or_else(|| Path::new("."));
     fs::File::open(parent)?.sync_all()
 }
 
@@ -93,6 +90,7 @@ pub(crate) fn sync_parent_dir(path: &Path) -> Result<(), UpdaterError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     struct TestDir(PathBuf);

@@ -1306,6 +1306,7 @@ fn sync_directories(_root: &Path) -> Result<(), UpdaterError> {
     Ok(())
 }
 
+#[cfg(unix)]
 fn collect_directories(root: &Path, directories: &mut Vec<PathBuf>) -> Result<(), UpdaterError> {
     let metadata = fs::symlink_metadata(root).map_err(atomic::io_error)?;
     if metadata.file_type().is_symlink() || !metadata.is_dir() {

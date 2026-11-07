@@ -293,7 +293,6 @@ fn stages_a_fixture_package_and_activates_it() {
     assert_eq!(readme.kind(), StagedEntryKind::File);
     assert_eq!(readme.size(), 5);
     assert_eq!(readme.sha256(), Some(Sha256Digest::hash(b"hello")));
-    #[cfg(unix)]
     assert_eq!(readme.mode(), 0o644);
 
     let tool = tree
@@ -301,7 +300,6 @@ fn stages_a_fixture_package_and_activates_it() {
         .iter()
         .find(|entry| entry.path().as_str() == "bin/tool")
         .unwrap();
-    #[cfg(unix)]
     assert_eq!(tool.mode(), 0o755);
 
     let mut registry = Registry::new(ScopeId::new("default").unwrap(), now());
@@ -570,11 +568,8 @@ fn normalizes_missing_and_executable_modes() {
         .iter()
         .find(|entry| entry.path().as_str() == "tool")
         .unwrap();
-    #[cfg(unix)]
-    {
-        assert_eq!(plain.mode(), 0o644);
-        assert_eq!(tool.mode(), 0o755);
-    }
+    assert_eq!(plain.mode(), 0o644);
+    assert_eq!(tool.mode(), 0o755);
 
     // A DOS-style archive with no Unix mode receives deterministic defaults.
     let mut bytes = build_zip(&[ZipEntry::file(b"plain", b"x"), ZipEntry::dir(b"dir/")]);
@@ -593,11 +588,8 @@ fn normalizes_missing_and_executable_modes() {
         .iter()
         .find(|entry| entry.path().as_str() == "dir")
         .unwrap();
-    #[cfg(unix)]
-    {
-        assert_eq!(plain.mode(), 0o644);
-        assert_eq!(dir.mode(), 0o755);
-    }
+    assert_eq!(plain.mode(), 0o644);
+    assert_eq!(dir.mode(), 0o755);
 }
 
 #[test]
