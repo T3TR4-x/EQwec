@@ -10,7 +10,7 @@ use std::io::Write;
 use std::path::Path;
 
 use eqwec_core::{Channel, ProductId};
-use eqwec_security::Sha256Digest;
+use eqwec_security::{KeyId, Sha256Digest};
 use semver::Version;
 use serde::{Deserialize, Serialize};
 
@@ -218,6 +218,9 @@ pub struct JournalContext {
     channel: Channel,
     package_sha256: Sha256Digest,
     error_code: Option<String>,
+    signer_key_id: Option<KeyId>,
+    key_epoch: Option<u64>,
+    metadata_sequence: Option<u64>,
 }
 
 impl JournalContext {
@@ -243,7 +246,53 @@ impl JournalContext {
             channel,
             package_sha256,
             error_code,
+            signer_key_id: None,
+            key_epoch: None,
+            metadata_sequence: None,
         })
+    }
+
+    /// Attaches the verified-manifest identity needed to rebuild a registry
+    /// record during recovery.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`UpdaterError::InvalidJournalRecord`] when `key_epoch` or
+    /// `metadata_sequence` is zero.
+    pub fn with_installation_identity(
+        mut self,
+        signer_key_id: KeyId,
+        key_epoch: u64,
+        metadata_sequence: u64,
+    ) -> Result<Self, UpdaterError> {
+        if key_epoch == 0 {
+            return Err(UpdaterError::InvalidJournalRecord {
+                reason: "key_epoch must be at least 1".to_owned(),
+            });
+        }
+        if metadata_sequence == 0 {
+            return Err(UpdaterError::InvalidJournalRecord {
+                reason: "metadata_sequence must be at least 1".to_owned(),
+            });
+        }
+        self.signer_key_id = Some(signer_key_id);
+        self.key_epoch = Some(key_epoch);
+        self.metadata_sequence = Some(metadata_sequence);
+        Ok(self)
+    }
+
+    /// Attaches or clears the error code.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`UpdaterError::InvalidJournalRecord`] when the error code is
+    /// empty or contains a character outside `A-Z a-z 0-9 . _ : -`.
+    pub fn with_error_code(mut self, error_code: Option<String>) -> Result<Self, UpdaterError> {
+        if let Some(code) = &error_code {
+            validate_error_code(code)?;
+        }
+        self.error_code = error_code;
+        Ok(self)
     }
 
     /// Returns the previous version, when this is an update.
@@ -274,6 +323,50 @@ impl JournalContext {
     #[must_use]
     pub fn error_code(&self) -> Option<&str> {
         self.error_code.as_deref()
+    }
+
+    /// Returns the signer key identifier, when the manifest identity was
+    /// recorded.
+    #[must_use]
+    pub fn signer_key_id(&self) -> Option<&KeyId> {
+        self.signer_key_id.as_ref()
+    }
+
+    /// Returns the signer key epoch, when the manifest identity was recorded.
+    #[must_use]
+    pub const fn key_epoch(&self) -> Option<u64> {
+        self.key_epoch
+    }
+
+    /// Returns the manifest metadata sequence, when recorded.
+    #[must_use]
+    pub const fn metadata_sequence(&self) -> Option<u64> {
+        self.metadata_sequence
+    }
+
+    /// Returns the complete verified-manifest identity.
+    ///
+    /// Recovery requires all three values to rebuild a registry record. A
+    /// partial identity is invalid.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`UpdaterError::InvalidJournalRecord`] when only some of the
+    /// identity fields are present.
+    pub fn installation_identity(&self) -> Result<(&KeyId, u64, u64), UpdaterError> {
+        match (
+            self.signer_key_id.as_ref(),
+            self.key_epoch,
+            self.metadata_sequence,
+        ) {
+            (Some(key_id), Some(epoch), Some(sequence)) => Ok((key_id, epoch, sequence)),
+            (None, None, None) => Err(UpdaterError::InvalidJournalRecord {
+                reason: "journal context has no verified-manifest identity".to_owned(),
+            }),
+            _ => Err(UpdaterError::InvalidJournalRecord {
+                reason: "journal context has a partial verified-manifest identity".to_owned(),
+            }),
+        }
     }
 }
 
@@ -408,6 +501,12 @@ impl JournalRecord {
                 channel: context.channel.as_str().to_owned(),
                 package_sha256: context.package_sha256.to_hex(),
                 error_code: context.error_code.clone(),
+                signer_key_id: context
+                    .signer_key_id
+                    .as_ref()
+                    .map(|key_id| key_id.as_str().to_owned()),
+                key_epoch: context.key_epoch,
+                metadata_sequence: context.metadata_sequence,
             }),
         };
         let mut line = serde_json::to_vec(&wire).map_err(UpdaterError::from_json)?;
@@ -475,6 +574,12 @@ struct WireContext {
     package_sha256: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     error_code: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    signer_key_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    key_epoch: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    metadata_sequence: Option<u64>,
 }
 
 fn parse_context(wire: WireContext, phase: Phase) -> Result<JournalContext, UpdaterError> {
@@ -502,13 +607,30 @@ fn parse_context(wire: WireContext, phase: Phase) -> Result<JournalContext, Upda
             reason: "error_code is allowed only for the failed phase".to_owned(),
         });
     }
-    JournalContext::new(
+    let mut context = JournalContext::new(
         from_version,
         to_version,
         channel,
         package_sha256,
         wire.error_code,
-    )
+    )?;
+    match (wire.signer_key_id, wire.key_epoch, wire.metadata_sequence) {
+        (None, None, None) => {}
+        (Some(key_id), Some(key_epoch), Some(metadata_sequence)) => {
+            let key_id =
+                KeyId::new(key_id).map_err(|error| UpdaterError::InvalidJournalRecord {
+                    reason: error.to_string(),
+                })?;
+            context = context.with_installation_identity(key_id, key_epoch, metadata_sequence)?;
+        }
+        _ => {
+            return Err(UpdaterError::InvalidJournalRecord {
+                reason: "signer_key_id, key_epoch, and metadata_sequence must appear together"
+                    .to_owned(),
+            });
+        }
+    }
+    Ok(context)
 }
 
 fn parse_version(value: &str) -> Result<Version, UpdaterError> {
@@ -571,6 +693,24 @@ impl JournalContents {
             .iter()
             .rev()
             .find(|record| !finished.contains(record.operation_id()))
+    }
+
+    /// Returns whether an operation other than `operation_id` has no terminal
+    /// record.
+    ///
+    /// A journal must never contain two in-flight operations. Recovery resolves
+    /// the existing operation before a new one starts.
+    #[must_use]
+    pub fn has_unfinished_operation_other_than(&self, operation_id: &OperationId) -> bool {
+        let finished: std::collections::HashSet<&OperationId> = self
+            .records
+            .iter()
+            .filter(|record| record.phase().is_terminal())
+            .map(JournalRecord::operation_id)
+            .collect();
+        self.records.iter().any(|record| {
+            record.operation_id() != operation_id && !finished.contains(record.operation_id())
+        })
     }
 }
 
@@ -889,12 +1029,17 @@ mod tests {
                 .as_str(),
             "0123456789abcdef0123456789abcdef"
         );
+        let first = OperationId::parse("0123456789abcdef0123456789abcdef").unwrap();
+        let second = OperationId::parse("fedcba9876543210fedcba9876543210").unwrap();
+        assert!(contents.has_unfinished_operation_other_than(&second));
+        assert!(!contents.has_unfinished_operation_other_than(&first));
 
         // Once the first operation also reaches a terminal phase, nothing is
         // unfinished.
         append_journal_record(&path, &record(Phase::Failed)).unwrap();
         let contents = read_journal(&path).unwrap();
         assert!(contents.unfinished_operation().is_none());
+        assert!(!contents.has_unfinished_operation_other_than(&second));
     }
 
     #[test]

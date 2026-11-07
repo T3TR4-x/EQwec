@@ -31,6 +31,9 @@ pub struct RetainedVersion {
     product_version: Version,
     tree: SafeRelativePath,
     package_sha256: Sha256Digest,
+    signer_key_id: KeyId,
+    key_epoch: u64,
+    metadata_sequence: u64,
 }
 
 impl RetainedVersion {
@@ -39,19 +42,34 @@ impl RetainedVersion {
     /// # Errors
     ///
     /// Returns [`UpdaterError::InvalidRegistry`] when the tree is not a
-    /// `versions/<tree-id>` path.
+    /// `versions/<tree-id>` path or the key epoch or metadata sequence is
+    /// zero.
     pub fn new(
         product_version: Version,
         tree: SafeRelativePath,
         package_sha256: Sha256Digest,
+        signer_key_id: KeyId,
+        key_epoch: u64,
+        metadata_sequence: u64,
     ) -> Result<Self, UpdaterError> {
         if !is_version_tree(&tree) {
             return Err(invalid_registry("retained tree must be versions/<tree-id>"));
+        }
+        if key_epoch == 0 {
+            return Err(invalid_registry("retained key_epoch must be at least 1"));
+        }
+        if metadata_sequence == 0 {
+            return Err(invalid_registry(
+                "retained metadata_sequence must be at least 1",
+            ));
         }
         Ok(Self {
             product_version,
             tree,
             package_sha256,
+            signer_key_id,
+            key_epoch,
+            metadata_sequence,
         })
     }
 
@@ -71,6 +89,24 @@ impl RetainedVersion {
     #[must_use]
     pub const fn package_sha256(&self) -> Sha256Digest {
         self.package_sha256
+    }
+
+    /// Returns the retained signer key identifier.
+    #[must_use]
+    pub fn signer_key_id(&self) -> &KeyId {
+        &self.signer_key_id
+    }
+
+    /// Returns the retained signer key epoch.
+    #[must_use]
+    pub const fn key_epoch(&self) -> u64 {
+        self.key_epoch
+    }
+
+    /// Returns the retained manifest metadata sequence.
+    #[must_use]
+    pub const fn metadata_sequence(&self) -> u64 {
+        self.metadata_sequence
     }
 }
 
@@ -477,6 +513,9 @@ struct WireRetained {
     product_version: String,
     tree: String,
     package_sha256: String,
+    signer_key_id: String,
+    key_epoch: u64,
+    metadata_sequence: u64,
 }
 
 fn installation_to_wire(record: &InstallationRecord) -> WireInstallation {
@@ -493,6 +532,9 @@ fn installation_to_wire(record: &InstallationRecord) -> WireInstallation {
                 product_version: retained.product_version.to_string(),
                 tree: retained.tree.as_str().to_owned(),
                 package_sha256: retained.package_sha256.to_hex(),
+                signer_key_id: retained.signer_key_id.as_str().to_owned(),
+                key_epoch: retained.key_epoch,
+                metadata_sequence: retained.metadata_sequence,
             })
             .collect(),
         signer_key_id: record.signer_key_id.as_str().to_owned(),
@@ -546,7 +588,18 @@ fn parse_installation(wire: WireInstallation) -> Result<InstallationRecord, Upda
                 reason: error.to_string(),
             }
         })?;
-        retained.push(RetainedVersion::new(version, tree, package_sha256)?);
+        let signer_key_id =
+            KeyId::new(entry.signer_key_id).map_err(|error| UpdaterError::InvalidRegistry {
+                reason: error.to_string(),
+            })?;
+        retained.push(RetainedVersion::new(
+            version,
+            tree,
+            package_sha256,
+            signer_key_id,
+            entry.key_epoch,
+            entry.metadata_sequence,
+        )?);
     }
     let signer_key_id =
         wire.signer_key_id

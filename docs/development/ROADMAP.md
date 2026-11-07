@@ -52,7 +52,7 @@ Gate: reproducible local build and passing baseline checks. No product feature y
 
 ## Phase 3 — EQwec Hub MVP
 
-**State:** in progress on `dev-hub`. Verification core and durable-state primitives implemented; activation transaction and installer not started.
+**State:** in progress on `dev-hub`. Verification core, durable-state primitives, and the in-process activation engine implemented; installer and launcher not started.
 
 Completed:
 
@@ -64,14 +64,14 @@ Completed:
 - Registry v1 with parse, serialize, atomic write, and layout containment.
 - Journal v1 with bounded append/read, partial-line recovery, and fail-closed corrupt lines.
 - Installation layout and atomic `active.json` pointer primitives.
-- 104 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
+- Activation engine for fresh install, update, rollback, and startup recovery, with five fault-injection points and a single-in-flight-operation invariant.
+- 129 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
 
 Remaining:
 
 - Native launcher UI.
-- Activation transaction, rollback, repair, and uninstall orchestration.
-- Verified download transport and offline install.
-- Interrupted-operation recovery with fault injection.
+- Verified download transport, extraction, uninstall, and offline install.
+- Repair orchestration and integrity re-verification of installed trees.
 - Diagnostics with redaction.
 - A real fixture product installed, launched, updated, and removed on each claimed platform.
 

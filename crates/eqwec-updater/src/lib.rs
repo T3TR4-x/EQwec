@@ -19,6 +19,7 @@
 
 mod atomic;
 
+pub mod activation;
 pub mod active;
 pub mod error;
 pub mod journal;
@@ -31,6 +32,10 @@ pub mod trust;
 pub mod url;
 pub mod verify;
 
+pub use activation::{
+    ActivationOutcome, FaultInjector, FaultPoint, NoFaults, OperationSpec, RecoveryOutcome,
+    RollbackSpec, VerifiedRelease, activate, record_phase, recover, rollback,
+};
 pub use active::{ACTIVE_POINTER_SCHEMA_VERSION, ActivePointer, MAX_ACTIVE_POINTER_BYTES};
 pub use error::UpdaterError;
 pub use journal::{

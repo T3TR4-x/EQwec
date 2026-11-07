@@ -388,6 +388,72 @@ pub enum UpdaterError {
         /// A short, human-readable reason.
         reason: String,
     },
+    /// The staging directory does not exist.
+    #[error("staging directory is missing: {path}")]
+    StagingMissing {
+        /// The missing path.
+        path: String,
+    },
+    /// The staging path is not a real directory.
+    #[error("invalid staging directory: {reason}")]
+    InvalidStaging {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// The target version tree already exists and is immutable.
+    #[error("version tree already exists: {tree}")]
+    TreeAlreadyExists {
+        /// The conflicting tree path.
+        tree: String,
+    },
+    /// No installation record exists for the product.
+    #[error("no installation record for {product_id}")]
+    NoInstallation {
+        /// The product identifier.
+        product_id: String,
+    },
+    /// An installation record already exists for a fresh install.
+    #[error("an installation record already exists for {product_id}")]
+    InstallationAlreadyExists {
+        /// The product identifier.
+        product_id: String,
+    },
+    /// The registry version differs from the operation's source version.
+    #[error("installation version mismatch: expected {expected}, found {found}")]
+    InstallationVersionMismatch {
+        /// The expected version.
+        expected: String,
+        /// The recorded version.
+        found: String,
+    },
+    /// The requested retained version does not exist.
+    #[error("no retained version {version} for {product_id}")]
+    NoSuchRetainedVersion {
+        /// The product identifier.
+        product_id: String,
+        /// The requested version.
+        version: String,
+    },
+    /// A journal phase is not valid for the current operation state.
+    #[error("invalid operation transition: expected {expected}, found {found}")]
+    InvalidOperationTransition {
+        /// The expected previous phase, or `none`.
+        expected: &'static str,
+        /// The actual previous phase, or `none`.
+        found: &'static str,
+    },
+    /// Recovery found inconsistent durable state and refuses to guess.
+    #[error("recovery conflict: {detail}")]
+    RecoveryConflict {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
+    /// A test fault injector aborted the transaction.
+    #[error("fault injected at {point}")]
+    FaultInjected {
+        /// The fault point name.
+        point: &'static str,
+    },
     /// An atomic filesystem write failed.
     #[error("atomic write failed: {detail}")]
     AtomicWrite {

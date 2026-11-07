@@ -328,7 +328,10 @@ The registry is the authoritative record of active installations for one user pr
         {
           "product_version": "0.0.9",
           "tree": "versions/0.0.9-fedcba987654",
-          "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "signer_key_id": "release-2025-01",
+          "key_epoch": 1,
+          "metadata_sequence": 17
         }
       ],
       "signer_key_id": "release-2026-01",
@@ -347,7 +350,8 @@ Field rules:
 - `install_root` is absolute, normalized, at most 1,024 bytes, contains no NUL or control character, and is inside the profile base.
 - `active_tree`, retained `tree`, and every path derived from the registry are relative `SafeRelativePath` values that resolve inside `install_root`.
 - `retained` has at most 3 entries, unique `product_version`, and each `tree` differs from `active_tree`.
-- `signer_key_id`, `key_epoch`, `package_sha256`, `metadata_sequence`, and `installed_at` come from the verified manifest that produced the active tree.
+- `signer_key_id`, `key_epoch`, `package_sha256`, and `metadata_sequence` come from the verified manifest that produced the active tree. Retained entries carry the same identity for their own tree so a rollback can rebuild the record without re-downloading the manifest.
+- `installed_at` is the local activation time recorded when the active pointer was committed.
 - A registry record is removed only after uninstall completes and the journal records it.
 
 ### 4.3 Atomic write
@@ -387,7 +391,10 @@ A failed write leaves the previous registry intact. A partial temporary file is 
     "from_version": "0.0.9",
     "to_version": "0.1.0",
     "channel": "stable",
-    "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "signer_key_id": "release-2026-01",
+    "key_epoch": 1,
+    "metadata_sequence": 42
   }
 }
 ```
@@ -399,6 +406,7 @@ Field rules:
 - `product_id` is a valid `ProductId`.
 - `phase` is one of the values in §5.3.
 - `context` is optional. When present, it has only the fields shown; unknown fields are rejected. `channel` and `package_sha256` are required; `from_version` and `to_version` may be omitted; `error_code` is present only for `failed` and is rejected for every other phase.
+- `signer_key_id`, `key_epoch`, and `metadata_sequence` come from the verified manifest. They appear together or not at all. Recovery requires them to rebuild a registry record and fails closed when they are missing or partial.
 - `from_version` and `to_version` are SemVer strings.
 - `package_sha256` is 64 lowercase hex characters.
 - A terminal record repeats the same `operation_id` and `idempotency_key` as the opening `intent`.
@@ -415,8 +423,8 @@ Field rules:
 | `activated` | Pointer points at the new tree | Commit registry |
 | `registry-committed` | Registry contains the new record | Mark committed |
 | `committed` | Operation complete | Prune staging and old downloads |
-| `failed` | Operation failed before activation or was safely rolled back | Reconcile and prune |
-| `rolled-back` | Previous tree is active again | Reconcile and prune |
+| `failed` | Operation failed before activation | Reconcile and prune |
+| `rolled-back` | Previous tree is active again after an activation attempt or an explicit rollback | Reconcile and prune |
 
 ### 5.4 Recovery
 
@@ -426,14 +434,14 @@ On startup, after acquiring the profile lock:
 2. Find the newest operation without a terminal phase.
 3. Reconcile against the filesystem and registry:
    - `intent`, `downloaded`, `verified`, `staged`: remove the operation's download and staging directories; no registry change.
-   - `activation-intent`: read `active.json`. If it points at the new verified tree, write the registry record and continue. Otherwise restore the previous pointer and mark `rolled-back`.
-   - `activated`: verify the active tree, then write the registry record and mark `registry-committed` and `committed`.
-   - `registry-committed`: mark `committed`.
+   - `activation-intent`: read `active.json`. If it points at the new verified tree, write the registry record and continue. Otherwise restore the previous pointer and mark `rolled-back`. A tree that already belongs to the previous registry record or its retained list is never deleted.
+   - `activated`: verify the active tree, then write the registry record and mark `registry-committed`, then `committed` for an install or update, or `rolled-back` when `from_version` is greater than `to_version`.
+   - `registry-committed`: mark `committed` for an install or update, or `rolled-back` for a rollback.
    - `committed`, `failed`, `rolled-back`: terminal; prune.
 4. Append a recovery record with the same `operation_id` before deleting any remaining operation data.
 5. Never leave a mixed tree active. A tree is either fully verified or not referenced.
 
-Recovery is idempotent. Running it twice produces the same registry and no duplicate records.
+Recovery resolves one operation per call. The caller repeats it until it returns `NothingToRecover`. A new operation is rejected while any other operation has no terminal record. Recovery is idempotent: running it twice produces the same registry and no duplicate records.
 
 ## 6. Installation layout v1
 
@@ -579,12 +587,13 @@ Last verified: 2026-11-07 on macOS 26.7.2 arm64 with Rust 1.99.1.
 | Journal v1 | `PASS` for record, append, read, and recovery mapping | `crates/eqwec-updater/src/journal.rs`; phase, partial-line, corrupt-line, size-bound, and recovery-action tests pass |
 | Installation layout | `PASS` for path construction and lexical validation | `crates/eqwec-updater/src/layout.rs`; normalized-absolute, containment, tree-id, and root-rejection tests pass |
 | Active pointer | `PASS` for parse and atomic replacement | `crates/eqwec-updater/src/active.rs`; round-trip, unknown-field, oversize, and atomic-write tests pass |
-| Activation transaction and recovery orchestration | `BLOCKED` | Primitives exist; no fault-injected activation engine |
+| Activation transaction and recovery orchestration | `PASS` for install, update, rollback, and recovery with fault injection | `crates/eqwec-updater/src/activation.rs`; 25 tests cover phase ordering, missing/symlinked staging, existing trees, downgrades, retention, rollback, all five fault points, recovery before and after the pointer, rollback recovery, single-in-flight enforcement, pruning, and the retention cap |
+| Installer orchestration (download, extraction, uninstall, launcher) | `BLOCKED` | No transport, extractor, uninstaller, or UI |
 | Platform fixtures | `BLOCKED` | macOS, Windows, and Linux fixture installs do not exist |
 
-Verification command: `cargo test --workspace --all-features --locked` — 104 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
+Verification command: `cargo test --workspace --all-features --locked` — 129 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
 
-This table is updated with real command output when an area is implemented. Parsing, cryptographic verification, and durable-state primitives are not evidence of a working installer. Install, update, rollback, repair, and uninstall remain `BLOCKED` until the activation engine exists and passes fault injection.
+This table is updated with real command output when an area is implemented. Parsing, cryptographic verification, durable-state primitives, and an in-process activation engine are not evidence of a working installer. Download, extraction, uninstall, the launcher UI, and end-to-end acceptance remain `BLOCKED`.
 
 ## 11. Change control
 

@@ -204,7 +204,7 @@ Gate decision: verification core `PASS` locally. Hub MVP acceptance remains `BLO
 | Skill | State | Evidence |
 |---|---|---|
 | `eqwec-engineering-core` | APPLIED | Bounded files, typed errors, atomic replacement, fail-closed corrupt journal, no `unsafe`, scoped Ukrainian commit policy |
-| `eqwec-quality-control` | APPLIED | 103 local tests pass; activation and install acceptance kept `BLOCKED`; no CI claim |
+| `eqwec-quality-control` | APPLIED | 104 local tests pass; activation and install acceptance kept `BLOCKED`; no CI claim |
 | `eqwec-hub` | APPLIED | Schema §4–§7 implemented; journal recovery mapping; layout containment; active-pointer rules |
 | `security-audit` | APPLIED | Traversal and unnormalized-path rejection, size bounds, partial-line handling, fail-closed malformed records |
 | `skill-creator` | APPLIED | `eqwec-hub` status text and crate table corrected to the real workspace state; validators rerun |
@@ -233,6 +233,51 @@ Findings:
 | Low | `Path::components()` normalizes `.`; lexical checks now cover it | Fixed; regression test added |
 
 Gate decision: durable-state primitives `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
+
+## Task: Hub activation, rollback, and recovery engine
+
+**Date:** 2026-11-07
+**Branch:** `dev-hub`
+**Scope:** `activation.rs`, activation tests, journal/registry identity fields, typed errors, and schema §4.2/§5.2/§5.4/§10. **No download transport, extraction, uninstall, launcher UI, or fixture product.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Journal record before every mutation, atomic pointer and registry replace, fail-closed recovery, typed errors, bounded inputs, no `unsafe`, scoped Ukrainian commit policy |
+| `eqwec-quality-control` | APPLIED | 129 local tests pass; installer and end-to-end acceptance kept `BLOCKED`; no CI claim |
+| `eqwec-hub` | APPLIED | Fresh install, update, rollback, and startup recovery follow schema §5.4; retained trees are preserved; single-in-flight invariant |
+| `security-audit` | APPLIED | Symlinked staging rejected, unexpected pointer conflicts fail closed, rollback target cannot be deleted, fault injection covers every durable phase |
+| `skill-creator` | APPLIED | `eqwec-hub` status and crate table updated to the real workspace state; validators rerun |
+| `code-review` (Matt Pocock) | APPLIED | Review and adversarial recovery testing fixed: rollback recovery deleting a retained tree, recovery losing the pointer activation time, a second in-flight operation being accepted, a rollback after `registry-committed` being marked `committed`, a missing source record being silently recreated, and an unbound `staged` record identity. Each has a regression test |
+| Other product skills | AVAILABLE_NOT_RELEVANT | No path in those products was touched |
+
+## Quality-control report for the activation task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | ADR-0011 and schema §4–§6 read; branch `dev-hub`; worktree inspected |
+| Implementation | PASS for the in-process engine | `activate`, `rollback`, `recover`, `record_phase`, five fault points, retention, pruning, and recovery |
+| Verification | PASS locally; installer `BLOCKED` | `cargo test --workspace --all-features --locked`: 129 passed, 0 failed; fmt, clippy, build, audit, deny exit 0; docs gate 0 failures; skills 10/10 |
+| Performance | NOT_APPLICABLE | No runtime product workload |
+| Security | PASS for implemented boundary | Missing, symlinked, and pre-existing trees rejected; downgrade rejected; corrupt or partial journal fails closed; incomplete manifest identity fails closed; unexpected active pointer fails closed; retained rollback target preserved |
+| Merge | PENDING | Commit not yet created |
+| Release | NOT_APPLICABLE | No artifact; versions remain `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| High | No download transport, extraction, uninstall, launcher, or fixture product | Open; install/update/rollback acceptance `BLOCKED` |
+| High | No signed v1/v2 fixture packages or H-E2E scenarios | Open |
+| Medium | Installed tree contents are not re-hashed after activation; repair and integrity re-verification do not exist | Open |
+| Medium | The engine assumes exclusive access to one profile; no profile-lock implementation exists | Open |
+| Low | First rollback-recovery draft deleted the retained target tree | Fixed; regression test added |
+| Low | Recovery overwrote the pointer activation time with recovery time | Fixed; regression test added |
+| Low | A second operation could start while another was unfinished | Fixed; single-in-flight check and test added |
+| Low | A rollback after `registry-committed` was marked `committed` instead of `rolled-back` | Fixed; recovery validates pointer, registry, and tree, with a regression test |
+| Low | Recovery could recreate an update record when the source registry record was missing | Fixed; `commit_registry` fails closed with `NoInstallation` |
+| Low | `activate` did not bind the recorded `staged` phase to the release identity | Fixed; context equality check with a regression test |
+
+Gate decision: activation engine `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
 
 ## Template for future tasks
 
