@@ -531,6 +531,12 @@ pub enum UpdaterError {
     /// Another process holds the profile lock.
     #[error("the profile is locked by another EQwec process")]
     ProfileLocked,
+    /// The requested product is not installed.
+    #[error("product {product_id} is not installed")]
+    ProductNotInstalled {
+        /// The requested product identifier.
+        product_id: String,
+    },
     /// The filesystem does not have enough space for the operation.
     #[error("insufficient disk space: {available} available, {required} required")]
     InsufficientDiskSpace {

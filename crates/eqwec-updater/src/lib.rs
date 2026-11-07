@@ -34,6 +34,7 @@ pub mod registry;
 pub mod staging;
 pub mod time;
 pub mod trust;
+pub mod uninstall;
 pub mod url;
 pub mod verify;
 
@@ -69,5 +70,6 @@ pub use staging::{
 };
 pub use time::{CLOCK_SKEW_SECONDS, MAX_KEY_VALIDITY_SECONDS, MAX_VALIDITY_SECONDS, Timestamp};
 pub use trust::{MAX_TRUST_KEYS, MAX_TRUST_STORE_BYTES, TrustStore, TrustedKey};
+pub use uninstall::{uninstall, uninstall_with_faults};
 pub use url::HttpsUrl;
 pub use verify::{VerificationContext, VerifiedManifest, parse_and_verify};

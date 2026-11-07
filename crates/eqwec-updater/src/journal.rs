@@ -155,6 +155,10 @@ pub enum Phase {
     Failed,
     /// The previous tree is active again.
     RolledBack,
+    /// A product uninstall is about to remove its tree.
+    UninstallIntent,
+    /// The product tree and registry record are removed.
+    Uninstalled,
 }
 
 impl Phase {
@@ -172,13 +176,18 @@ impl Phase {
             Self::Committed => "committed",
             Self::Failed => "failed",
             Self::RolledBack => "rolled-back",
+            Self::UninstallIntent => "uninstall-intent",
+            Self::Uninstalled => "uninstalled",
         }
     }
 
     /// Returns whether no further mutation follows this phase.
     #[must_use]
     pub const fn is_terminal(self) -> bool {
-        matches!(self, Self::Committed | Self::Failed | Self::RolledBack)
+        matches!(
+            self,
+            Self::Committed | Self::Failed | Self::RolledBack | Self::Uninstalled
+        )
     }
 }
 
@@ -203,6 +212,8 @@ impl std::str::FromStr for Phase {
             "committed" => Ok(Self::Committed),
             "failed" => Ok(Self::Failed),
             "rolled-back" => Ok(Self::RolledBack),
+            "uninstall-intent" => Ok(Self::UninstallIntent),
+            "uninstalled" => Ok(Self::Uninstalled),
             other => Err(UpdaterError::InvalidJournalPhase {
                 value: UpdaterError::bounded_detail(other),
             }),
@@ -821,6 +832,8 @@ pub enum RecoveryAction {
     CommitRegistry,
     /// Mark the operation committed.
     MarkCommitted,
+    /// Remove the product tree and registry record, then mark uninstalled.
+    ResumeUninstall,
     /// The operation is terminal; only prune.
     Terminal,
 }
@@ -835,7 +848,10 @@ pub const fn recovery_action(phase: Phase) -> RecoveryAction {
         Phase::ActivationIntent => RecoveryAction::ResumeActivation,
         Phase::Activated => RecoveryAction::CommitRegistry,
         Phase::RegistryCommitted => RecoveryAction::MarkCommitted,
-        Phase::Committed | Phase::Failed | Phase::RolledBack => RecoveryAction::Terminal,
+        Phase::UninstallIntent => RecoveryAction::ResumeUninstall,
+        Phase::Committed | Phase::Failed | Phase::RolledBack | Phase::Uninstalled => {
+            RecoveryAction::Terminal
+        }
     }
 }
 

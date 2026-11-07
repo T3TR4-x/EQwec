@@ -425,6 +425,8 @@ Field rules:
 | `committed` | Operation complete | Prune staging and old downloads |
 | `failed` | Operation failed before activation | Reconcile and prune |
 | `rolled-back` | Previous tree is active again after an activation attempt or an explicit rollback | Reconcile and prune |
+| `uninstall-intent` | Record and containment validated; product removal is about to start | Remove the product root |
+| `uninstalled` | Product tree and registry record removed | Terminal; prune |
 
 ### 5.4 Recovery
 
@@ -437,7 +439,8 @@ On startup, after acquiring the profile lock:
    - `activation-intent`: read `active.json`. If it points at the new verified tree, write the registry record and continue. Otherwise restore the previous pointer and mark `rolled-back`. A tree that already belongs to the previous registry record or its retained list is never deleted.
    - `activated`: verify the active tree, then write the registry record and mark `registry-committed`, then `committed` for an install or update, or `rolled-back` when `from_version` is greater than `to_version`.
    - `registry-committed`: mark `committed` for an install or update, or `rolled-back` for a rollback.
-   - `committed`, `failed`, `rolled-back`: terminal; prune.
+   - `uninstall-intent`: remove the product root, remove the registry record when present, write the registry atomically, and mark `uninstalled` (ADR-0013).
+   - `committed`, `failed`, `rolled-back`, `uninstalled`: terminal; prune.
 4. Append a recovery record with the same `operation_id` before deleting any remaining operation data.
 5. Never leave a mixed tree active. A tree is either fully verified or not referenced.
 

@@ -44,6 +44,7 @@ Never delete an ADR. If a decision changes, write a new one and mark the old one
 | [0010](0010-plugin-and-extension-trust.md) | Plugin and extension trust model | ACCEPTED with prototype and isolation gates |
 | [0011](0011-hub-manifest-registry-and-layout.md) | Hub manifest, registry, journal, and layout | ACCEPTED with implementation gates |
 | [0012](0012-hub-package-archive.md) | Hub package archive | ACCEPTED with implementation gates |
+| [0013](0013-hub-uninstall-transaction.md) | Hub uninstall transaction | ACCEPTED |
 
 An ADR marked "with a gate" is normative as a direction, but the gated work is `BLOCKED` until its stated evidence exists. A `PROPOSED` ADR is not normative.
 

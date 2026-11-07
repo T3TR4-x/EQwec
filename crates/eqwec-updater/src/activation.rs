@@ -303,6 +303,8 @@ pub enum FaultPoint {
     AfterRegistryWrite,
     /// The `registry-committed` record is durable.
     AfterRegistryCommitted,
+    /// The product tree was removed; the registry still has the record.
+    AfterUninstallTreeRemoved,
 }
 
 impl FaultPoint {
@@ -315,6 +317,7 @@ impl FaultPoint {
             Self::AfterPointerWrite => "after-pointer-write",
             Self::AfterRegistryWrite => "after-registry-write",
             Self::AfterRegistryCommitted => "after-registry-committed",
+            Self::AfterUninstallTreeRemoved => "after-uninstall-tree-removed",
         }
     }
 }
@@ -378,6 +381,11 @@ pub enum RecoveryOutcome {
         /// The recovered operation.
         operation_id: OperationId,
     },
+    /// The product tree and registry record are removed.
+    Uninstalled {
+        /// The recovered operation.
+        operation_id: OperationId,
+    },
 }
 
 /// Records a pre-activation phase.
@@ -414,7 +422,9 @@ pub fn record_phase(
         | Phase::RegistryCommitted
         | Phase::Committed
         | Phase::Failed
-        | Phase::RolledBack => {
+        | Phase::RolledBack
+        | Phase::UninstallIntent
+        | Phase::Uninstalled => {
             return Err(UpdaterError::InvalidOperationTransition {
                 expected: "intent, downloaded, verified, or staged",
                 found: phase.as_str(),
@@ -677,9 +687,68 @@ pub fn recover(
         Phase::RegistryCommitted => {
             recover_registry_committed(layout, registry, record, &context, now)
         }
-        Phase::Committed | Phase::Failed | Phase::RolledBack => {
+        Phase::UninstallIntent => recover_uninstall(layout, registry, record, now),
+        Phase::Committed | Phase::Failed | Phase::RolledBack | Phase::Uninstalled => {
             Ok(RecoveryOutcome::NothingToRecover)
         }
+    }
+}
+
+fn recover_uninstall(
+    layout: &InstallLayout,
+    registry: &mut Registry,
+    record: &JournalRecord,
+    now: Timestamp,
+) -> Result<RecoveryOutcome, UpdaterError> {
+    let product = record.product_id().clone();
+    let operation_id = record.operation_id().clone();
+    if let Some(existing) = registry.get(&product)
+        && existing.install_root() != layout.product_root(&product)
+    {
+        return Err(UpdaterError::RecoveryConflict {
+            detail: "uninstall record root does not match the layout".to_owned(),
+        });
+    }
+    remove_product_tree(layout, &product)?;
+    if registry.get(&product).is_some() {
+        registry.remove(&product)?;
+        registry.set_updated_at(now);
+        registry.write_atomic(&layout.registry_path(), &operation_id)?;
+    }
+    append_recovery_record(layout, record, Phase::Uninstalled, None, now)?;
+    Ok(RecoveryOutcome::Uninstalled { operation_id })
+}
+
+/// Removes a product root without following links.
+///
+/// # Errors
+///
+/// Returns a typed error when the root is outside the layout, is a symlink, or
+/// cannot be removed.
+pub(crate) fn remove_product_tree(
+    layout: &InstallLayout,
+    product: &ProductId,
+) -> Result<(), UpdaterError> {
+    let root = layout.product_root(product);
+    layout.validate_install_root(&root)?;
+    match std::fs::symlink_metadata(&root) {
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            Err(UpdaterError::InvalidInstallRoot {
+                reason: "product root must not be a symlink".to_owned(),
+            })
+        }
+        Ok(metadata) if metadata.is_dir() => {
+            std::fs::remove_dir_all(&root).map_err(|error| UpdaterError::Io {
+                detail: format!("remove product root {}: {error}", root.display()),
+            })
+        }
+        Ok(_) => std::fs::remove_file(&root).map_err(|error| UpdaterError::Io {
+            detail: format!("remove product root {}: {error}", root.display()),
+        }),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(UpdaterError::Io {
+            detail: format!("inspect product root {}: {error}", root.display()),
+        }),
     }
 }
 
