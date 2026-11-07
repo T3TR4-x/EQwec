@@ -52,7 +52,7 @@ Gate: reproducible local build and passing baseline checks. No product feature y
 
 ## Phase 3 — EQwec Hub MVP
 
-**State:** in progress on `dev-hub`. Verification core, durable-state primitives, the in-process activation engine, and bounded package staging implemented; download transport, installer orchestration, and launcher not started.
+**State:** in progress on `dev-hub`. Verification core, durable-state primitives, the in-process activation engine, bounded package staging, and a non-production fixture product with in-process macOS end-to-end tests implemented; download transport, installer orchestration, uninstall, and launcher not started.
 
 Completed:
 
@@ -66,7 +66,8 @@ Completed:
 - Installation layout and atomic `active.json` pointer primitives.
 - Activation engine for fresh install, update, rollback, and startup recovery, with five fault-injection points and a single-in-flight-operation invariant.
 - Bounded ZIP/ZIP64 package validation and extraction into a durable staging tree, including path, mode, header-confusion, ratio, size, and timeout rejection with partial-tree cleanup.
-- 160 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
+- A real non-production fixture product (`tests/fixtures/eqwec-hub`) with v1 and v2 executables and signed packages. Three in-process macOS tests install, launch, update, roll back, reject a tampered package, and recover an interrupted activation.
+- 163 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
 
 Remaining:
 
@@ -74,7 +75,7 @@ Remaining:
 - Verified download transport, uninstall, and offline install.
 - Repair orchestration and integrity re-verification of installed trees.
 - Diagnostics with redaction.
-- A real fixture product installed, launched, updated, and removed on each claimed platform.
+- Installer packaging and a real fixture product installed, launched, updated, repaired, and removed on each claimed platform.
 
 Acceptance: install, verify, launch, update, interrupt/recover, repair, roll back, and uninstall a real fixture application on each claimed platform. This remains `BLOCKED` until the remaining items exist and pass.
 
@@ -180,7 +181,7 @@ Products release independently. The ecosystem is not "finished" until each produ
 ## Current blockers
 
 - ADR-0004 (media/codecs) and ADR-0008 (project license) are `PROPOSED`, not normative. Codec/patent and DRM decisions require counsel; the project license requires owner approval.
-- Hub verification, durable-state, activation, and staging crates exist, but no product application, installer, or launcher exists.
+- Hub verification, durable-state, activation, and staging crates and an in-process fixture workflow exist, but no product application, installer, uninstaller, or launcher exists.
 - GUI accessibility, text input, browser integration, and audio real-time behavior are `UNVERIFIED` until their prototypes run.
 - No remote, signing infrastructure, or release channel exists.
 - Windows and Linux are planned targets but have not been tested in this environment.

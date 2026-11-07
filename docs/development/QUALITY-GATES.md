@@ -128,15 +128,17 @@ For a performance result, also record hardware, workload, baseline, target, obse
 | `cargo fmt --check` | PASS | `cargo fmt --all -- --check`, exit 0, 2026-11-07 |
 | `cargo clippy` | PASS | `cargo clippy --workspace --all-targets --all-features -- -D warnings`, exit 0 |
 | `cargo build` | PASS | `cargo build --workspace --all-targets --locked`, exit 0 |
-| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 129 tests passed, 0 failed |
+| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 163 tests passed, 0 failed |
 | Hub manifest/trust/package verification | PASS | 19 integration tests in `crates/eqwec-updater/tests/verification.rs`, including a fixed OpenSSL-generated Ed25519 vector |
 | Hub registry/journal/layout/active-pointer primitives | PASS | `registry.rs`, `journal.rs`, `layout.rs`, `active.rs`, `atomic.rs`; unit tests cover round-trip, bounds, traversal, partial lines, and atomic replacement |
 | Hub activation transaction and recovery | PASS for the in-process engine | `activation.rs`; 25 tests cover install, update, rollback, five fault points, recovery before and after the pointer, rollback recovery, and single-in-flight enforcement |
-| Hub installer and launcher | BLOCKED | No download transport, extractor, uninstaller, UI, or fixture product |
-| `cargo audit` | PASS | `cargo audit`, exit 0; 0 advisories across 41 locked dependencies |
+| Hub package archive validation and staging | PASS for in-process gates 1–11 | `staging.rs`; 31 tests cover ZIP/ZIP64, traversal, links, modes, duplicate names, every bound, header confusion, encryption, multi-disk, cleanup, and staging-to-activation |
+| Hub fixture install/update/rollback workflow | PASS for in-process macOS evidence | `tests/fixtures/eqwec-hub/`; 3 tests install and launch v1, update and launch v2, roll back, reject a tampered package, and recover an interrupted activation |
+| Hub installer and launcher | BLOCKED | No download transport, uninstaller, installer packaging, or UI |
+| `cargo audit` | PASS | `cargo audit`, exit 0; 0 advisories across 64 locked dependencies |
 | `cargo deny check` | PASS | `cargo deny check`, exit 0; advisories, bans, licenses, sources ok |
 | CI pipeline | BLOCKED | `.github/workflows/ci.yml` exists; never executed because no remote exists |
-| Hub install/update/rollback acceptance | BLOCKED | Download transport, extraction, uninstall, launcher, and fixture product do not exist |
+| Hub install/update/rollback platform acceptance | BLOCKED | Only the macOS in-process fixture runs; download transport, uninstall, installer, launcher, and Windows/Linux fixture runs do not exist |
 | Packaging/signing checks | BLOCKED | No product artifact |
 | Benchmarks | BLOCKED | No runtime product fixture |
 

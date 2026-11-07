@@ -320,6 +320,47 @@ Findings:
 
 Gate decision: package staging `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
 
+## Task: Hub fixture product and end-to-end install/update/rollback tests
+
+**Date:** 2026-11-07
+**Branch:** `dev-hub`
+**Scope:** `tests/fixtures/eqwec-hub/` workspace member, two real fixture executables, signed v1/v2 packages with a public non-production seed, three end-to-end tests, root workspace membership, and status reconciliation in ADR-0012, the Hub schema document, the roadmap, and the Hub skill. **No download transport, uninstall, launcher UI, installer packaging, or production key.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Fixture isolated as test infrastructure, no production key, bounded package use, scoped Ukrainian commit policy, no product claim beyond evidence |
+| `eqwec-quality-control` | APPLIED | 163 local tests pass; gate 12 kept `BLOCKED` overall; no CI or platform claim; test-key isolation and tampered-package behavior verified |
+| `eqwec-hub` | APPLIED | H-E2E-01/03/04/05/07/10 partially exercised in process; fixture requirements for real v1/v2 executables and non-production keys followed |
+| `security-audit` | APPLIED | Confirmed the seed is public test material, manifests are signed and verified before staging, tampered package fails with `PackageHashMismatch`, and no unverified binary executes |
+| `code-review` (Matt Pocock) | APPLIED | Review checked exact stdout assertions, retained-version state, recovery cleanup, and `FaultInjected` typing; no production path was changed |
+| `skill-creator` | APPLIED | `eqwec-hub` status, ownership table, and fixture row corrected; `verify-skills.py` rerun |
+| Other product skills | AVAILABLE_NOT_RELEVANT | No path in those products was touched |
+| UI, browser, research, and Playwright skills | AVAILABLE_NOT_RELEVANT | No UI, browser test, or research question in this scope |
+
+## Quality-control report for the fixture task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | Branch `dev-hub` at `c281d9a`; worktree inspected; ADR-0012 gate 12 and Hub fixture requirements read before writing |
+| Implementation | PASS for the in-process fixture workflow | Real v1/v2 executables read `share/fixture.txt`; signed manifests; install, launch, update, rollback, tampered-package rejection, and interrupted-activation recovery |
+| Verification | PASS locally; platform acceptance `BLOCKED` | `cargo test --workspace --all-features --locked`: 163 passed, 0 failed; fmt, clippy, build, audit, deny, docs gate, and skills gate exit 0 |
+| Performance | NOT_APPLICABLE | No startup, throughput, or memory measurement; fixture tests assert behavior only |
+| Security | PASS for the tested boundary | Public non-production seed; signature and hash verified before staging; tampered package rejected; active v1 unchanged; interrupted activation recovers to v1 |
+| Merge | PASS | Scoped commit created on `dev-hub`; fixture, workspace membership, docs, and Hub skill only |
+| Release | NOT_APPLICABLE | No artifact; fixture is non-published test infrastructure; version remains `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| High | ADR-0012 gate 12 is only partially met: uninstall, installer orchestration, download transport, platform packaging, and Windows/Linux runs do not exist | Open; overall gate remains `BLOCKED` |
+| High | The fixture runs in process, not from a signed platform installer; shortcuts, launcher listing, and per-platform quarantine/Gatekeeper behavior are unverified | Open; `BLOCKED` on installer and launcher work |
+| Medium | Only the `AfterTreeMove` activation interruption is exercised end to end; the full H-E2E-05 phase matrix remains open | Open |
+| Medium | Staging still lacks a disk-space preflight and retains the same-user symlink-swap TOCTOU window noted in the staging task | Open |
+| Low | The fixture seed is public and must never be reused for release signing | Accepted; documented in the test module and skill |
+
+Gate decision: fixture workflow `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
+
 ## Template for future tasks
 
 | Skill | State | Evidence |

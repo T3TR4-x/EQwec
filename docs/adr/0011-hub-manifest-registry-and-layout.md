@@ -77,7 +77,7 @@ The formats are security contracts. The manifest signature must cover every secu
 - ADR-0007 selects Ed25519 with root/release key separation, rollback protection, and signed manifest envelopes.
 - ADR-0009 requires bounded, redacted diagnostics and no default upload.
 - The Hub product specification requires canonical encoding, bounded parsing, duplicate-key rejection, exact size and hash verification, atomic activation, a journal, and a per-user layout.
-- No Hub code, fixture product, test key, registry, or journal exists. Every runtime claim is `BLOCKED` until implemented and tested.
+- Hub verification, durable-state, activation, and staging code, a non-production fixture product, and public test keys now exist. Repair, uninstall, installer orchestration, and Windows/Linux fixture runs remain `BLOCKED`.
 
 ## 5. Decision
 
@@ -183,6 +183,8 @@ Layout:
 4. Registry atomic replace and journal recovery are tested with fault injection.
 5. A real fixture product installs, updates, rolls back, repairs, and uninstalls on macOS, then Windows and Linux.
 6. Non-production test keys are isolated from release artifacts.
+
+Gates 1–4 pass in process. Gate 5 is partially exercised on macOS: the fixture installs, launches, updates, and rolls back, but repair, uninstall, installer orchestration, and Windows/Linux runs do not exist, so gate 5 remains `BLOCKED`. The fixture uses a public seed and is not part of any release artifact; production signing infrastructure does not exist.
 
 ## 7. Consequences
 

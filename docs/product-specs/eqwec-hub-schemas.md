@@ -605,12 +605,13 @@ Last verified: 2026-11-07 on macOS 26.7.2 arm64 with Rust 1.99.1.
 | Active pointer | `PASS` for parse and atomic replacement | `crates/eqwec-updater/src/active.rs`; round-trip, unknown-field, oversize, and atomic-write tests pass |
 | Activation transaction and recovery orchestration | `PASS` for install, update, rollback, and recovery with fault injection | `crates/eqwec-updater/src/activation.rs`; 25 tests cover phase ordering, missing/symlinked staging, existing trees, downgrades, retention, rollback, all five fault points, recovery before and after the pointer, rollback recovery, single-in-flight enforcement, pruning, and the retention cap |
 | Package archive validation and staging | `PASS` for in-process archive gates 1–11 | `crates/eqwec-updater/src/staging.rs`; 31 tests cover a valid fixture, ZIP64, traversal and unsafe names, links and special modes, duplicate and case-colliding names, every bound, header confusion, encryption, unsupported compression, multi-disk and empty archives, pre-existing staging, failed-extraction cleanup, and activation from a staged tree |
+| Real fixture product (v1/v2) | `PASS` for in-process macOS install, launch, update, rollback, tampered-package rejection, and interrupted-activation recovery | `tests/fixtures/eqwec-hub/`; two real executables, signed v1/v2 manifests with a public non-production seed, and 3 end-to-end tests in `tests/hub_end_to_end.rs` |
 | Installer orchestration (download, uninstall, launcher) | `BLOCKED` | No transport, uninstaller, or UI |
-| Platform fixtures | `BLOCKED` | macOS, Windows, and Linux fixture installs do not exist |
+| Platform fixtures | `BLOCKED` | Only the macOS in-process fixture runs; Windows and Linux fixture installs do not exist |
 
-Verification command: `cargo test --workspace --all-features --locked` — 160 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
+Verification command: `cargo test --workspace --all-features --locked` — 163 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
 
-This table is updated with real command output when an area is implemented. Parsing, cryptographic verification, durable-state primitives, an in-process activation engine, and package staging are not evidence of a working installer. Download, uninstall, the launcher UI, and end-to-end acceptance remain `BLOCKED`.
+This table is updated with real command output when an area is implemented. Parsing, cryptographic verification, durable-state primitives, an in-process activation engine, package staging, and a non-production fixture workflow are not evidence of a working installer. Download, uninstall, the launcher UI, installer packaging, and Windows/Linux acceptance remain `BLOCKED`.
 
 ## 11. Package archive v1
 

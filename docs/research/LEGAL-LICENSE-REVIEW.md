@@ -291,6 +291,7 @@ A build that silently enables a GPL or proprietary component is a release blocke
 - Use original, generated, or licensed test media.
 - Do not commit copyrighted music, footage, photos, or fonts to the repository.
 - Mark fixtures with their license and source.
+- The Hub fixture under `tests/fixtures/eqwec-hub` is original EQwec-generated Rust source, is not published, and uses a public non-production signing seed. It is test infrastructure, not a distributable asset.
 
 ### 8.4 Trademarks
 

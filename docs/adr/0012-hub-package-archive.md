@@ -1,6 +1,6 @@
 # ADR-0012: Hub package archive v1
 
-- **Status:** ACCEPTED (in-process gates 1–11 pass locally; platform fixture gate 12 remains `BLOCKED`)
+- **Status:** ACCEPTED (in-process gates 1–11 pass locally; gate 12 is partially exercised on macOS and remains `BLOCKED` for uninstall and the Windows/Linux fixture runs)
 - **Date:** 2026-11-07
 - **Deciders:** EQwec project owner and engineering agent (bootstrap mandate)
 - **Supersedes:** none
@@ -104,7 +104,7 @@ Per-entry signatures are rejected for v1.
 - `flate2` with `zlib-rs` is a pure-Rust deflate implementation. `flate2` is MIT or Apache-2.0; `zlib-rs` is Zlib-licensed. `cargo deny` permits both.
 - The Hub product specification requires bounded extraction, rejection of links and special files, and verification before extraction.
 - The threat model records path traversal, symlink escape, and archive bombs as Hub threats H-04 and H-05.
-- No extractor, fixture package, or end-to-end install exists. Every runtime claim is `BLOCKED` until implemented and tested.
+- No extractor, fixture package, or end-to-end install existed when this ADR was accepted. A non-production fixture product and in-process install/update/rollback tests now exist; uninstall, installer orchestration, and Windows/Linux runs remain `BLOCKED`.
 
 ## 5. Decision
 
@@ -211,9 +211,9 @@ The staging function requires the last journal record for the operation to be `d
 11. A staged tree contains exactly the planned files with the planned modes and hashes.
 12. A real fixture product installs, updates, rolls back, and uninstalls on macOS, then Windows and Linux.
 
-Gates 1–11 are in-process tests. Gate 12 is end-to-end acceptance and remains `BLOCKED` until the installer, download transport, uninstaller, and fixture product exist.
+Gates 1–11 are in-process tests. Gate 12 is end-to-end acceptance. On 2026-11-07 the macOS in-process portion of gate 12 passes: `tests/fixtures/eqwec-hub` builds real v1 and v2 executables, signs manifests with a public non-production seed, installs v1, launches it, updates to v2, rolls back to v1, rejects a tampered package, and recovers an activation interrupted after the tree move. Uninstall, installer orchestration, download transport, platform packaging, and Windows/Linux fixture runs do not exist, so gate 12 remains `BLOCKED`.
 
-Implementation evidence (2026-11-07): gates 1–11 are covered by 31 tests in `crates/eqwec-updater/src/staging.rs`; `cargo test --workspace --all-features --locked` passed 160 tests locally on macOS. Gate 12 remains `BLOCKED`.
+Implementation evidence (2026-11-07): gates 1–11 are covered by 31 tests in `crates/eqwec-updater/src/staging.rs`; the macOS fixture portion of gate 12 is covered by 3 tests in `tests/fixtures/eqwec-hub/tests/hub_end_to_end.rs`; `cargo test --workspace --all-features --locked` passed 163 tests locally on macOS. Gate 12 remains `BLOCKED` overall.
 
 ## 7. Consequences
 

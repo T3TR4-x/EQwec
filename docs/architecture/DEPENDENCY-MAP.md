@@ -1,6 +1,6 @@
 # Dependency Map
 
-**Status:** planning baseline with an admitted verification core. The six dependencies in §9 are admitted for manifest, trust, and package verification. GUI, media, audio, browser, and packaging technologies remain candidates under research and legal review.
+**Status:** planning baseline with an admitted verification core. The seven dependencies in §9 are admitted for manifest, trust, package verification, and the non-production fixture tests. GUI, media, audio, browser, and packaging technologies remain candidates under research and legal review.
 
 ## 1. Internal dependency direction
 
@@ -119,10 +119,10 @@ Last verified: 2026-11-07.
 
 | Item | State |
 |---|---|
-| Cargo workspace | Exists: resolver 3, edition 2024, Rust 1.99.1, members `crates/*` |
-| Workspace crates | `eqwec-core`, `eqwec-security`, `eqwec-updater`; six direct third-party dependencies |
-| Approved dependencies | The six direct dependencies in §9 passed advisory, license, ban, and source checks on 2026-11-07 |
-| Lockfile | `Cargo.lock` committed; 41 locked packages |
+| Cargo workspace | Exists: resolver 3, edition 2024, Rust 1.99.1, members `crates/*` and `tests/fixtures/eqwec-hub` |
+| Workspace crates | `eqwec-core`, `eqwec-security`, `eqwec-updater`; non-published `eqwec-hub-fixture` test crate; seven direct third-party dependencies |
+| Approved dependencies | The seven direct dependencies in §9 passed advisory, license, ban, and source checks on 2026-11-07 |
+| Lockfile | `Cargo.lock` committed; 64 locked packages |
 | SBOM | None |
 | License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel |
 | Technology selection | Planning baseline: `docs/architecture/TECHNOLOGY-SELECTION.md` |
@@ -135,15 +135,15 @@ These are the only third-party direct dependencies admitted so far. Admission co
 
 | Crate | Declared | Locked | License | Purpose | Used by |
 |---|---|---|---|---|---|
-| `ed25519-dalek` | 3.0.0 | 3.0.0 | BSD-3-Clause | Strict Ed25519 verification | `eqwec-security` |
+| `ed25519-dalek` | 3.0.0 | 3.0.0 | BSD-3-Clause | Strict Ed25519 verification; signing in the non-production fixture tests | `eqwec-security`, `eqwec-hub-fixture` (dev) |
 | `sha2` | 0.11.1 | 0.11.1 | MIT OR Apache-2.0 | SHA-256 digests | `eqwec-security`, `eqwec-updater` |
 | `serde` | 1.0.228 | 1.0.229 | MIT OR Apache-2.0 | Derive deserialization for wire structs | `eqwec-updater` |
-| `serde_json` | 1.0.150 | 1.0.154 | MIT OR Apache-2.0 | Bounded JSON parsing | `eqwec-updater` |
-| `semver` | 1.0.28 | 1.0.28 | MIT OR Apache-2.0 | Version and constraint validation | `eqwec-updater` |
+| `serde_json` | 1.0.150 | 1.0.154 | MIT OR Apache-2.0 | Bounded JSON parsing; fixture manifest construction | `eqwec-updater`, `eqwec-hub-fixture` (dev) |
+| `semver` | 1.0.28 | 1.0.28 | MIT OR Apache-2.0 | Version and constraint validation | `eqwec-updater`, `eqwec-hub-fixture` (dev) |
 | `thiserror` | 2.0.18 | 2.0.21 | MIT OR Apache-2.0 | Typed error definitions | `eqwec-security`, `eqwec-updater` |
-| `zip` | 9.4.1 | 9.4.1 | MIT | Bounded ZIP/ZIP64 package validation and extraction | `eqwec-updater` |
+| `zip` | 9.4.1 | 9.4.1 | MIT | Bounded ZIP/ZIP64 package validation and extraction; fixture package construction | `eqwec-updater`, `eqwec-hub-fixture` (dev) |
 
-`zip` pulls `flate2` (MIT OR Apache-2.0) and `zlib-rs` (Zlib) for the pure-Rust deflate backend. They are transitive and pinned by `Cargo.lock`; a direct use requires a new admission entry.
+`eqwec-hub-fixture` is non-published test infrastructure. Its dev-dependencies reuse admitted crates; it introduces no new third-party dependency. `zip` pulls `flate2` (MIT OR Apache-2.0) and `zlib-rs` (Zlib) for the pure-Rust deflate backend. They are transitive and pinned by `Cargo.lock`; a direct use requires a new admission entry.
 
 `cargo deny check` reported `advisories ok, bans ok, licenses ok, sources ok` on 2026-11-07. The duplicate `syn` 2.x/3.x warning is accepted because the two versions are isolated to proc-macro expansion.
 

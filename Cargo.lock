@@ -158,6 +158,19 @@ name = "eqwec-core"
 version = "0.0.0"
 
 [[package]]
+name = "eqwec-hub-fixture"
+version = "0.0.0"
+dependencies = [
+ "ed25519-dalek",
+ "eqwec-core",
+ "eqwec-security",
+ "eqwec-updater",
+ "semver",
+ "serde_json",
+ "zip",
+]
+
+[[package]]
 name = "eqwec-security"
 version = "0.0.0"
 dependencies = [
