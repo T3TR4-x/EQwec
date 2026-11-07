@@ -43,11 +43,12 @@ try {
     $dist = Join-Path $root "dist"
     New-Item -ItemType Directory -Force -Path $dist | Out-Null
     $msi = Join-Path $dist "EQwec-Hub-$version-windows-$arch.msi"
+    $binary = Join-Path $root "target/release/eqwec-hub.exe"
 
     wix build (Join-Path $PSScriptRoot "eqwec-hub.wxs") `
         -arch $arch `
-        -d ProductVersion=$msiVersion `
-        -d BinaryPath=(Join-Path $root "target/release/eqwec-hub.exe") `
+        -d "ProductVersion=$msiVersion" `
+        -d "BinaryPath=$binary" `
         -o $msi
     if ($LASTEXITCODE -ne 0) {
         throw "wix build failed with exit code $LASTEXITCODE"
