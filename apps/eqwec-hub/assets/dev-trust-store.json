@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "keys": [
+    {
+      "key_id": "dev-fixture-2026",
+      "algorithm": "ed25519",
+      "public_key": "03a107bff3ce10be1d70dd18e74bc09967e4d6309ba50d5f1ddc8664125531b8",
+      "key_epoch": 1,
+      "channels": ["stable"],
+      "not_before": "2026-01-01T00:00:00Z",
+      "not_after": "2030-01-01T00:00:00Z",
+      "revoked": false
+    }
+  ]
+}
