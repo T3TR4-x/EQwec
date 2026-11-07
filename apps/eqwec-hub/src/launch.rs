@@ -19,6 +19,7 @@ use crate::paths::HostOs;
 pub const HEALTH_CHECK_TIMEOUT: Duration = Duration::from_secs(10);
 
 const HEALTH_CHECK_POLL: Duration = Duration::from_millis(25);
+#[cfg(unix)]
 const UNIX_EXECUTE_BITS: u32 = 0o111;
 
 /// A resolved entry point and its tree root.
