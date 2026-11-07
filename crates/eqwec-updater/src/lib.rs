@@ -26,6 +26,7 @@ pub mod active;
 pub mod error;
 pub mod journal;
 pub mod layout;
+pub mod lock;
 pub mod manifest;
 pub mod package;
 pub mod registry;
@@ -47,6 +48,7 @@ pub use journal::{
     RecoveryAction, append_journal_record, read_journal, recovery_action,
 };
 pub use layout::{InstallLayout, MAX_PATH_BYTES, is_version_tree, tree_id};
+pub use lock::ProfileLock;
 pub use manifest::{
     Dependency, MANIFEST_SCHEMA_VERSION, MAX_DEPENDENCIES, MAX_MANIFEST_BYTES, MAX_PACKAGE_BYTES,
     MAX_RELEASE_NOTES_BYTES, Manifest, Package, PackageHash, SignatureAlgorithm, SignatureBlock,

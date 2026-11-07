@@ -120,9 +120,9 @@ Last verified: 2026-11-07.
 | Item | State |
 |---|---|
 | Cargo workspace | Exists: resolver 3, edition 2024, Rust 1.99.1, members `crates/*` and `tests/fixtures/eqwec-hub` |
-| Workspace crates | `eqwec-core`, `eqwec-security`, `eqwec-updater`; non-published `eqwec-hub-fixture` test crate; seven direct third-party dependencies |
-| Approved dependencies | The seven direct dependencies in §9 passed advisory, license, ban, and source checks on 2026-11-07 |
-| Lockfile | `Cargo.lock` committed; 64 locked packages |
+| Workspace crates | `eqwec-core`, `eqwec-security`, `eqwec-updater`; non-published `eqwec-hub-fixture` test crate; eight direct third-party dependencies |
+| Approved dependencies | The eight direct dependencies in §9 passed advisory, license, ban, and source checks on 2026-11-07 |
+| Lockfile | `Cargo.lock` committed; 68 locked packages |
 | SBOM | None |
 | License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel |
 | Technology selection | Planning baseline: `docs/architecture/TECHNOLOGY-SELECTION.md` |
@@ -142,6 +142,7 @@ These are the only third-party direct dependencies admitted so far. Admission co
 | `semver` | 1.0.28 | 1.0.28 | MIT OR Apache-2.0 | Version and constraint validation | `eqwec-updater`, `eqwec-hub-fixture` (dev) |
 | `thiserror` | 2.0.18 | 2.0.21 | MIT OR Apache-2.0 | Typed error definitions | `eqwec-security`, `eqwec-updater` |
 | `zip` | 9.4.1 | 9.4.1 | MIT | Bounded ZIP/ZIP64 package validation and extraction; fixture package construction | `eqwec-updater`, `eqwec-hub-fixture` (dev) |
+| `fs4` | 1.1.0 | 1.1.0 | MIT OR Apache-2.0 | Cross-platform available disk space for the staging preflight | `eqwec-updater` |
 
 `eqwec-hub-fixture` is non-published test infrastructure. Its dev-dependencies reuse admitted crates; it introduces no new third-party dependency. `zip` pulls `flate2` (MIT OR Apache-2.0) and `zlib-rs` (Zlib) for the pure-Rust deflate backend. They are transitive and pinned by `Cargo.lock`; a direct use requires a new admission entry.
 

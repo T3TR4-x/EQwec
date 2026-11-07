@@ -9,6 +9,7 @@ description = "Manifest verification, trust policy, and package integrity for EQ
 [dependencies]
 eqwec-core.workspace = true
 eqwec-security.workspace = true
+fs4.workspace = true
 semver.workspace = true
 serde.workspace = true
 serde_json.workspace = true

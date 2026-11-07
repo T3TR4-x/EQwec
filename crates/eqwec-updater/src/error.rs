@@ -528,6 +528,9 @@ pub enum UpdaterError {
         /// Bounded diagnostic detail.
         detail: String,
     },
+    /// Another process holds the profile lock.
+    #[error("the profile is locked by another EQwec process")]
+    ProfileLocked,
     /// The system clock is unavailable or outside the supported range.
     #[error("clock error: {detail}")]
     Clock {

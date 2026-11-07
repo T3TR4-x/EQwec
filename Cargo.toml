@@ -11,6 +11,7 @@ publish = false
 [workspace.dependencies]
 ed25519-dalek = { version = "3.0.0", default-features = false, features = ["alloc"] }
 eqwec-core = { version = "0.0.0", path = "crates/eqwec-core" }
+fs4 = "1.1.0"
 eqwec-security = { version = "0.0.0", path = "crates/eqwec-security" }
 semver = "1.0.28"
 serde = { version = "1.0.228", features = ["derive"] }
