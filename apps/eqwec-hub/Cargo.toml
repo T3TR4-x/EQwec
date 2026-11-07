@@ -18,4 +18,4 @@ thiserror.workspace = true
 workspace = true
 
 [dev-dependencies]
-eqwec-hub-fixture = { path = "../../tests/fixtures/eqwec-hub" }
+eqwec-hub-fixture = { version = "0.0.0", path = "../../tests/fixtures/eqwec-hub" }
