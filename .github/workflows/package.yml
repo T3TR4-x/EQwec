@@ -3,6 +3,8 @@ name: Package
 on:
   workflow_dispatch:
   push:
+    branches:
+      - dev-hub
     tags:
       - "eqwec-hub/v*"
 
