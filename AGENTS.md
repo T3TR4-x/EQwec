@@ -7,9 +7,9 @@ This is the canonical instruction file for every AI agent working in the EQwec r
 - **Project:** EQwec — *Engineer Quality with Empathy to Customer*.
 - **Repository:** `~/Documents/EQwec` (resolve the actual home directory; do not hardcode a username).
 - **Architecture:** Rust-first modular monorepo with a Cargo workspace. Native-first, cross-platform, security-first.
-- **Current phase:** Phase 3 — Hub MVP in progress on `dev-hub`. Version `0.0.0`. **No product application is implemented.** The Phase 2 CI gate passed its first full GitHub Actions run on 2026-11-07: macOS, Ubuntu, Windows, advisories, and licenses/bans all succeeded.
-- **Actual repository contents today:** `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `.github/workflows/ci.yml`, `crates/eqwec-core/`, `crates/eqwec-security/`, `crates/eqwec-updater/`, `tests/fixtures/eqwec-hub/`, `docs/`, `.agents/skills/`, `scripts/`, `README.md`, and this file. There is **no** `apps/`, product application, installer, or release artifact yet. The fixture under `tests/` is non-production test infrastructure, not a shipped product.
-- **Environment used for current evidence:** macOS on Apple silicon for local commands. GitHub Actions also runs the workspace tests on Ubuntu and Windows; no product runtime has been accepted on those platforms.
+- **Current phase:** Phase 3 — Hub MVP in progress on `dev-hub`. Workspace version `0.0.0`; the Hub launcher is a developer preview at `0.1.0-alpha.1`. A runnable `egui`/`eframe` launcher exists in `apps/eqwec-hub` and supports local signed-bundle install, update, rollback, uninstall, launch, and `--self-check`. Packaging scripts build a macOS DMG, a per-user Windows MSI, and Linux `.deb`/`tar.zst` artifacts. There is no production release, download transport, repair, dependency resolution, or release signing.
+- **Actual repository contents today:** `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `.github/workflows/ci.yml`, `.github/workflows/package.yml`, `apps/eqwec-hub/`, `crates/eqwec-core/`, `crates/eqwec-security/`, `crates/eqwec-updater/`, `packaging/eqwec-hub/`, `tests/fixtures/eqwec-hub/`, `docs/`, `.agents/skills/`, `scripts/`, `README.md`, and this file. The fixture under `tests/` is non-production test infrastructure, not a shipped product.
+- **Environment used for current evidence:** macOS on Apple silicon for local commands, including a live launcher window and a locally built DMG. GitHub Actions runs the workspace tests and packaging jobs on macOS, Ubuntu, and Windows; no desktop launcher run has been accepted on Windows or Linux.
 
 Never describe a planned capability as implemented. Never invent a command, path, version, test result, benchmark, or release.
 
@@ -132,10 +132,27 @@ python3 scripts/verify-skills.py
 python3 scripts/check-docs.py --gate
 ```
 
+Hub developer-preview commands:
+
+```bash
+cargo run -p eqwec-hub
+cargo run -p eqwec-hub -- --self-check
+cargo run -p eqwec-hub-fixture --bin make-demo-bundle -- /tmp/eqwec-demo/bundle
+```
+
+Packaging commands (artifacts land in `dist/`):
+
+```bash
+./packaging/eqwec-hub/macos/build-dmg.sh
+./packaging/eqwec-hub/windows/build-msi.ps1   # PowerShell on Windows
+./packaging/eqwec-hub/linux/build-deb.sh
+```
+
 - `cargo audit` and `cargo deny check` require the tools installed locally; CI installs them.
-- CI is configured in `.github/workflows/ci.yml` and runs on `integration`, `dev-*`, and scoped work branches. GitHub Actions run `42389844319` on commit `c066d67` passed all five jobs: `test (macos-latest)`, `test (ubuntu-latest)`, `test (windows-latest)`, `advisories`, and `licenses and bans`.
-- There is no installer, packaging check, benchmark harness, or product test yet.
-- Windows and Linux are exercised only by CI test jobs; no local or product-runtime acceptance exists for them.
+- CI is configured in `.github/workflows/ci.yml` and runs on `integration`, `dev-*`, and scoped work branches. The workspace has 211 tests. GitHub Actions run `42398364288` on commit `67c7444` passed all five jobs: `test (macos-latest)`, `test (ubuntu-latest)`, `test (windows-latest)`, `advisories`, and `licenses and bans`.
+- `.github/workflows/package.yml` builds and smoke-tests platform artifacts. macOS DMG, Windows MSI, and Linux packages all passed in run `42398364283`, including install, `--self-check`, and uninstall where the runner permits.
+- The launcher, installer, and packaging scripts exist, but there is no benchmark harness and no accepted Windows/Linux desktop run.
+- Windows and Linux are exercised by CI tests and package smoke checks; no local or product-runtime desktop acceptance exists for them.
 
 Do not copy generic command lists and present them as verified project commands.
 
@@ -191,13 +208,13 @@ A task is complete only when:
 
 ## 11. Current gate status
 
-- **SKILLS_GATE:** PASS for the bootstrap scope. All 10 packages exist, validate, and are discoverable; trigger and scenario evidence is recorded in `docs/development/SKILLS-AUDIT.md`. Runtime product end-to-end scenarios are `BLOCKED` until product code exists.
-- **DOCUMENTATION_GATE:** PASS for the planning scope. `python3 scripts/check-docs.py --gate` returned 0 failures on 2026-11-07. Research, architecture, security, performance, and development documents exist.
-- **ARCHITECTURE_GATE:** PASS for the planning baseline. ADR-0001 through ADR-0012 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. Runtime verification is `BLOCKED` until prototypes exist.
-- **SECURITY_GATE:** PASS for the planning baseline. `docs/security/THREAT-MODEL.md` and `SECURITY-BASELINE.md` exist. Product-specific runtime controls, isolation tests, and fuzzing are `BLOCKED` until implementation.
-- **WORKSPACE_GATE:** PASS locally on macOS for format, clippy, build, test, audit, and deny, and PASS in GitHub Actions run `42389844319` on commit `c066d67` for all five jobs, including `test (windows-latest)` and `test (ubuntu-latest)`.
-- **PRODUCT_IMPLEMENTATION:** Hub verification core, durable-state primitives, activation engine, bounded package staging, and a non-production fixture product implemented on `dev-hub` (`eqwec-security`, `eqwec-updater`, `tests/fixtures/eqwec-hub`): bounded manifest v1, trust-store policy, strict Ed25519, package size/hash verification, registry, journal, installation layout, atomic active pointer, install/update/rollback transactions, fault-injected startup recovery, ZIP/ZIP64 package validation and extraction into a durable staging tree, and three in-process end-to-end fixture tests covering install, launch, update, rollback, tampered-package rejection, and interrupted-activation recovery, with 163 workspace tests passing locally and in CI on macOS, Ubuntu, and Windows. Hub download transport, uninstall, installer orchestration, launcher UI, platform packaging, and every other product are `BLOCKED`. Planning documents and verification crates are not a working product.
-- **PLATFORM VERIFICATION:** Workspace tests `PASS` on GitHub-hosted macOS, Ubuntu, and Windows runners. Product runtime acceptance is `BLOCKED` on Windows and Linux: there is no Hub application, installer, launcher, or platform package to exercise.
-- **RELEASE_GATE:** `BLOCKED`. No signing keys, certificates, notarization account, installer, or release channel exists.
+- **SKILLS_GATE:** PASS for the bootstrap scope. All 10 packages exist, validate, and are discoverable; trigger and scenario evidence is recorded in `docs/development/SKILLS-AUDIT.md`. Runtime product end-to-end scenarios on Windows and Linux are `BLOCKED` until desktop runs exist.
+- **DOCUMENTATION_GATE:** PASS. `python3 scripts/check-docs.py --gate` returned 0 failures across 63 Markdown files on 2026-11-07. Research, architecture, security, performance, and development documents exist.
+- **ARCHITECTURE_GATE:** PASS for the planning baseline. ADR-0001 through ADR-0013 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. Runtime verification beyond the Hub developer preview is `BLOCKED` until other prototypes exist.
+- **SECURITY_GATE:** PASS for the planning baseline and local Hub bundle controls. `docs/security/THREAT-MODEL.md` and `SECURITY-BASELINE.md` exist; H-12–H-15 controls are implemented and tested. Other product runtime controls, platform trust, and fuzzing remain `BLOCKED`.
+- **WORKSPACE_GATE:** PASS locally on macOS for format, clippy, build, test, audit, and deny, and PASS in GitHub Actions run `42398364288` on commit `67c7444` for all five jobs, including `test (windows-latest)` and `test (ubuntu-latest)`.
+- **PRODUCT_IMPLEMENTATION:** Hub verification core, durable-state primitives, activation engine, bounded package staging, journaled uninstall, profile locking, disk preflight, a native `egui`/`eframe` launcher, and a non-production fixture product are implemented on `dev-hub` (`eqwec-security`, `eqwec-updater`, `apps/eqwec-hub`, `tests/fixtures/eqwec-hub`): bounded manifest v1, trust-store policy, strict Ed25519, package size/hash verification, registry, journal, installation layout, atomic active pointer, install/update/rollback transactions, fault-injected startup recovery, ZIP/ZIP64 package validation and extraction into a durable staging tree, uninstall recovery, local signed-bundle install/update/rollback/uninstall/launch, health checks, `--self-check`, and packaging scripts for macOS, Windows, and Linux. The workspace has 211 tests passing locally and in CI on macOS, Ubuntu, and Windows. The macOS launcher window and DMG were exercised locally. Hub download transport, repair orchestration, offline bundles, dependency resolution, release signing, notarization, Authenticode, and Windows/Linux desktop acceptance remain `BLOCKED`. Planning documents and verification crates are not a released product.
+- **PLATFORM VERIFICATION:** Workspace tests `PASS` on GitHub-hosted macOS, Ubuntu, and Windows runners. macOS DMG, Windows MSI, and Linux package smoke checks `PASS` in run `42398364283`. Desktop launcher acceptance is `BLOCKED` on Windows and Linux because no desktop session has been exercised there.
+- **RELEASE_GATE:** `BLOCKED`. No signing keys, certificates, notarization account, release channel, or signed release artifact exists.
 
 Report blockers as `BLOCKED` with the exact missing precondition. Do not fabricate progress.

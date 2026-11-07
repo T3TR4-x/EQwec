@@ -212,3 +212,12 @@ Revisit this ADR if:
 - `docs/development/RELEASE-STRATEGY.md`
 - `docs/research/LEGAL-LICENSE-REVIEW.md`
 - ADR-0001
+
+## 10. Implementation note — developer-preview packaging (2026-11-07)
+
+The first launcher artifacts follow this ADR's direction but are not releases:
+
+- macOS: an ad-hoc-signed `.app` inside a DMG built by `packaging/eqwec-hub/macos/build-dmg.sh`. Developer ID signing, hardened runtime, notarization, and stapling remain `BLOCKED` on certificates and an Apple account.
+- Windows: a per-user WiX v4 MSI installed to `%LOCALAPPDATA%\Programs\EQwec Hub` with no elevation, built by `packaging/eqwec-hub/windows/build-msi.ps1`. Authenticode signing remains `BLOCKED`.
+- Linux: a `.deb` with a `.desktop` entry and a `tar.zst` archive built by `packaging/eqwec-hub/linux/build-deb.sh`. The §5.1 matrix listed `.deb` as a later addition; it is included now because it makes install and self-check verifiable in CI. Flatpak and RPM remain future work.
+- The artifacts are unsigned developer builds. They are not published, carry no release channel, and must not be described as releases. Run `42398364283` built all three and passed the platform smoke checks: the macOS DMG mounted and self-checked, the Windows MSI installed/self-checked/uninstalled, and the Linux `.deb` installed/self-checked/removed.

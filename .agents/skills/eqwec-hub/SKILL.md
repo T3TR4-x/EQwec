@@ -9,8 +9,8 @@ Hub is the launcher, package manager, installer, updater, repair tool, and insta
 
 ## Status and authority
 
-- The Cargo workspace exists with `eqwec-core`, `eqwec-security`, and `eqwec-updater`. The verification core, durable-state primitives, in-process activation engine, bounded package staging, and a non-production fixture product are implemented; no Hub application, installer, uninstaller, or launcher UI exists. Verify the current repository before editing and report drift instead of creating empty scaffolding.
-- Manifest, trust-store, package verification, registry, journal, layout, active-pointer, activation, rollback, startup recovery, and bounded ZIP/ZIP64 staging are implemented and tested. The fixture product at `tests/fixtures/eqwec-hub` exercises install, launch, update, rollback, tampered-package rejection, and one interrupted-activation recovery in process on macOS. Download, uninstall, repair orchestration, installer packaging, and the launcher are not implemented. Do not describe planned behavior as shipped.
+- The Cargo workspace exists with `eqwec-core`, `eqwec-security`, `eqwec-updater`, `apps/eqwec-hub`, `packaging/eqwec-hub`, and a non-production fixture product. Verification, durable-state primitives, the activation engine, bounded package staging, journaled uninstall, profile locking, disk preflight, the native launcher UI, local signed-bundle install/update/rollback/uninstall/launch, `--self-check`, and packaging scripts are implemented. Download transport, repair orchestration, offline bundles, redacted diagnostics, release signing, notarization, Authenticode, and Windows/Linux desktop acceptance are not. Verify the current repository before editing and report drift instead of creating empty scaffolding.
+- Manifest, trust-store, package verification, registry, journal, layout, active-pointer, activation, rollback, startup recovery, bounded ZIP/ZIP64 staging, and journaled uninstall are implemented and tested. The fixture product at `tests/fixtures/eqwec-hub` and the launcher integration tests exercise install, launch, update, rollback, uninstall, tampered-package rejection, and interrupted-activation recovery in process and on local macOS. The macOS DMG, Windows MSI, and Linux packages passed their CI smoke checks. Download transport, repair, offline install, release signing, and platform desktop acceptance are not implemented. Do not describe planned behavior as shipped.
 - `eqwec-engineering-core` governs architecture, security baseline, Git, versions, and documentation. `eqwec-quality-control` governs gates and evidence. This skill adds Hub domain rules and may not weaken either one.
 - Discover real commands, paths, and formats from `AGENTS.md`, CI, and the workspace. Do not invent commands, schemas, or test results.
 
@@ -34,15 +34,15 @@ Do not use it for:
 
 | Path | Owner | State | Rule |
 |---|---|---|---|
-| `apps/eqwec-hub` | Hub | Planned | Product entry point, launcher UI, Hub policy, self-update orchestration. |
-| `crates/eqwec-updater` | Hub-owned, shared API | Exists: verification, durable-state, activation, and staging engine | Generic download, verification, staging, activation, rollback, and recovery engine. No Hub UI or product-specific policy. |
+| `apps/eqwec-hub` | Hub | Exists: developer-preview launcher | Product entry point, launcher UI, Hub policy, self-update orchestration. |
+| `crates/eqwec-updater` | Hub-owned, shared API | Exists: verification, durable-state, activation, staging, and uninstall engine | Generic download, verification, staging, activation, rollback, and recovery engine. No Hub UI or product-specific policy. |
 | `crates/eqwec-security` | Security owner | Exists: digest, signature, key id, safe path | Cryptographic verification, path safety, permission checks. Hub consumes; do not reimplement. |
 | `crates/eqwec-storage` | Storage owner | Planned | Atomic writes, tenant/profile-scoped persistence. Hub uses it for registry, journal, and cache. |
 | `crates/eqwec-config` | Config owner | Planned | Configuration loading, validation, migration. Hub uses it for channel and launcher settings. |
 | `crates/eqwec-ipc` | IPC owner | Planned | Versioned transport and message primitives. Hub owns only its message types and authorization rules. |
-| `packaging/eqwec-hub/` | Hub + release engineering | Planned | Installers, manifest templates, signing/notarization configuration, and packaging scripts. Never private keys. |
+| `packaging/eqwec-hub/` | Hub + release engineering | Exists: unsigned developer scripts | Installers, manifest templates, signing/notarization configuration, and packaging scripts. Never private keys. |
 | `tests/fixtures/eqwec-hub/` | Hub | Exists: non-production v1/v2 fixture and in-process end-to-end tests | Real test application, signed test packages, and a public non-production seed. Never reuse the seed or fixture for release signing. |
-| `docs/product-specs/eqwec-hub.md` | Hub | Planned | Product scope, channel policy, install layout, registry schema, and supported platforms. |
+| `docs/product-specs/eqwec-hub.md` | Hub | Exists: product scope and policy | Product scope, channel policy, install layout, registry schema, and supported platforms. |
 
 Shared-ownership rules:
 
@@ -203,6 +203,8 @@ Fixture requirements:
 - Record registry snapshots, file-tree hashes, process exit codes, bounded logs, and disk usage.
 - Never use production signing keys in tests. Never place test keys in release artifacts.
 
+Current coverage: the in-process fixture and launcher integration tests cover install (H-E2E-01), launch (H-E2E-03), update (H-E2E-04), rollback (H-E2E-07), uninstall (H-E2E-08), signature/tampered-package rejection (H-E2E-10), insufficient disk preflight (H-E2E-13), and malformed/traversal archive rejection (H-E2E-14) on local macOS. Recovery, repair, offline install, channel/architecture rejection, concurrency, and launcher self-update remain partial or `BLOCKED` until their workflows run on real installers and every claimed platform.
+
 | ID | Workflow | Success criteria |
 |---|---|---|
 | H-E2E-01 | Install fixture v1 from stable on a clean profile. | One active registry record; files match the manifest; no writes outside install, data, and cache roots; shortcut is correct; launcher lists the product. |
@@ -290,10 +292,11 @@ Release review is required when a change affects the manifest, package, registry
 
 Update the affected documents or record why no change is needed:
 
-- `docs/product-specs/eqwec-hub.md` — planned product spec, channel policy, install layout, and registry schema.
-- `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md` — planned.
-- `docs/security/THREAT-MODEL.md` — planned.
-- Hub performance budgets and measurement records — planned.
+- `docs/product-specs/eqwec-hub.md` — product scope, channel policy, install layout, and registry schema.
+- `docs/product-specs/eqwec-hub-schemas.md` — normative manifest, trust-store, registry, journal, and layout schemas.
+- `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md` — current launcher and packaging boundaries.
+- `docs/security/THREAT-MODEL.md` — local bundle, launcher, and packaging threats.
+- Hub performance budgets and measurement records — still `BLOCKED`; no benchmark harness.
 - `README.md` status, `AGENTS.md` skill activation map, changelog, and release notes.
 
 Version Hub independently. Version each schema separately and provide migrations. Do not describe an alpha or prototype as stable.

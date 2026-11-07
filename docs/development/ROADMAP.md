@@ -42,7 +42,7 @@ Deliverables:
 - Approved `SYSTEM-ARCHITECTURE.md` and `DEPENDENCY-MAP.md`.
 - Accepted ADRs for the first implementation decisions.
 - Cargo workspace with a pinned toolchain. **Done.**
-- Minimal shared crates with real APIs and tests. **`eqwec-core`, `eqwec-security`, and `eqwec-updater` done; 163 workspace tests pass.**
+- Minimal shared crates with real APIs and tests. **`eqwec-core`, `eqwec-security`, and `eqwec-updater` done; the workspace now has 211 tests.**
 - CI baseline: format, lint, build, test, advisory/license checks. **Done; GitHub Actions run `42389844319` passed on all three platforms.**
 - `dev-*` and `production` branch creation from the approved baseline. **`dev-hub` created; `production` deferred until a verified release.**
 - Initial version metadata at `0.0.0`. **Done.**
@@ -52,7 +52,7 @@ Gate: reproducible local build and passing baseline checks. No product feature y
 
 ## Phase 3 — EQwec Hub MVP
 
-**State:** in progress on `dev-hub`. Verification core, durable-state primitives, the in-process activation engine, bounded package staging, and a non-production fixture product with in-process end-to-end tests implemented; download transport, installer orchestration, uninstall, and launcher not started.
+**State:** in progress on `dev-hub`. Verification core, durable-state primitives, the activation engine, bounded package staging, journaled uninstall, the native launcher, local signed-bundle workflows, and platform packaging scripts are implemented. Download transport, repair orchestration, offline install, release signing, and Windows/Linux desktop acceptance are not.
 
 Completed:
 
@@ -67,17 +67,21 @@ Completed:
 - Activation engine for fresh install, update, rollback, and startup recovery, with five fault-injection points and a single-in-flight-operation invariant.
 - Bounded ZIP/ZIP64 package validation and extraction into a durable staging tree, including path, mode, header-confusion, ratio, size, and timeout rejection with partial-tree cleanup.
 - A real non-production fixture product (`tests/fixtures/eqwec-hub`) with v1 and v2 executables and signed packages. Three in-process tests install, launch, update, roll back, reject a tampered package, and recover an interrupted activation.
-- 163 workspace tests pass; fmt, clippy, build, audit, and deny pass locally and in GitHub Actions run `42389844319` on macOS, Ubuntu, and Windows.
+- Profile locking, disk-space preflight, and journaled uninstall with crash recovery (ADR-0013).
+- A native `egui`/`eframe` launcher with install, update, rollback, uninstall, launch, health check, read-only/repair states, and `--self-check`; 17 unit and 13 integration tests.
+- A deterministic demo-bundle generator using the public fixture key, with four generator/trust-store tests.
+- macOS DMG, per-user Windows MSI, and Linux `.deb`/`tar.zst` packaging scripts plus `.github/workflows/package.yml`; all three artifacts passed their smoke checks in run `42398364283`.
+- 211 workspace tests pass; fmt, clippy, build, audit, and deny pass locally on macOS.
 
 Remaining:
 
-- Native launcher UI.
-- Verified download transport, uninstall, and offline install.
+- Verified download transport and offline install.
 - Repair orchestration and integrity re-verification of installed trees.
 - Diagnostics with redaction.
-- Installer packaging and a real fixture product installed, launched, updated, repaired, and removed on each claimed platform.
+- Release signing, notarization, and Authenticode.
+- A real fixture product installed, launched, updated, repaired, and removed through each platform installer, including a desktop launcher run on Windows and Linux.
 
-Acceptance: install, verify, launch, update, interrupt/recover, repair, roll back, and uninstall a real fixture application on each claimed platform. This remains `BLOCKED` until the remaining items exist and pass.
+Acceptance: install, verify, launch, update, interrupt/recover, repair, roll back, and uninstall a real fixture application on each claimed platform. Local macOS launcher evidence and in-process tests exist, but the full acceptance remains `BLOCKED` until repair, offline install, release signing, and Windows/Linux desktop runs exist.
 
 Why first: Hub establishes package trust, versioning, installation, and update infrastructure that the ecosystem needs. It is smaller than a browser or creative editor and its security model is well bounded.
 
@@ -181,8 +185,8 @@ Products release independently. The ecosystem is not "finished" until each produ
 ## Current blockers
 
 - ADR-0004 (media/codecs) and ADR-0008 (project license) are `PROPOSED`, not normative. Codec/patent and DRM decisions require counsel; the project license requires owner approval.
-- Hub verification, durable-state, activation, and staging crates and an in-process fixture workflow exist, but no product application, installer, uninstaller, or launcher exists.
+- Hub verification, durable-state, activation, staging, and uninstall crates, the non-production fixture workflow, the native launcher, and platform packaging scripts exist. Download transport, repair, offline install, release signing, and Windows/Linux desktop acceptance do not.
 - GUI accessibility, text input, browser integration, and audio real-time behavior are `UNVERIFIED` until their prototypes run.
-- No signing infrastructure, installer, or release channel exists.
+- No signing infrastructure, notarization, Authenticode, or release channel exists.
 - Windows and Linux workspace tests run in CI; their product runtime has not been exercised.
 - The competitor, legal, and feasibility reviews are planning evidence, not implementation approval.

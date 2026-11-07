@@ -119,15 +119,15 @@ Last verified: 2026-11-07.
 
 | Item | State |
 |---|---|
-| Cargo workspace | Exists: resolver 3, edition 2024, Rust 1.99.1, members `crates/*` and `tests/fixtures/eqwec-hub` |
-| Workspace crates | `eqwec-core`, `eqwec-security`, `eqwec-updater`; non-published `eqwec-hub-fixture` test crate; eight direct third-party dependencies |
-| Approved dependencies | The eight direct dependencies in §9 passed advisory, license, ban, and source checks on 2026-11-07 |
-| Lockfile | `Cargo.lock` committed; 68 locked packages |
+| Cargo workspace | Exists: resolver 3, edition 2024, Rust 1.99.1, members `crates/*`, `apps/*`, and `tests/fixtures/eqwec-hub` |
+| Workspace crates | `eqwec-core`, `eqwec-security`, `eqwec-updater`; the `eqwec-hub` launcher application; non-published `eqwec-hub-fixture` test crate; nine direct third-party dependencies |
+| Approved dependencies | The nine direct dependencies in §9 passed advisory, license, ban, and source checks on 2026-11-07 |
+| Lockfile | `Cargo.lock` committed; 458 locked packages |
 | SBOM | None |
-| License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel |
+| License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel; GUI font and Windows clipboard licenses admitted in `deny.toml` |
 | Technology selection | Planning baseline: `docs/architecture/TECHNOLOGY-SELECTION.md` |
-| ADR set | ADR-0001 through ADR-0012 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
-| Advisory/license CI | PASS in GitHub Actions run `42389844319` on commit `c066d67`; local commands also pass |
+| ADR set | ADR-0001 through ADR-0013 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
+| Advisory/license CI | PASS in GitHub Actions run `42398364288` on commit `67c7444`; local commands also pass with the GUI stack admitted |
 
 ## 9. Admitted dependencies
 
@@ -143,8 +143,11 @@ These are the only third-party direct dependencies admitted so far. Admission co
 | `thiserror` | 2.0.18 | 2.0.21 | MIT OR Apache-2.0 | Typed error definitions | `eqwec-security`, `eqwec-updater` |
 | `zip` | 9.4.1 | 9.4.1 | MIT | Bounded ZIP/ZIP64 package validation and extraction; fixture package construction | `eqwec-updater`, `eqwec-hub-fixture` (dev) |
 | `fs4` | 1.1.0 | 1.1.0 | MIT OR Apache-2.0 | Cross-platform available disk space for the staging preflight | `eqwec-updater` |
+| `eframe` | 0.37.0 | 0.37.0 | MIT OR Apache-2.0 | Native launcher window and event loop; default features include wgpu, Wayland, X11, accessibility, and bundled fonts | `eqwec-hub` |
 
 `eqwec-hub-fixture` is non-published test infrastructure. Its dev-dependencies reuse admitted crates; it introduces no new third-party dependency. `zip` pulls `flate2` (MIT OR Apache-2.0) and `zlib-rs` (Zlib) for the pure-Rust deflate backend. They are transitive and pinned by `Cargo.lock`; a direct use requires a new admission entry.
+
+`eframe` pulls a large transitive GUI tree (458 locked packages total). Four RustSec `unmaintained` advisories are explicitly ignored in `deny.toml` with reasons: `ttf-parser` through winit's Wayland decorations, and `zbus_names`, `zvariant`, `zvariant_derive` through accesskit's Linux screen-reader bridge. None has a known vulnerability; each is re-evaluated on a winit, accesskit, or zbus upgrade. The GUI tree also adds `BSL-1.0` (Windows clipboard), `OFL-1.1`, and `Ubuntu-font-1.0` (bundled fonts) to the license allow list.
 
 `cargo deny check` reported `advisories ok, bans ok, licenses ok, sources ok` on 2026-11-07. The duplicate `syn` 2.x/3.x warning is accepted because the two versions are isolated to proc-macro expansion.
 

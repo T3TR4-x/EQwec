@@ -393,9 +393,54 @@ Findings:
 |---|---|---|
 | Medium | GitHub did not discover `.github/workflows/ci.yml` until the default branch changed and a workflow file was created through the API | Worked around; the temporary probe was removed in `2fa0203` |
 | Low | Windows verification is compile-only locally; runtime test execution depends on GitHub-hosted runners | Accepted; run `42389844319` is the runtime evidence |
-| High | Windows and Linux product-runtime acceptance remains impossible because no Hub application or installer exists | Open; `BLOCKED` |
+| High | Windows and Linux product-runtime acceptance remains impossible because no Hub application or installer exists | Resolved by the launcher and packaging task below; Windows/Linux desktop acceptance remains `BLOCKED` |
 
 Gate decision: CI `PASS` for commit `c066d67`. Hub MVP acceptance remains `BLOCKED`.
+
+## Task: Hub launcher, demo bundle, and platform packaging (2026-11-07)
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Work stayed on `dev-hub`; changes were scoped to the launcher, updater lock test, packaging, and impacted docs; commits use Ukrainian imperative Conventional Commits; no release or desktop acceptance was fabricated |
+| `eqwec-quality-control` | APPLIED | Final gates: CI run `42398364288` passed all five jobs; package run `42398364283` passed macOS DMG, Windows MSI, and Linux packages; release and Windows/Linux desktop acceptance remain `BLOCKED` |
+| `eqwec-hub` | APPLIED | Launcher actions and UI in `apps/eqwec-hub`, journaled uninstall, profile lock, disk preflight, and packaging under `packaging/eqwec-hub`; Hub invariants drove pointer-first launch and health-check ordering |
+| `caveman` | APPLIED | Responses kept terse and fact-first; no repository artifact |
+| `superpowers` | APPLIED | Plan and ledger at `docs/superpowers/plans/2026-11-07-eqwec-hub-launcher.md` and `.superpowers/sdd/2026-11-07-eqwec-hub-launcher/progress.md` |
+| `code-review` | APPLIED | Review found three defects before merge: Windows mandatory locking broke a lock-file read, WiX v7 required the OSMF EULA, and a parenthesized PowerShell argument produced an empty `BinaryPath`; each received a fix and a rerun |
+| `frontend-design` | APPLIED | Launcher hierarchy in `apps/eqwec-hub/src/app.rs`: header, status banner, action strip, product list, and detail panel; plain native typography without decorative gradients |
+| `ui-ux-pro-max` | APPLIED | Empty, error, read-only, and repair-required states; disabled mutations when the profile lock is unavailable; uninstall confirmation modal; progress and error text |
+| `playwright` (best-practices and CLI) | AVAILABLE_NOT_RELEVANT | The launcher is a native `egui` window with no web content; Playwright cannot test native desktop chrome |
+| `ponytail` | APPLIED | One `actions::install_bundle` handles install and update; no new abstraction for launch, open-folder, or status rendering; fixes were the smallest change that passed |
+| `karpathy-guidelines` | APPLIED | Explicit assumptions before editing, surgical diffs, typed errors, and verification with the repository's real commands |
+| `unslop` | APPLIED | UI uses plain status text, native widgets, and no emoji labels, gradient text, glows, or decorative badges |
+| `security-audit` | APPLIED | Threat-model entries H-12–H-15 cover malicious local bundle layout, health-check hangs, concurrent profile mutation, and pointer/tree tampering; controls are implemented and tested |
+| Matt Pocock skill | BLOCKED | No skill with that name exists in the available registry; no substitute was invented |
+| Other product skills | AVAILABLE_NOT_RELEVANT | No path in Browser, PhotoCraft, VectorCraft, FilmCraft, EffectCraft, CraftAnything, or AudioCraft was touched |
+
+## Quality-control report for the launcher and packaging task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | Branch `dev-hub`; approved design revision 2 and plan inspected; worktree checked before each commit |
+| Implementation | PASS | `actions.rs`, `launch.rs`, `worker.rs`, `app.rs`, demo-bundle generator, packaging scripts, and the Windows lock-test fix; no unrelated product code |
+| Verification | PASS | `cargo test --workspace --all-features --locked` — 211 passed, 0 failed; fmt, clippy, build, audit, and deny pass locally; CI run `42398364288` all jobs green; package run `42398364283` all platforms green; macOS window alive for 5 seconds and `--self-check` exit 0 |
+| Performance | NOT_APPLICABLE | No performance claim; no benchmark harness exists |
+| Security | PASS for the local developer-preview scope | Bundle layout, symlink, pointer, lock, disk, signature, and health-check controls tested; release signing and platform trust remain `BLOCKED` |
+| Merge | PASS | Commits `488d49b`, `9cd4a60`, `f66577b`, `ef14f5f`, `4c846df`, `a0a3973`, `4bda412`, `860acf6`, `2231dc5`, `6f25b8a`, and `67c7444` on `dev-hub` |
+| Release | BLOCKED | No signing keys, Developer ID, notarization, Authenticode, release channel, or desktop acceptance on Windows/Linux |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| High | Windows and Linux desktop launcher runs do not exist; only headless tests and package smoke checks ran | Open; `BLOCKED` |
+| High | Release signing, notarization, Authenticode, and a release channel do not exist | Open; `BLOCKED` |
+| Medium | Download transport, repair, dependency resolution, and offline bundles are not implemented | Open; `BLOCKED` |
+| Medium | WiX v5+ requires the OSMF EULA, so the MSI script pins WiX 4.0.6 | Accepted with a pinned tool; re-evaluate on upgrade |
+| Medium | `workflow_dispatch` cannot be used until `package.yml` exists on the default branch; a temporary `dev-hub` push trigger provides verification | Open; remove or replace when the workflow reaches the default branch |
+| Low | The Windows MSI smoke test installs silently and runs `--self-check`; it does not click through the launcher | Accepted; desktop acceptance remains `BLOCKED` |
+
+Gate decision: Hub launcher developer preview `PASS` locally and in CI/package smoke checks. Hub MVP acceptance remains `BLOCKED` on repair, offline install, release signing, and Windows/Linux desktop runs.
 
 ## Template for future tasks
 

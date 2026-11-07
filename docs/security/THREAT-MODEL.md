@@ -1,6 +1,6 @@
 # Threat Model
 
-**Status:** planning baseline. Architecture-dependent details will be refined after the browser-engine, GUI, media, and audio decisions are accepted. This model covers the ecosystem-level trust boundaries that every product inherits.
+**Status:** planning baseline refined by the Hub developer-preview implementation. Architecture-dependent details for other products will be refined after the browser-engine, GUI, media, and audio decisions are accepted. This model covers the ecosystem-level trust boundaries that every product inherits.
 
 ## 1. Scope and assumptions
 
@@ -101,6 +101,10 @@ Risk is qualitative: likelihood and impact are `low`, `medium`, `high`, or `crit
 | H-09 | Signing-key theft | low | critical | Offline/HSM custody, rotation, revocation, incident response | Insider risk |
 | H-10 | IPC spoofing to privileged operation | medium | high | Authenticated per-user socket, ACLs, version/authorization checks | Local same-user malware |
 | H-11 | Unsafe elevation | low | high | Per-user install by default; absolute paths; no inherited `PATH` | Platform installer quirks |
+| H-12 | Malicious local bundle layout (extra files, symlinked manifest or package) | medium | high | Accept exactly `manifest.json` and `package.zip`, both regular files, no symlinks; absolute bundle path; verify before copy | Same-user filesystem control |
+| H-13 | Health check hangs or leaves an orphan child | medium | medium | Ten-second bound, kill and reap on timeout, no shell, stdio nulled | Product startup side effects |
+| H-14 | Concurrent launcher mutation corrupts the profile | medium | high | Exclusive profile lock; read-only mode with disabled mutations when the lock is unavailable | Same-user lock bypass |
+| H-15 | Launch after pointer or tree tampering | medium | high | Pointer-first resolution; pointer/record/tree/entry must agree; reject symlinked tree, bin, or entry; no PATH lookup | Local administrator |
 
 ### 5.2 Browser
 

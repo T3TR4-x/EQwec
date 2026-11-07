@@ -234,7 +234,8 @@ Technology selections are recorded in `docs/architecture/TECHNOLOGY-SELECTION.md
 
 ## 12. Current state
 
-- `Cargo.toml`, `Cargo.lock`, `crates/eqwec-core/`, and `.github/workflows/ci.yml` exist. There is no `apps/`, product crate, installer, or release artifact.
-- This document describes the approved target, not implemented behavior.
-- ADR-0001 through ADR-0010 are recorded. ADR-0004 and ADR-0008 remain `PROPOSED`; the other ADRs carry explicit prototype, legal, or release gates.
-- The architecture gate is `PASS` for the planning baseline: the target architecture, dependency direction, security boundaries, and ADR set exist and agree. Runtime architecture verification is `BLOCKED` until the workspace and prototypes exist.
+- The workspace contains `eqwec-core`, `eqwec-security`, `eqwec-updater`, the `eqwec-hub` launcher application under `apps/eqwec-hub/`, the non-published `eqwec-hub-fixture` test crate, CI, and packaging scripts under `packaging/eqwec-hub/`. No other product crate, signed installer, or release artifact exists.
+- The launcher is a developer-preview `eframe` window. It installs, updates, rolls back, uninstalls, and launches locally supplied signed bundles. Download transport, repair, dependency resolution, and background updates do not exist.
+- This document describes the approved target, not fully implemented behavior.
+- ADR-0001 through ADR-0013 are recorded. ADR-0004 and ADR-0008 remain `PROPOSED`; the other ADRs carry explicit prototype, legal, or release gates.
+- The architecture gate is `PASS` for the planning baseline: the target architecture, dependency direction, security boundaries, and ADR set exist and agree. Runtime architecture verification beyond the Hub developer preview remains `BLOCKED` until other prototypes exist.

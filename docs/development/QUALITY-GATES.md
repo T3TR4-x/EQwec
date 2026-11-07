@@ -128,19 +128,20 @@ For a performance result, also record hardware, workload, baseline, target, obse
 | `cargo fmt --check` | PASS | `cargo fmt --all -- --check`, exit 0, 2026-11-07 |
 | `cargo clippy` | PASS | `cargo clippy --workspace --all-targets --all-features -- -D warnings`, exit 0 |
 | `cargo build` | PASS | `cargo build --workspace --all-targets --locked`, exit 0 |
-| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 163 tests passed, 0 failed |
+| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 211 tests passed, 0 failed |
 | Hub manifest/trust/package verification | PASS | 19 integration tests in `crates/eqwec-updater/tests/verification.rs`, including a fixed OpenSSL-generated Ed25519 vector |
 | Hub registry/journal/layout/active-pointer primitives | PASS | `registry.rs`, `journal.rs`, `layout.rs`, `active.rs`, `atomic.rs`; unit tests cover round-trip, bounds, traversal, partial lines, and atomic replacement |
 | Hub activation transaction and recovery | PASS for the in-process engine | `activation.rs`; 25 tests cover install, update, rollback, five fault points, recovery before and after the pointer, rollback recovery, and single-in-flight enforcement |
 | Hub package archive validation and staging | PASS for in-process gates 1–11 | `staging.rs`; 31 tests cover ZIP/ZIP64, traversal, links, modes, duplicate names, every bound, header confusion, encryption, multi-disk, cleanup, and staging-to-activation |
-| Hub fixture install/update/rollback workflow | PASS for in-process macOS evidence | `tests/fixtures/eqwec-hub/`; 3 tests install and launch v1, update and launch v2, roll back, reject a tampered package, and recover an interrupted activation |
-| Hub installer and launcher | BLOCKED | No download transport, uninstaller, installer packaging, or UI |
-| `cargo audit` | PASS | `cargo audit`, exit 0; 0 advisories across 64 locked dependencies |
+| Hub fixture install/update/rollback workflow | PASS for in-process and local macOS evidence | `tests/fixtures/eqwec-hub/`; 3 end-to-end tests plus 4 demo-bundle tests install and launch v1, update and launch v2, roll back, reject a tampered package, and recover an interrupted activation |
+| Hub launcher workflow | PASS for local macOS developer preview | `apps/eqwec-hub`; 17 unit and 13 integration tests cover install, update, rollback, uninstall, launch, health check, pointer-first resolution, and disk preflight; `--self-check` exits 0; the window stayed alive for 5 seconds |
+| Hub installer and launcher | BLOCKED for release; local developer preview PASS | Launcher, uninstaller, and packaging scripts exist and pass local/in-process tests; download transport, repair, offline bundles, diagnostics, release signing, and Windows/Linux desktop acceptance do not |
+| `cargo audit` | PASS | `cargo audit`, exit 0; 0 advisories across 458 locked dependencies with 4 documented RUSTSEC ignores |
 | `cargo deny check` | PASS | `cargo deny check`, exit 0; advisories, bans, licenses, sources ok |
-| CI pipeline | PASS | GitHub Actions run `42389844319` on commit `c066d67`: all five jobs succeeded (`test` on macOS, Ubuntu, Windows; `advisories`; `licenses and bans`) |
-| Hub install/update/rollback platform acceptance | BLOCKED | The in-process fixture tests run on all three CI platforms; download transport, uninstall, installer, launcher, and platform packaging do not exist |
-| Packaging/signing checks | BLOCKED | No product artifact |
-| Benchmarks | BLOCKED | No runtime product fixture |
+| CI pipeline | PASS | GitHub Actions run `42398364288` on commit `67c7444`: all five jobs succeeded (`test` on macOS, Ubuntu, Windows; `advisories`; `licenses and bans`) |
+| Hub install/update/rollback platform acceptance | BLOCKED for Windows/Linux desktop; headless and package smoke checks PASS | In-process and launcher tests run on all three CI platforms; package install/self-check/uninstall passed on macOS, Windows, and Linux. The launcher window has only local macOS evidence |
+| Packaging/signing checks | BLOCKED for release signing; unsigned artifact checks PASS | Run `42398364283`: macOS DMG mounted and self-checked; Windows per-user MSI installed, self-checked, and uninstalled; Linux `.deb` installed, self-checked, and removed. Developer ID, notarization, and Authenticode do not exist |
+| Benchmarks | BLOCKED | No benchmark harness or baseline |
 
 A `BLOCKED` check is not a failure of the project at the planning stage, but it must remain visible and must be executed before the relevant release gate.
 
@@ -150,7 +151,7 @@ The author should not be the only reviewer of a high-risk change. When a separat
 
 ## 7. CI execution
 
-The workspace exists and `.github/workflows/ci.yml` runs on GitHub Actions. Run `42389844319` on commit `c066d67` passed all five jobs: format, clippy, build, and tests on macOS, Ubuntu, and Windows, plus advisory and license/ban checks. The pipeline executes, in order:
+The workspace exists and `.github/workflows/ci.yml` runs on GitHub Actions. Run `42398364288` on commit `67c7444` passed all five jobs: format, clippy, build, and tests on macOS, Ubuntu, and Windows, plus advisory and license/ban checks. `.github/workflows/package.yml` builds and smoke-tests the macOS DMG, Windows MSI, and Linux packages; all three passed in run `42398364283`. The pipeline executes, in order:
 
 ```text
 format -> lint -> license/advisory -> build -> unit -> integration

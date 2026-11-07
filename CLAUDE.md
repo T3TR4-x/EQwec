@@ -21,7 +21,7 @@
 
 ## Repository constraints
 
-- Current phase: Phase 3 Hub MVP at `0.0.0`. The verification core, durable-state primitives, activation engine, package staging, and a non-production in-process fixture workflow exist; no installer, launcher UI, or usable product exists.
+- Current phase: Phase 3 Hub MVP. Workspace version `0.0.0`; the Hub launcher is a `0.1.0-alpha.1` developer preview. Verification, durable state, activation, rollback, recovery, package staging, journaled uninstall, a native launcher UI, local signed-bundle workflows, and platform packaging scripts exist. Download transport, repair, release signing, and Windows/Linux desktop acceptance do not.
 - Do not create applications for other products or add product features outside the Hub MVP. Shared infrastructure changes still require an owner, tests, and an impacted-document update.
 - `main` contains only `README.md`. Never add skills, `AGENTS.md`, `CLAUDE.md`, or technical documents to `main`.
 - Work on `integration` or an appropriate scoped branch. Inspect the worktree before switching, staging, merging, or rebasing.
@@ -47,6 +47,6 @@ python3 -m venv .venv-skillcheck
   --validator ~/.agents/skills/skill-creator/scripts/quick_validate.py
 ```
 
-The Cargo workspace exists. The verified local commands are `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo build --workspace --all-targets --locked`, and `cargo test --workspace --all-features --locked`. GitHub Actions run `42389844319` passed all jobs on macOS, Ubuntu, and Windows, including advisory and license checks.
+The Cargo workspace exists. The verified local commands are `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo build --workspace --all-targets --locked`, and `cargo test --workspace --all-features --locked`. GitHub Actions run `42398364288` passed all jobs on macOS, Ubuntu, and Windows, including advisory and license checks. The Hub launcher runs with `cargo run -p eqwec-hub` and reports state with `cargo run -p eqwec-hub -- --self-check`.
 
 If this file and `AGENTS.md` disagree, `AGENTS.md` wins. Report the conflict and fix this file.

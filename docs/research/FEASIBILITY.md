@@ -13,7 +13,7 @@
 
 The ecosystem is **technically feasible but not yet de-risked**. Every product has a credible implementation path using the selected Rust-first stack, and no product requires an unsolved research breakthrough. The binding constraints are organizational and legal, not algorithmic:
 
-1. **Breadth is the largest risk.** Eight product families, including a browser and a package manager, are planned with only a Phase 2 workspace, one passing three-OS CI run, no installer, and no release artifact. The sequence must be depth-first: Hub, then one creative product, then the rest.
+1. **Breadth is the largest risk.** Eight product families, including a browser and a package manager, are planned with a Phase 2 workspace, a Hub developer-preview launcher, packaging scripts, no accepted platform release, and no release artifact. The sequence must be depth-first: Hub, then one creative product, then the rest.
 2. **The browser is the highest-risk product.** CEF provides Chromium-class compatibility without a fork, but EQwec becomes responsible for engine rebuilds, security response, codecs, DRM, and a large installer. This is a permanent operating cost, not a one-time integration.
 3. **Codec and DRM licensing is unresolved.** H.264, AAC, HEVC, ProRes, and DNxHR cannot ship by default until counsel or an authorized licensing decision exists. AV1, VP9, Opus, FLAC, PNG, JPEG, and WebP provide a royalty-free first-release path.
 4. **Audio real-time correctness is unproven.** CPAL and out-of-process CLAP/VST3 hosting are credible, but no EQwec measurement exists. The audio callback contract and plugin crash isolation must be proven before AudioCraft work.
@@ -45,7 +45,7 @@ Limits:
 
 `OBSERVED`/`ASSUMPTION`: The accepted ADRs define one coherent stack: Rust, `egui`/`eframe`, `wgpu`, `kurbo`/`lyon`/`cosmic-text`, FFmpeg under LGPL-only, CPAL, CLAP-first plugin hosting, a versioned project bundle, and signed native packages. Each choice has a documented fallback. This reduces integration risk compared with per-product stacks.
 
-The common foundation is now a workspace with three crates and a non-published fixture. The next evidence must be the Hub trust chain: signed manifest, verified download, transactional install/update/rollback, and fault injection. Workspace CI now runs on all three platforms; product-runtime acceptance on Windows and Linux remains to be built.
+The common foundation is a workspace with three crates, a non-published fixture, and a Hub developer-preview launcher. The next evidence must be the Hub trust chain end to end: signed download transport, repair, transactional install/update/rollback, fault injection, and platform installer acceptance. Workspace CI runs on all three platforms; product-runtime desktop acceptance on Windows and Linux remains to be built.
 
 ### 3.2 Trust and update chain
 
@@ -81,7 +81,7 @@ The common foundation is now a workspace with three crates and a non-published f
 
 **Verdict:** feasible; recommended first product.
 
-**Credible path:** native `egui` shell, signed manifest, local installation registry, transactional staging and activation, rollback, repair, uninstall, offline bundles, redacted diagnostics. Uses ADR-0006 storage discipline and ADR-0007 signing.
+**Credible path:** native `egui` shell, signed manifest, local installation registry, transactional staging and activation, rollback, repair, uninstall, offline bundles, redacted diagnostics. Uses ADR-0006 storage discipline and ADR-0007 signing. The launcher, local signed-bundle install/update/rollback/uninstall/launch, journaled uninstall, disk preflight, profile locking, and packaging scripts are implemented as a developer preview; download transport, repair, offline bundles, diagnostics, and release signing remain.
 
 **Key risks:**
 
@@ -92,7 +92,7 @@ The common foundation is now a workspace with three crates and a non-published f
 
 **Blockers:** signing keys, certificates, notarization account, and release channel. All release steps `BLOCKED`.
 
-**First proof:** install, verify, launch, update, kill mid-update, recover, repair, roll back, and uninstall a fixture application on macOS, then Windows and Linux.
+**First proof:** install, verify, launch, update, kill mid-update, recover, repair, roll back, and uninstall a fixture application on macOS, then Windows and Linux. Local macOS launcher evidence covers install, update, rollback, uninstall, and launch; repair and Windows/Linux desktop acceptance remain.
 
 ### 4.2 EQwec Browser
 
@@ -243,8 +243,8 @@ The common foundation is now a workspace with three crates and a non-published f
 
 ## 6. Recommended sequence
 
-1. **Phase 2 — Workspace baseline (in progress).** Cargo workspace, pinned toolchain, `eqwec-core`, CI configuration, local advisory/license checks. `dev-hub` next; `production` only after a verified release. No product feature.
-2. **Phase 3 — Hub MVP.** Signed manifest, registry, transactional install/update/rollback/repair/uninstall, offline bundles, diagnostics. First real trust chain.
+1. **Phase 2 — Workspace baseline (done).** Cargo workspace, pinned toolchain, `eqwec-core`, CI configuration, local advisory/license checks. `dev-hub` exists; `production` only after a verified release.
+2. **Phase 3 — Hub MVP (in progress).** Signed manifest, registry, transactional install/update/rollback/repair/uninstall, offline bundles, diagnostics. Launcher, local signed-bundle workflows, uninstall, and packaging scripts exist; transport, repair, offline bundles, diagnostics, and release signing do not.
 3. **Phase 4 — Browser prototype.** CEF integration, isolation, session restore, packaging, measurements. Do not expand features before the gate.
 4. **Phase 5 — Creative foundation.** Document lifecycle, undo, assets, project serialization, migrations, design tokens.
 5. **Phase 6 — VectorCraft first complete creative product.** Smallest credible vertical slice with deterministic tests.
@@ -260,8 +260,8 @@ This order is a recommendation, not a commitment. It can change only with record
 | Documentation | Required research, architecture, security, performance, and development docs exist and pass structural checks | `PASS`; `check-docs.py --gate` returned 0 failures on 2026-11-07 |
 | Architecture | ADRs for GUI, browser, media, audio, storage, packaging, license, diagnostics, and plugin trust are recorded | `PASS` with open gates inside ADRs |
 | Security | Threat model and baseline exist; product-specific boundaries reviewed | `PASS` for planning baseline; runtime `BLOCKED` |
-| Workspace | Cargo workspace builds, tests, lints, and checks advisories/licenses | `PASS` locally on macOS and in GitHub Actions run `42389844319` on macOS, Ubuntu, and Windows |
-| Hub release | Install/update/rollback/repair/uninstall verified on claimed platforms | `BLOCKED` — no implementation |
+| Workspace | Cargo workspace builds, tests, lints, and checks advisories/licenses | `PASS` locally on macOS and in GitHub Actions run `42398364288` on macOS, Ubuntu, and Windows |
+| Hub release | Install/update/rollback/repair/uninstall verified on claimed platforms | `BLOCKED` — local developer preview, in-process tests, and package smoke checks exist; repair, release signing, and Windows/Linux desktop acceptance do not |
 | Browser prototype | Sandbox, isolation, session restore, packaging, measurements | `BLOCKED` — no prototype |
 | Media legal | Codec/patent and DRM decisions recorded | `BLOCKED` — counsel required |
 | GUI prototype | Accessibility, IME, performance on three platforms | `BLOCKED` — no prototype |
@@ -274,12 +274,12 @@ This order is a recommendation, not a commitment. It can change only with record
 | Environment audit | `PASS` | macOS 26.7.2 arm64; Rust 1.99.1; Cargo 1.99.1; Node 26.10.0; OpenCode 2.2.5 |
 | Project skills | `PASS` | `scripts/verify-skills.py` 10/10; schema validation 10/10; trigger evidence in `SKILLS-AUDIT.md` |
 | Research | `PASS` | Browser, competitor, legal, and this synthesis exist |
-| Architecture | `PASS` with open decisions | ADR-0001 through ADR-0010 recorded; 0004 and 0008 remain `PROPOSED` |
+| Architecture | `PASS` with open decisions | ADR-0001 through ADR-0013 recorded; 0004 and 0008 remain `PROPOSED` |
 | Security baseline | `PASS` for planning | Threat model and baseline exist; runtime verification `BLOCKED` |
 | Performance | `PASS` for methodology | Strategy exists; no benchmark `BLOCKED` |
-| Workspace | `PASS` locally and in CI | Cargo workspace; 163 tests; fmt, clippy, build, audit, and deny pass; GitHub Actions run `42389844319` passed on macOS, Ubuntu, and Windows |
-| Product implementation | `BLOCKED` | Gates above must pass first |
-| Windows/Linux verification | `PASS` for workspace tests; product acceptance `BLOCKED` | CI runs the workspace tests; no Hub application or installer exists to accept |
+| Workspace | `PASS` locally and in CI | Cargo workspace; 211 tests; fmt, clippy, build, audit, and deny pass; GitHub Actions run `42398364288` passed on macOS, Ubuntu, and Windows |
+| Product implementation | `PASS` for the local Hub developer preview; `BLOCKED` for release | Launcher, install/update/rollback/uninstall/launch, `--self-check`, and packaging scripts exist; download transport, repair, offline install, release signing, and platform desktop acceptance do not |
+| Windows/Linux verification | `PASS` for workspace tests and package smoke checks; desktop acceptance `BLOCKED` | CI runs the workspace tests and packaging jobs; no desktop launcher run has been accepted |
 | Release | `BLOCKED` | No keys, signing, installer, or channel |
 
 ## 9. Open decisions

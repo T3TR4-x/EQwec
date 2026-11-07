@@ -1,6 +1,6 @@
 # Test Strategy
 
-**Status:** approved strategy. The workspace now contains `eqwec-core`, `eqwec-security`, `eqwec-updater`, and the non-published `eqwec-hub-fixture` with 163 tests. Workspace tests run on macOS, Ubuntu, and Windows in CI. Product-level installer acceptance, benchmarks, and fuzzing remain `BLOCKED` until the corresponding product code exists.
+**Status:** approved strategy. The workspace contains `eqwec-core`, `eqwec-security`, `eqwec-updater`, the non-published `eqwec-hub-fixture`, and the `eqwec-hub` launcher developer preview with 211 tests. Workspace tests run on macOS, Ubuntu, and Windows in CI. The launcher has local macOS evidence; Windows/Linux desktop acceptance, repair, offline install, benchmarks, and fuzzing remain `BLOCKED` until the corresponding workflows exist.
 
 ## 1. Principles
 
@@ -91,15 +91,16 @@ format -> lint -> license/advisory -> build -> unit -> integration
 ```
 
 - `.github/workflows/ci.yml` implements format, clippy, build, test, audit, and deny jobs on an Ubuntu/macOS/Windows matrix.
+- `.github/workflows/package.yml` builds the macOS DMG, per-user Windows MSI, and Linux `.deb`/`tar.zst`, then installs and smoke-tests them where the runner permits.
 - Use a pinned toolchain and `Cargo.lock`.
 - Cache dependencies without allowing stale or compromised artifacts to bypass verification.
 - Run platform-specific jobs for Windows, macOS, and Linux where the change is platform-sensitive.
 - Publish test reports and artifacts with retention appropriate to the release.
-- GitHub Actions run `42389844319` on commit `c066d67` passed all five jobs: tests on macOS, Ubuntu, and Windows, plus advisories and licenses/bans. `CI_EXECUTION` is `PASS` for this commit.
+- GitHub Actions run `42398364288` on commit `67c7444` passed all five jobs: tests on macOS, Ubuntu, and Windows, plus advisories and licenses/bans. `CI_EXECUTION` is `PASS` for this commit. macOS DMG, Windows MSI, and Linux packages all passed run `42398364283`.
 
 ## 10. Current state
 
-- The Phase 2 workspace exists with `eqwec-core`, `eqwec-security`, `eqwec-updater`, and the non-published `eqwec-hub-fixture`; 163 workspace tests pass.
-- `.github/workflows/ci.yml` runs on a three-OS matrix and passed on 2026-11-07.
-- Local evidence: fmt, clippy, build, test, audit, and deny pass on macOS 26.7.2 arm64 with Rust 1.99.1.
-- The fixture corpus and three in-process Hub end-to-end tests exist; platform product acceptance, benchmarks, and fuzzing do not.
+- The workspace contains `eqwec-core`, `eqwec-security`, `eqwec-updater`, the non-published `eqwec-hub-fixture`, and the `eqwec-hub` launcher developer preview; 211 workspace tests pass.
+- `.github/workflows/ci.yml` runs on a three-OS matrix and passed on 2026-11-07. `.github/workflows/package.yml` builds and smoke-tests macOS, Windows, and Linux artifacts.
+- Local evidence: fmt, clippy, build, test, audit, and deny pass on macOS 26.7.2 arm64 with Rust 1.99.1; the launcher window opened, `--self-check` exited 0, and a macOS DMG was mounted and self-checked.
+- The fixture corpus, three in-process Hub end-to-end tests, four demo-bundle tests, and 17 launcher unit plus 13 launcher integration tests exist. Repair, offline install, Windows/Linux desktop acceptance, benchmarks, and fuzzing do not.

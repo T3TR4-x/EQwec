@@ -8,13 +8,13 @@ EQwec is an independent ecosystem of professional desktop applications and a uni
 
 **Phase 3 — Hub MVP.** The project is at version `0.0.0`. No product has a usable release yet, and nothing in this repository should be treated as production-ready.
 
-The Cargo workspace, pinned toolchain, `eqwec-core` shared crate, and CI workflow exist on `integration`. Hub verification, durable state, activation, rollback, recovery, bounded package staging, and a non-production v1/v2 fixture workflow are implemented on `dev-hub`. The mandatory skills, research, architecture, and security gates have passed for the planning scope. GitHub Actions run `42389844319` passed on macOS, Ubuntu, and Windows with 163 workspace tests plus advisory and license checks. Download transport, uninstall, the launcher UI, installer packaging, platform product acceptance, and every other product remain `BLOCKED`.
+The Cargo workspace, pinned toolchain, shared crates, and CI workflow exist on `integration`. Hub verification, durable state, activation, rollback, recovery, bounded package staging, journaled uninstall, a native launcher UI, local signed-bundle install/update/rollback/uninstall/launch, and packaging scripts for macOS, Windows, and Linux are implemented on `dev-hub`. The mandatory skills, research, architecture, and security gates have passed for the planning scope. GitHub Actions CI run `42398364288` passed the workspace tests on macOS, Ubuntu, and Windows; packaging run `42398364283` built and smoke-tested the macOS DMG, Windows MSI, and Linux packages. Download transport, repair, dependency resolution, release signing, notarization, and Windows/Linux desktop acceptance remain `BLOCKED`.
 
 ## Products
 
 | Product | Purpose | Status |
 |---|---|---|
-| EQwec Hub | Launcher, package manager, installer, updater, and installation health manager | MVP in progress: verification, activation, rollback, recovery, package staging, and an in-process v1/v2 fixture workflow implemented; no installer or launcher UI yet |
+| EQwec Hub | Launcher, package manager, installer, updater, and installation health manager | MVP in progress: verification, activation, rollback, recovery, package staging, journaled uninstall, native launcher UI, local signed-bundle workflows, and packaging scripts implemented; download transport and release signing are not |
 | EQwec Browser | Chromium-based browser with Rust-owned application logic and a native UI | Research and feasibility |
 | PhotoCraft | Layer-based, non-destructive image editing and photography | Planned |
 | VectorCraft | Vector graphics, Bézier path editing, and SVG interoperability | Planned |
@@ -41,6 +41,40 @@ The browser will use a maintained Chromium-based foundation. EQwec does not clai
 ## Platforms
 
 Planned targets are Windows, macOS, and Linux on x86_64 and ARM64 where technically feasible. The current development environment is macOS on Apple silicon. No platform is supported for public use until its release gates pass.
+
+## Run the Hub developer preview
+
+The launcher is a developer preview. It accepts only locally supplied bundles signed with the public fixture key embedded in `apps/eqwec-hub/assets/dev-trust-store.json`; that key is test material and must never sign a release.
+
+```bash
+# 1. Open the launcher window.
+cargo run -p eqwec-hub
+
+# 2. In another terminal, generate a signed demo bundle for this host.
+cargo run -p eqwec-hub-fixture --bin make-demo-bundle -- /tmp/eqwec-demo/bundle
+
+# 3. Paste the printed absolute path into the launcher, then Install / Update and Launch.
+#    The installed fixture prints its generation and payload.
+
+# 4. Generate a newer bundle into the same folder, install it, and use Roll back.
+cargo run -p eqwec-hub-fixture --bin make-demo-bundle -- /tmp/eqwec-demo/bundle 1.1.0 2
+```
+
+`--self-check` reports profile state without opening a window:
+
+```bash
+cargo run -p eqwec-hub -- --self-check
+```
+
+Packaging scripts build local artifacts into `dist/`:
+
+| Platform | Command | Artifact |
+|---|---|---|
+| macOS | `./packaging/eqwec-hub/macos/build-dmg.sh` | Ad-hoc-signed `.app` in a DMG; the script mounts it and runs `--self-check` |
+| Windows | `./packaging/eqwec-hub/windows/build-msi.ps1` | Per-user MSI for `%LOCALAPPDATA%\Programs\EQwec Hub`; requires the .NET SDK and pins the WiX 4.0.6 tool |
+| Linux | `./packaging/eqwec-hub/linux/build-deb.sh` | `.deb` and `tar.zst`; requires `dpkg-deb` and `zstd` |
+
+These artifacts are unsigned developer builds. Developer ID signing, notarization, Authenticode, and a release channel do not exist yet.
 
 ## Repository Branches
 

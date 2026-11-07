@@ -213,7 +213,7 @@ The staging function requires the last journal record for the operation to be `d
 
 Gates 1–11 are in-process tests. Gate 12 is end-to-end acceptance. On 2026-11-07 the macOS in-process portion of gate 12 passes: `tests/fixtures/eqwec-hub` builds real v1 and v2 executables, signs manifests with a public non-production seed, installs v1, launches it, updates to v2, rolls back to v1, rejects a tampered package, and recovers an activation interrupted after the tree move. Uninstall, installer orchestration, download transport, platform packaging, and Windows/Linux fixture runs do not exist, so gate 12 remains `BLOCKED`.
 
-Implementation evidence (2026-11-07): gates 1–11 are covered by 31 tests in `crates/eqwec-updater/src/staging.rs`; the macOS fixture portion of gate 12 is covered by 3 tests in `tests/fixtures/eqwec-hub/tests/hub_end_to_end.rs`; `cargo test --workspace --all-features --locked` passed 163 tests locally on macOS. Gate 12 remains `BLOCKED` overall.
+Implementation evidence (2026-11-07): gates 1–11 are covered by 31 tests in `crates/eqwec-updater/src/staging.rs`; the macOS fixture portion of gate 12 is covered by 3 tests in `tests/fixtures/eqwec-hub/tests/hub_end_to_end.rs`; `cargo test --workspace --all-features --locked` passed 211 tests locally on macOS. Gate 12 remains `BLOCKED` overall.
 
 ## 7. Consequences
 

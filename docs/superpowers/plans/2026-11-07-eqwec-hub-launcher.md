@@ -131,18 +131,18 @@
 - Create: `packaging/eqwec-hub/macos/build-dmg.sh`, `packaging/eqwec-hub/windows/eqwec-hub.wxs`, `packaging/eqwec-hub/windows/build-msi.ps1`, `packaging/eqwec-hub/linux/build-deb.sh`, `packaging/eqwec-hub/linux/eqwec-hub.desktop`, `.github/workflows/package.yml`
 - Modify: `README.md` (artifact instructions)
 
-- [ ] macOS: build release, assemble `.app`, ad-hoc sign, `hdiutil create`, mount, run `--self-check`.
-- [ ] Windows: WiX v4 dotnet tool, per-user MSI to `%LOCALAPPDATA%\Programs\EQwec Hub`, no elevation.
-- [ ] Linux: `.deb` + `.desktop` + `tar.zst`; install with `dpkg -i` in CI and run `--self-check`.
-- [ ] `package.yml`: `workflow_dispatch` + `v*`, matrix, upload artifacts, 14-day retention.
-- [ ] Commit `build(hub): додати пакування для macOS, Windows і Linux`.
+- [x] macOS: build release, assemble `.app`, ad-hoc sign, `hdiutil create`, mount, run `--self-check`.
+- [x] Windows: WiX v4 dotnet tool, per-user MSI to `%LOCALAPPDATA%\Programs\EQwec Hub`, no elevation.
+- [x] Linux: `.deb` + `.desktop` + `tar.zst`; install with `dpkg -i` in CI and run `--self-check`.
+- [x] `package.yml`: `workflow_dispatch` + `dev-hub` verification push + `eqwec-hub/v*` tags, upload artifacts, 14-day retention.
+- [x] Commit `build(hub): додати пакування для macOS, Windows і Linux`.
 
 ### Task 8: Documentation and gates
 
 **Files:**
 - Modify: `AGENTS.md`, `README.md`, `CLAUDE.md`, `docs/development/QUALITY-GATES.md`, `TEST-STRATEGY.md`, `SKILL-USAGE.md`, `ROADMAP.md`, `docs/research/FEASIBILITY.md`, `docs/architecture/DEPENDENCY-MAP.md`, `docs/architecture/SYSTEM-ARCHITECTURE.md`, `docs/security/THREAT-MODEL.md`, `docs/product-specs/eqwec-hub-schemas.md`, `docs/adr/0007-packaging-and-signing.md`, `.agents/skills/eqwec-hub/SKILL.md`
 
-- [ ] Run fmt, clippy, build, full tests, audit, deny, skills, docs; record exact results.
-- [ ] Run `package.yml` on all three platforms; record artifact and `--self-check` evidence.
-- [ ] Reconcile every status claim; keep GUI window on Windows/Linux `BLOCKED` unless a desktop run exists.
-- [ ] Commit `docs(hub): зафіксувати стан лаунчера та пакування`.
+- [x] Run fmt, clippy, build, full tests, audit, deny, skills, docs; record exact results.
+- [x] Run `package.yml` on all three platforms; record artifact and `--self-check` evidence.
+- [x] Reconcile every status claim; keep GUI window on Windows/Linux `BLOCKED` unless a desktop run exists.
+- [x] Commit `docs(hub): зафіксувати стан лаунчера та пакування`.
