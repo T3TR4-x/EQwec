@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=EQwec Hub
+Comment=EQwec developer-preview launcher
+Exec=eqwec-hub
+Terminal=false
+Categories=Utility;

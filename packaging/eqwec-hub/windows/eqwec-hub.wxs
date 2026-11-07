@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+      Name="EQwec Hub"
+      Manufacturer="EQwec"
+      Version="$(var.ProductVersion)"
+      UpgradeCode="883EF7D4-FD22-4FF3-9144-6449BE9FF65E"
+      Scope="perUser">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of EQwec Hub is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="ProgramsFolder" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="EQwec Hub" />
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="EQwec Hub" />
+    </StandardDirectory>
+
+    <Feature Id="HubFeature" Title="EQwec Hub" Level="1">
+      <ComponentGroupRef Id="HubComponents" />
+    </Feature>
+
+    <ComponentGroup Id="HubComponents">
+      <Component Id="HubExecutable" Directory="INSTALLFOLDER" Guid="79DADA4B-9700-4737-9429-84C5EE728E4A">
+        <File Id="HubExecutableFile" Source="$(var.BinaryPath)" KeyPath="yes" />
+      </Component>
+      <Component Id="HubStartMenuShortcut" Directory="ApplicationProgramsFolder" Guid="6DC3BB32-8CC1-4E68-88BF-502ABD3085D1">
+        <Shortcut
+            Id="HubShortcut"
+            Name="EQwec Hub"
+            Description="EQwec developer-preview launcher"
+            Target="[INSTALLFOLDER]eqwec-hub.exe"
+            WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\EQwec\Hub" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Package>
+</Wix>

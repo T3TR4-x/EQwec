@@ -1,0 +1,106 @@
+name: Package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "eqwec-hub/v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: package-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  macos:
+    name: macOS DMG
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.99.1
+      - uses: Swatinem/rust-cache@v2
+      - name: Build, sign, and verify DMG
+        run: ./packaging/eqwec-hub/macos/build-dmg.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eqwec-hub-macos
+          path: dist/*.dmg
+          retention-days: 14
+
+  windows:
+    name: Windows MSI
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.99.1
+      - uses: Swatinem/rust-cache@v2
+      - name: Build MSI
+        shell: pwsh
+        run: ./packaging/eqwec-hub/windows/build-msi.ps1
+      - name: Install, self-check, and uninstall
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $msi = Get-ChildItem dist/*.msi | Select-Object -First 1
+          $log = Join-Path $env:RUNNER_TEMP "eqwec-msi.log"
+          $install = Start-Process msiexec.exe -PassThru -Wait -ArgumentList @(
+            "/i", "`"$($msi.FullName)`"", "/qn", "/norestart", "/l*v", "`"$log`""
+          )
+          if ($install.ExitCode -ne 0) {
+            Get-Content $log
+            throw "MSI install failed with exit code $($install.ExitCode)"
+          }
+          $exe = Join-Path $env:LOCALAPPDATA "Programs\EQwec Hub\eqwec-hub.exe"
+          $env:EQWEC_DATA_DIR = Join-Path $env:RUNNER_TEMP "eqwec-data"
+          & $exe --self-check
+          if ($LASTEXITCODE -ne 0) { throw "self-check failed with exit code $LASTEXITCODE" }
+          $uninstall = Start-Process msiexec.exe -PassThru -Wait -ArgumentList @(
+            "/x", "`"$($msi.FullName)`"", "/qn", "/norestart"
+          )
+          if ($uninstall.ExitCode -ne 0) {
+            throw "MSI uninstall failed with exit code $($uninstall.ExitCode)"
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eqwec-hub-windows
+          path: dist/*.msi
+          retention-days: 14
+
+  linux:
+    name: Linux packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GUI and packaging dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxkbcommon-dev libwayland-dev libx11-dev libxcursor-dev \
+            libxrandr-dev libxi-dev libgl1-mesa-dev zstd
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.99.1
+      - uses: Swatinem/rust-cache@v2
+      - name: Build .deb and tar.zst
+        run: ./packaging/eqwec-hub/linux/build-deb.sh
+      - name: Install and self-check
+        run: |
+          sudo dpkg -i dist/*.deb
+          EQWEC_DATA_DIR="$(mktemp -d)" eqwec-hub --self-check
+          sudo dpkg --remove eqwec-hub
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eqwec-hub-linux
+          path: |
+            dist/*.deb
+            dist/*.tar.zst
+          retention-days: 14
