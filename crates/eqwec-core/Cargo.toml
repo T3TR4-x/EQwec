@@ -1,0 +1,12 @@
+[package]
+name = "eqwec-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+description = "Core identifiers and platform primitives shared by EQwec products"
+
+[dependencies]
+
+[lints]
+workspace = true

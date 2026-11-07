@@ -1,0 +1,40 @@
+# cargo-deny policy for the EQwec workspace.
+#
+# The project license is not selected yet (ADR-0008). This policy allows the
+# permissive and weak-copyleft licenses already approved for evaluation.
+# GPL/AGPL/LGPL dependencies require an explicit exception and legal review.
+
+[graph]
+all-features = true
+
+[advisories]
+version = 2
+yanked = "deny"
+
+[licenses]
+version = 2
+# Workspace crates are publish = false and have no license field until
+# ADR-0008 is accepted. Third-party crates are still checked normally.
+private = { ignore = true }
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "MPL-2.0",
+    "Unicode-3.0",
+    "Zlib",
+    "CC0-1.0",
+    "Unlicense",
+]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
