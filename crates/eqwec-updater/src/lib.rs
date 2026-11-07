@@ -23,6 +23,7 @@ mod atomic;
 
 pub mod activation;
 pub mod active;
+pub mod disk;
 pub mod error;
 pub mod journal;
 pub mod layout;
@@ -41,6 +42,7 @@ pub use activation::{
     RollbackSpec, VerifiedRelease, activate, record_phase, recover, rollback,
 };
 pub use active::{ACTIVE_POINTER_SCHEMA_VERSION, ActivePointer, MAX_ACTIVE_POINTER_BYTES};
+pub use disk::{STAGING_MARGIN_BYTES, ensure_free_space, required_staging_bytes};
 pub use error::UpdaterError;
 pub use journal::{
     IdempotencyKey, JOURNAL_SCHEMA_VERSION, JournalContents, JournalContext, JournalRecord,

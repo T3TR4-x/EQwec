@@ -531,6 +531,14 @@ pub enum UpdaterError {
     /// Another process holds the profile lock.
     #[error("the profile is locked by another EQwec process")]
     ProfileLocked,
+    /// The filesystem does not have enough space for the operation.
+    #[error("insufficient disk space: {available} available, {required} required")]
+    InsufficientDiskSpace {
+        /// Available bytes.
+        available: u64,
+        /// Required bytes.
+        required: u64,
+    },
     /// The system clock is unavailable or outside the supported range.
     #[error("clock error: {detail}")]
     Clock {
