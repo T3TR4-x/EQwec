@@ -55,8 +55,10 @@ fn lock_file_is_not_empty() {
     let base = temp_base();
     let path = base.join("profile.lock");
     let lock = ProfileLock::acquire(&path).expect("lock");
+    // Windows locks the region, so the file cannot be read until the handle is
+    // released. The diagnostics are durable and must survive the drop.
+    drop(lock);
     let contents = fs::read_to_string(&path).expect("read lock file");
     assert!(!contents.is_empty());
-    drop(lock);
     fs::remove_dir_all(base).expect("cleanup");
 }
