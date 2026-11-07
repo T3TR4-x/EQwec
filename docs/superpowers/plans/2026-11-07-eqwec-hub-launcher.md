@@ -120,10 +120,10 @@
 **Interfaces:**
 - Produces: `cargo run -p eqwec-hub-fixture --bin make-demo-bundle -- <outdir>` writing `manifest.json` + `package.zip` for the host target and current time.
 
-- [ ] Rename packaged executable to `bin/eqwec-fixture` (`.exe` on Windows); update the end-to-end tests.
-- [ ] Implement the generator using the public fixture seed, `Timestamp::now()` or the current clock, host `Platform`/`Architecture`.
-- [ ] Test: generated bundle parses and verifies with the launcher trust store.
-- [ ] Run fixture tests; commit `test(hub): генерувати демонстраційний пакет для лаунчера`.
+- [x] Rename packaged executable to `bin/eqwec-fixture` (`.exe` on Windows); update the end-to-end tests.
+- [x] Implement the generator using the public fixture seed, `Timestamp::now()` or the current clock, host `Platform`/`Architecture`.
+- [x] Test: generated bundle parses and verifies with the launcher trust store.
+- [x] Run fixture tests; commit `test(hub): генерувати демонстраційний пакет для лаунчера`.
 
 ### Task 7: Packaging
 

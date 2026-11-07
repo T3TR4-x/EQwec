@@ -49,9 +49,9 @@ const OP_RETRY: &str = "55555555555555555555555555555555";
 const OP_INTERRUPTED: &str = "66666666666666666666666666666666";
 
 #[cfg(windows)]
-const FIXTURE_EXE: &str = "bin/fixture.exe";
+const FIXTURE_EXE: &str = "bin/eqwec-fixture.exe";
 #[cfg(not(windows))]
-const FIXTURE_EXE: &str = "bin/fixture";
+const FIXTURE_EXE: &str = "bin/eqwec-fixture";
 
 struct TestDir(PathBuf);
 
