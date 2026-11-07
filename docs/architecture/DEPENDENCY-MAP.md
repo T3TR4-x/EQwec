@@ -126,7 +126,7 @@ Last verified: 2026-11-07.
 | SBOM | None |
 | License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel |
 | Technology selection | Planning baseline: `docs/architecture/TECHNOLOGY-SELECTION.md` |
-| ADR set | ADR-0001 through ADR-0011 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
+| ADR set | ADR-0001 through ADR-0012 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
 | Advisory/license CI | Configured in `.github/workflows/ci.yml`; local commands pass, CI execution `BLOCKED` because no remote exists |
 
 ## 9. Admitted dependencies
@@ -141,6 +141,9 @@ These are the only third-party direct dependencies admitted so far. Admission co
 | `serde_json` | 1.0.150 | 1.0.154 | MIT OR Apache-2.0 | Bounded JSON parsing | `eqwec-updater` |
 | `semver` | 1.0.28 | 1.0.28 | MIT OR Apache-2.0 | Version and constraint validation | `eqwec-updater` |
 | `thiserror` | 2.0.18 | 2.0.21 | MIT OR Apache-2.0 | Typed error definitions | `eqwec-security`, `eqwec-updater` |
+| `zip` | 9.4.1 | 9.4.1 | MIT | Bounded ZIP/ZIP64 package validation and extraction | `eqwec-updater` |
+
+`zip` pulls `flate2` (MIT OR Apache-2.0) and `zlib-rs` (Zlib) for the pure-Rust deflate backend. They are transitive and pinned by `Cargo.lock`; a direct use requires a new admission entry.
 
 `cargo deny check` reported `advisories ok, bans ok, licenses ok, sources ok` on 2026-11-07. The duplicate `syn` 2.x/3.x warning is accepted because the two versions are isolated to proc-macro expansion.
 

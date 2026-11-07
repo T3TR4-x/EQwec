@@ -6,15 +6,15 @@ EQwec is an independent ecosystem of professional desktop applications and a uni
 
 ## Status
 
-**Phase 2 — workspace baseline.** The project is at version `0.0.0`. No product has a usable release yet, and nothing in this repository should be treated as production-ready.
+**Phase 3 — Hub MVP.** The project is at version `0.0.0`. No product has a usable release yet, and nothing in this repository should be treated as production-ready.
 
-The Cargo workspace, pinned toolchain, `eqwec-core` shared crate, and CI workflow exist on `integration`. The mandatory skills, research, architecture, and security gates have passed for the planning scope. Product implementation remains `BLOCKED` until the Phase 2 gate closes with local and CI evidence and the Hub MVP begins.
+The Cargo workspace, pinned toolchain, `eqwec-core` shared crate, and CI workflow exist on `integration`. Hub verification, durable state, activation, rollback, recovery, and bounded package staging are implemented on `dev-hub`. The mandatory skills, research, architecture, and security gates have passed for the planning scope. Download transport, uninstall, the launcher UI, a fixture product, and every other product remain `BLOCKED`; CI has not executed because no remote exists.
 
 ## Products
 
 | Product | Purpose | Status |
 |---|---|---|
-| EQwec Hub | Launcher, package manager, installer, updater, and installation health manager | Planned |
+| EQwec Hub | Launcher, package manager, installer, updater, and installation health manager | MVP in progress: verification, activation, rollback, recovery, and package staging implemented; no installer or launcher UI yet |
 | EQwec Browser | Chromium-based browser with Rust-owned application logic and a native UI | Research and feasibility |
 | PhotoCraft | Layer-based, non-destructive image editing and photography | Planned |
 | VectorCraft | Vector graphics, Bézier path editing, and SVG interoperability | Planned |

@@ -97,6 +97,12 @@ impl InstallLayout {
         self.base.join("downloads").join(operation_id.as_str())
     }
 
+    /// Returns the package file path for one operation.
+    #[must_use]
+    pub fn download_package_path(&self, operation_id: &OperationId) -> PathBuf {
+        self.downloads_dir(operation_id).join("package.zip")
+    }
+
     /// Creates the base layout directories.
     ///
     /// # Errors
@@ -275,6 +281,12 @@ mod tests {
             layout.downloads_dir(&operation),
             PathBuf::from(
                 "/home/user/.local/share/eqwec/downloads/0123456789abcdef0123456789abcdef"
+            )
+        );
+        assert_eq!(
+            layout.download_package_path(&operation),
+            PathBuf::from(
+                "/home/user/.local/share/eqwec/downloads/0123456789abcdef0123456789abcdef/package.zip"
             )
         );
     }

@@ -279,6 +279,47 @@ Findings:
 
 Gate decision: activation engine `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
 
+## Package staging task
+
+**Date:** 2026-11-07
+**Branch:** `dev-hub`
+**Scope:** `staging.rs`, staging tests, `layout.rs` download-package path, ADR-0012, schema §11, typed archive errors, and the `zip` dependency. **No download transport, uninstall, launcher UI, or fixture product.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Same-handle verification and parsing, bounded parser, no `unsafe`, typed errors, fail-closed cleanup, scoped Ukrainian commit policy |
+| `eqwec-quality-control` | APPLIED | 160 local tests pass; installer and end-to-end acceptance kept `BLOCKED`; no CI claim; review found and fixed three defects |
+| `eqwec-hub` | APPLIED | ADR-0012 and schema §11 enforced: path, mode, header, compression, size, ratio, timeout, staging, and journal rules |
+| `security-audit` | AVAILABLE_NOT_RELEVANT | Archive threat review performed directly against ADR-0012 and the Hub threat table; the external workflow was not invoked |
+| `code-review` (Matt Pocock) | APPLIED | Review fixed ZIP64 contiguity, reader-rewind, and directory-mode verification defects; each has a regression test |
+| `skill-creator` | AVAILABLE_NOT_RELEVANT | No skill wording changed |
+| Other product skills | AVAILABLE_NOT_RELEVANT | No path in those products was touched |
+
+## Quality-control report for the package staging task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | ADR-0012, schema §11, and `eqwec-hub` loaded; branch and worktree inspected before editing |
+| Implementation | PASS for the in-process staging engine | Central-directory preflight, two-pass validation/extraction, durable sync, tree verification, journal `verified`/`staged` integration |
+| Verification | PASS locally; installer `BLOCKED` | `cargo test --workspace --all-features --locked`: 160 passed, 0 failed; fmt, clippy, build, audit, deny, docs gate, and skills gate exit 0 |
+| Performance | NOT_APPLICABLE | No throughput claim; deflate is single-threaded and no benchmark was run |
+| Security | PASS for implemented boundary | Same handle hashed and parsed, traversal/link/mode/header/ratio bounds enforced, partial trees removed, no unverified binary executed |
+| Merge | PASS | Scoped commit on `dev-hub`; staging, tests, ADR, dependency inventory, and status documents only |
+| Release | NOT_APPLICABLE | No artifact; versions remain `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| Medium | Staging does not preflight free disk space; the install orchestrator must do it before download or staging | Open; `BLOCKED` on the transport/install layer |
+| Medium | No real fixture product or platform package; ADR-0012 gate 12 remains unmet | Open; H-E2E scenarios `BLOCKED` |
+| Low | ZIP64 contiguity compared the central-directory end with the locator instead of the ZIP64 end record start | Fixed; ZIP64 regression test added |
+| Low | The package reader was hashed from its current position but parsed from byte zero | Fixed; rewind plus regression test |
+| Low | Staged directory modes were created but not re-verified | Fixed; tree verification now checks them |
+| Low | `stage_package_from_path` checks for a symlink and then opens by path; a same-user swap race remains | Open; profile directory is mode `0700`, and `O_NOFOLLOW` is not yet used |
+
+Gate decision: package staging `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
+
 ## Template for future tasks
 
 | Skill | State | Evidence |

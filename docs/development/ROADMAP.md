@@ -52,7 +52,7 @@ Gate: reproducible local build and passing baseline checks. No product feature y
 
 ## Phase 3 — EQwec Hub MVP
 
-**State:** in progress on `dev-hub`. Verification core, durable-state primitives, and the in-process activation engine implemented; installer and launcher not started.
+**State:** in progress on `dev-hub`. Verification core, durable-state primitives, the in-process activation engine, and bounded package staging implemented; download transport, installer orchestration, and launcher not started.
 
 Completed:
 
@@ -65,12 +65,13 @@ Completed:
 - Journal v1 with bounded append/read, partial-line recovery, and fail-closed corrupt lines.
 - Installation layout and atomic `active.json` pointer primitives.
 - Activation engine for fresh install, update, rollback, and startup recovery, with five fault-injection points and a single-in-flight-operation invariant.
-- 129 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
+- Bounded ZIP/ZIP64 package validation and extraction into a durable staging tree, including path, mode, header-confusion, ratio, size, and timeout rejection with partial-tree cleanup.
+- 160 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
 
 Remaining:
 
 - Native launcher UI.
-- Verified download transport, extraction, uninstall, and offline install.
+- Verified download transport, uninstall, and offline install.
 - Repair orchestration and integrity re-verification of installed trees.
 - Diagnostics with redaction.
 - A real fixture product installed, launched, updated, and removed on each claimed platform.
@@ -179,7 +180,7 @@ Products release independently. The ecosystem is not "finished" until each produ
 ## Current blockers
 
 - ADR-0004 (media/codecs) and ADR-0008 (project license) are `PROPOSED`, not normative. Codec/patent and DRM decisions require counsel; the project license requires owner approval.
-- No product code exists; the Phase 2 workspace and CI configuration exist.
+- Hub verification, durable-state, activation, and staging crates exist, but no product application, installer, or launcher exists.
 - GUI accessibility, text input, browser integration, and audio real-time behavior are `UNVERIFIED` until their prototypes run.
 - No remote, signing infrastructure, or release channel exists.
 - Windows and Linux are planned targets but have not been tested in this environment.

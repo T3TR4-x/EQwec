@@ -133,7 +133,7 @@ impl VerifiedManifest {
     }
 }
 
-fn digest_from_hasher(hasher: Sha256) -> Sha256Digest {
+pub(crate) fn digest_from_hasher(hasher: Sha256) -> Sha256Digest {
     let digest = hasher.finalize();
     let mut bytes = [0u8; Sha256Digest::LEN];
     bytes.copy_from_slice(&digest);

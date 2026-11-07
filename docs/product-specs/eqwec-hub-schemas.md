@@ -1,9 +1,9 @@
 # EQwec Hub — Normative Schemas v1
 
-- **Status:** NORMATIVE for Hub manifest v1, trust store v1, registry v1, journal v1, and installation layout v1.
+- **Status:** NORMATIVE for Hub manifest v1, trust store v1, registry v1, journal v1, installation layout v1, and package archive v1.
 - **Version:** `1` for each schema unless stated otherwise.
 - **Owner:** Hub product workstream.
-- **Decision:** `docs/adr/0011-hub-manifest-registry-and-layout.md`.
+- **Decision:** `docs/adr/0011-hub-manifest-registry-and-layout.md` and `docs/adr/0012-hub-package-archive.md`.
 - **Product requirements:** `docs/product-specs/eqwec-hub.md`.
 - **Implementation status:** see §10. A schema being normative does not mean its runtime path is implemented or tested.
 
@@ -521,9 +521,10 @@ The updater applies checks in this order and stops at the first failure:
 10. Strict Ed25519 verification over canonical bytes.
 11. `metadata_sequence` regression check against the caller's minimum.
 12. Package size and SHA-256 verification before extraction.
-13. Return a `VerifiedManifest` or `VerifiedPackage`.
+13. Package archive validation and bounded extraction into staging per §11.
+14. Return a `VerifiedManifest`, `VerifiedPackage`, and `StagedTree`.
 
-A failure at steps 1–11 produces no verified manifest. A failure at step 12 produces no verified package. No partial result is promoted.
+A failure at steps 1–11 produces no verified manifest. A failure at step 12 produces no verified package. A failure at step 13 produces no staged tree and no promotion. No partial result is promoted.
 
 ## 8. Bounds summary
 
@@ -546,6 +547,15 @@ A failure at steps 1–11 produces no verified manifest. A failure at step 12 pr
 | Retained versions per product | 3 |
 | Journal records | 4,096 |
 | Package size | 8 GiB |
+| Archive entries | 100,000 |
+| Archive total uncompressed bytes | 16 GiB |
+| Archive uncompressed bytes per entry | 4 GiB |
+| Archive compression ratio per entry | 200:1 |
+| Archive total compression ratio | 100:1 |
+| Archive path length | 1,024 bytes |
+| Archive path component | 255 bytes |
+| Archive path depth | 32 components |
+| Archive extraction time | 600 seconds |
 | Manifest validity | 366 days |
 | Clock skew | 300 seconds |
 | Key validity | 10 years |
@@ -568,6 +578,12 @@ A conforming implementation must pass at least:
 - tampered payload and tampered signature;
 - metadata sequence regression;
 - package size mismatch, truncation, and hash mismatch;
+- archive traversal, absolute paths, drive and UNC prefixes, backslashes, NUL and control characters, empty components, trailing dots, and Windows reserved device names;
+- archive symlinks, special-file modes, setuid, setgid, and sticky bits;
+- archive duplicate names, ASCII case collisions, file/directory conflicts, and file-as-ancestor conflicts;
+- archive entry-count, per-entry size, total-size, ratio, path-length, component-length, depth, and timeout bounds;
+- archive header confusion: duplicate central-directory names, local/central disagreement, overlapping entries, unlisted local headers, prepended data, and a non-empty comment;
+- archive encryption, unsupported compression methods, multi-disk archives, and empty archives;
 - registry atomic replace and journal recovery with fault injection at every phase.
 
 Tests use non-production keys. Test private keys never enter a release artifact.
@@ -588,18 +604,93 @@ Last verified: 2026-11-07 on macOS 26.7.2 arm64 with Rust 1.99.1.
 | Installation layout | `PASS` for path construction and lexical validation | `crates/eqwec-updater/src/layout.rs`; normalized-absolute, containment, tree-id, and root-rejection tests pass |
 | Active pointer | `PASS` for parse and atomic replacement | `crates/eqwec-updater/src/active.rs`; round-trip, unknown-field, oversize, and atomic-write tests pass |
 | Activation transaction and recovery orchestration | `PASS` for install, update, rollback, and recovery with fault injection | `crates/eqwec-updater/src/activation.rs`; 25 tests cover phase ordering, missing/symlinked staging, existing trees, downgrades, retention, rollback, all five fault points, recovery before and after the pointer, rollback recovery, single-in-flight enforcement, pruning, and the retention cap |
-| Installer orchestration (download, extraction, uninstall, launcher) | `BLOCKED` | No transport, extractor, uninstaller, or UI |
+| Package archive validation and staging | `PASS` for in-process archive gates 1–11 | `crates/eqwec-updater/src/staging.rs`; 31 tests cover a valid fixture, ZIP64, traversal and unsafe names, links and special modes, duplicate and case-colliding names, every bound, header confusion, encryption, unsupported compression, multi-disk and empty archives, pre-existing staging, failed-extraction cleanup, and activation from a staged tree |
+| Installer orchestration (download, uninstall, launcher) | `BLOCKED` | No transport, uninstaller, or UI |
 | Platform fixtures | `BLOCKED` | macOS, Windows, and Linux fixture installs do not exist |
 
-Verification command: `cargo test --workspace --all-features --locked` — 129 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
+Verification command: `cargo test --workspace --all-features --locked` — 160 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
 
-This table is updated with real command output when an area is implemented. Parsing, cryptographic verification, durable-state primitives, and an in-process activation engine are not evidence of a working installer. Download, extraction, uninstall, the launcher UI, and end-to-end acceptance remain `BLOCKED`.
+This table is updated with real command output when an area is implemented. Parsing, cryptographic verification, durable-state primitives, an in-process activation engine, and package staging are not evidence of a working installer. Download, uninstall, the launcher UI, and end-to-end acceptance remain `BLOCKED`.
 
-## 11. Change control
+## 11. Package archive v1
+
+- **Status:** NORMATIVE for Hub product packages.
+- **Decision:** `docs/adr/0012-hub-package-archive.md`.
+- **Container:** one ZIP or ZIP64 archive.
+- **Coverage:** the manifest `package.size` and `package.hashes[0].value` cover the complete archive bytes.
+
+### 11.1 Container rules
+
+- The archive starts at byte zero. Prepended data is rejected.
+- Multi-disk and spanned archives are rejected.
+- The archive comment is empty.
+- The archive contains at least one regular file.
+- Encryption, passwords, and AES entries are rejected.
+- The only accepted compression methods are `stored` (0) and `deflate` (8). Every other method is rejected before decompression.
+- The central directory is authoritative. The local file header must agree with it.
+- The archive-level header-consistency check must pass before any entry is written. Duplicate central-directory names, overlapping entries, local/central disagreement, and local headers missing from the central directory are rejected.
+- Entry names are read from the raw central-directory bytes. The Unicode Path extra field and every other name override are ignored.
+- Data descriptors are accepted only when the central directory declares the sizes. The extractor bounds actual output independently of declared sizes.
+
+### 11.2 Entry types and modes
+
+- Only regular files and directories are allowed.
+- Symbolic links, hardlinks, device nodes, FIFOs, sockets, and every other special type are rejected. A Unix mode with type bits other than regular file or directory is rejected.
+- File modes are `0644` or `0755`. Directory modes are `0755`.
+- Setuid, setgid, and sticky bits are rejected.
+- A missing Unix mode means `0644` for a file and `0755` for a directory.
+- An executable file must declare `0755`. The extractor does not infer executability from the name or extension.
+- On platforms without Unix modes, the mode is validated and then ignored for creation.
+
+### 11.3 Entry paths
+
+Every entry name is valid UTF-8 and uses only `A-Z`, `a-z`, `0-9`, `.`, `_`, `-`, and `/`.
+
+- Non-empty and at most 1,024 bytes.
+- Relative, with no leading `/`.
+- No trailing `/` unless the entry is a directory.
+- No empty, `.`, or `..` component.
+- No `\`, `:`, NUL, or control character.
+- Each component is at most 255 bytes.
+- At most 32 components.
+- No component ends with `.`.
+- No component is a Windows reserved device name, case-insensitively, with or without an extension: `CON`, `PRN`, `AUX`, `NUL`, `COM1`–`COM9`, `LPT1`–`LPT9`, `CONIN$`, `CONOUT$`.
+- Paths are unique after ASCII case folding.
+- A path cannot be both a file and a directory, and a file cannot be an ancestor of another entry.
+
+The ASCII-only rule is intentional. It removes Unicode normalization collisions on macOS and case-folding ambiguity on Windows. Extending it requires a new archive schema version.
+
+### 11.4 Bounds
+
+The bounds in §8 apply. The ratio is `declared uncompressed / max(compressed, 1)`. A stored entry has ratio 1; a zero-byte entry has ratio 0. The total ratio uses the sum of entry compressed sizes, not the package size.
+
+The caller may lower a bound. Raising a default bound requires an explicit policy decision and must still fit the declared package size and available disk. The extraction time bound is measured with a monotonic clock and checked before parsing, before each entry, and during each bounded read.
+
+### 11.5 Staging sequence
+
+1. Open the package file once.
+2. Verify size and SHA-256 on that open handle against the verified manifest.
+3. Seek to the start and parse the archive from the same handle. Do not reopen by path.
+4. Parse the central directory and apply §11.1.
+5. Run the archive-level header-consistency check.
+6. Validate every entry's name, type, mode, compression, encryption, declared size, conflicts, totals, and ratio. Write nothing in this pass.
+7. Create a fresh staging directory. A pre-existing file, directory, or symlink at the operation path is rejected. Every ancestor from the profile base to the staging root must be a real directory, not a symlink.
+8. Extract with `create_new` for every file. Never follow a pre-existing final path. Count actual bytes and hash each file. Reject short and long entries.
+9. Sync file data and, on Unix, directory entries before recording `staged`.
+10. Walk the staged tree with `symlink_metadata`. Reject symlinks and non-regular files. Compare the actual file set, sizes, and modes with the plan. Reject extra and missing entries.
+11. Append the `staged` journal record. Only then may activation move the tree.
+
+Any failure removes the partial staging tree. The journal remains at `verified`; startup recovery discards the staging directory and marks the operation failed. No partial tree is promoted.
+
+### 11.6 Journal integration
+
+The staging function requires the last journal record for the operation to be `downloaded` or `verified`, and its context must match the operation identity. It records `verified` after the package hash check when the last phase is `downloaded`, and records `staged` only after the tree is durable and verified.
+
+## 12. Change control
 
 - Manifest v1 canonical bytes are frozen once a production signature exists.
 - Adding, removing, reordering, or retyping a payload field requires manifest v2 and a new signature domain.
 - Registry, journal, trust store, and layout versions migrate forward only.
 - A migration is tested on a copy, fails closed on unknown versions, and records its own journal phase.
 - Downgrades require a signed policy allowance and explicit user confirmation.
-- This document, ADR-0011, and the implementation change in the same commit.
+- This document, ADR-0011, ADR-0012, and the implementation change in the same commit.

@@ -21,8 +21,8 @@
 
 ## Repository constraints
 
-- Current phase: Phase 2 workspace baseline at `0.0.0`. No product implementation exists.
-- Do not create `apps/`, product crates, installers, or product features until the Phase 2 gate closes and the Hub acceptance workflow begins. Shared infrastructure changes still require an owner, tests, and an impacted-document update.
+- Current phase: Phase 3 Hub MVP at `0.0.0`. The verification core, durable-state primitives, activation engine, and package staging exist; no installer, launcher UI, or usable product exists.
+- Do not create applications for other products or add product features outside the Hub MVP. Shared infrastructure changes still require an owner, tests, and an impacted-document update.
 - `main` contains only `README.md`. Never add skills, `AGENTS.md`, `CLAUDE.md`, or technical documents to `main`.
 - Work on `integration` or an appropriate scoped branch. Inspect the worktree before switching, staging, merging, or rebasing.
 - Never force-push or rewrite shared history without explicit authorization.

@@ -12,10 +12,12 @@
 //! - strict Ed25519 signature verification;
 //! - channel, target, time, epoch, revocation, and rollback policy;
 //! - package size and SHA-256 verification;
-//! - registry, journal, active pointer, and installation layout primitives.
+//! - registry, journal, active pointer, and installation layout primitives;
+//! - bounded package archive validation and staging.
 //!
-//! It does not download packages, extract archives, or hold signing keys.
-//! Those belong to the Hub application and its transaction engine.
+//! It does not download packages or hold signing keys. The Hub application
+//! owns the transport and the profile lock; activation and staging are
+//! implemented here.
 
 mod atomic;
 
@@ -27,6 +29,7 @@ pub mod layout;
 pub mod manifest;
 pub mod package;
 pub mod registry;
+pub mod staging;
 pub mod time;
 pub mod trust;
 pub mod url;
@@ -53,6 +56,12 @@ pub use package::VerifiedPackage;
 pub use registry::{
     InstallationRecord, MAX_INSTALLATIONS, MAX_REGISTRY_BYTES, MAX_RETAINED_VERSIONS,
     REGISTRY_SCHEMA_VERSION, Registry, RetainedVersion,
+};
+pub use staging::{
+    DEFAULT_EXTRACTION_TIMEOUT, ExtractionLimits, MAX_ARCHIVE_COMPONENT_BYTES, MAX_ARCHIVE_DEPTH,
+    MAX_ARCHIVE_ENTRIES, MAX_ARCHIVE_ENTRY_RATIO, MAX_ARCHIVE_ENTRY_UNCOMPRESSED_BYTES,
+    MAX_ARCHIVE_PATH_BYTES, MAX_ARCHIVE_TOTAL_RATIO, MAX_ARCHIVE_TOTAL_UNCOMPRESSED_BYTES,
+    StagedEntry, StagedEntryKind, StagedTree, stage_package, stage_package_from_path,
 };
 pub use time::{CLOCK_SKEW_SECONDS, MAX_KEY_VALIDITY_SECONDS, MAX_VALIDITY_SECONDS, Timestamp};
 pub use trust::{MAX_TRUST_KEYS, MAX_TRUST_STORE_BYTES, TrustStore, TrustedKey};

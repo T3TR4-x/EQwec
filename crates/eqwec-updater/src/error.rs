@@ -400,6 +400,68 @@ pub enum UpdaterError {
         /// A short, human-readable reason.
         reason: String,
     },
+    /// The package archive is malformed or violates archive v1.
+    #[error("invalid package archive: {reason}")]
+    ArchiveInvalid {
+        /// Bounded diagnostic detail.
+        reason: String,
+    },
+    /// The package archive exceeds a configured bound.
+    #[error("package archive {limit} exceeds the maximum {max}: {actual}")]
+    ArchiveLimitExceeded {
+        /// The bound name.
+        limit: &'static str,
+        /// Maximum accepted value.
+        max: u64,
+        /// Actual observed value.
+        actual: u64,
+    },
+    /// An archive entry path is unsafe.
+    #[error("rejected archive path {path}: {reason}")]
+    ArchivePathRejected {
+        /// The rejected path, escaped for display.
+        path: String,
+        /// A short, human-readable reason.
+        reason: &'static str,
+    },
+    /// An archive entry is not allowed.
+    #[error("rejected archive entry {index}: {reason}")]
+    ArchiveEntryRejected {
+        /// The central-directory index.
+        index: usize,
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// Extraction exceeded the time bound.
+    #[error("package extraction exceeded {seconds} seconds")]
+    ArchiveTimeout {
+        /// The configured time bound in seconds.
+        seconds: u64,
+    },
+    /// The staging directory cannot be created or used safely.
+    #[error("staging rejected: {reason}")]
+    StagingRejected {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// The staged tree failed post-extraction verification.
+    #[error("staged tree verification failed: {reason}")]
+    StagingVerification {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// The verified manifest does not match the operation release identity.
+    #[error("package identity mismatch: {field}")]
+    PackageIdentityMismatch {
+        /// The mismatched field.
+        field: &'static str,
+    },
+    /// Extraction limits are invalid.
+    #[error("invalid extraction limits: {reason}")]
+    InvalidExtractionLimits {
+        /// A short, human-readable reason.
+        reason: &'static str,
+    },
     /// The target version tree already exists and is immutable.
     #[error("version tree already exists: {tree}")]
     TreeAlreadyExists {

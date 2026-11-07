@@ -134,7 +134,7 @@ The following table is a planning inventory. "Verify" means the exact version an
 | `exr` | BSD-3-Clause (verify) | OpenEXR | Notices | Candidate |
 | `png`, `jpeg-decoder`, `image-webp` | MIT OR Apache-2.0 (verify) | Format codecs | Notices | Candidate |
 | `ravif` / `rav1e` | BSD-3-Clause (verify) | AVIF encode | Notices; patent policy | Evaluation |
-| zlib / `flate2` | Zlib OR Apache-2.0/MIT | Compression | Notices | Candidate |
+| zlib / `flate2` / `zlib-rs` | Zlib OR Apache-2.0/MIT | Compression | Notices; admitted transitively through `zip` | Admitted (transitive) |
 | zstd | BSD-3-Clause OR GPLv2 | Compression | Choose BSD-3-Clause; notices | Candidate |
 
 ### 5.4 Audio and plugins
@@ -160,7 +160,7 @@ The following table is a planning inventory. "Verify" means the exact version an
 | `rusqlite` | MIT | SQLite binding | Notices | Candidate |
 | `redb` | MIT OR Apache-2.0 (verify) | Embedded store alternative | Notices | Evaluation |
 | `serde`, `serde_json` | MIT OR Apache-2.0 | Serialization | Notices | Candidate |
-| `zip` | MIT | Single-file project package | Notices; bounded parsing | Candidate |
+| `zip` | MIT | Single-file project and Hub package archive | Notices; bounded parsing | Admitted for Hub package archive |
 | `sha2`, `ed25519-dalek`, `ring` | MIT/Apache-2.0; BSD-3-Clause; ISC | Hashing and signatures | Notices; security review; no homegrown crypto | Candidate |
 | `tracing`, `tracing-subscriber`, `tracing-appender` | MIT | Diagnostics | Notices; redaction required | Candidate |
 | `interprocess` or platform IPC | MIT OR Apache-2.0 (verify) | Local IPC | Notices; peer credential validation | Candidate |
