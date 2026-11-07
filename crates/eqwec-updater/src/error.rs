@@ -282,6 +282,118 @@ pub enum UpdaterError {
     /// Trust-store keys are not sorted by key identifier.
     #[error("trust-store keys must be sorted by key_id")]
     TrustStoreOrder,
+    /// The registry exceeded the encoded size bound.
+    #[error("registry exceeds {max} bytes: {actual} bytes")]
+    RegistryTooLarge {
+        /// Maximum accepted bytes.
+        max: usize,
+        /// Actual input length.
+        actual: usize,
+    },
+    /// The registry has too many installation records.
+    #[error("registry has {actual} installations; maximum is {max}")]
+    TooManyInstallations {
+        /// Maximum accepted count.
+        max: usize,
+        /// Actual count.
+        actual: usize,
+    },
+    /// A registry record failed validation.
+    #[error("invalid registry: {reason}")]
+    InvalidRegistry {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// Two registry records share a product identifier.
+    #[error("duplicate installation record: {product_id}")]
+    DuplicateInstallation {
+        /// The duplicated product identifier.
+        product_id: String,
+    },
+    /// Registry records are not sorted by product identifier.
+    #[error("registry installations must be sorted by product_id")]
+    RegistryOrder,
+    /// An installation root failed validation.
+    #[error("invalid installation root: {reason}")]
+    InvalidInstallRoot {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// An installation root is not inside the profile base.
+    #[error("installation root escapes the profile base")]
+    InstallRootOutsideBase,
+    /// The journal file exceeded the size bound.
+    #[error("journal exceeds {max} bytes: {actual} bytes")]
+    JournalTooLarge {
+        /// Maximum accepted bytes.
+        max: u64,
+        /// Actual input length.
+        actual: u64,
+    },
+    /// A journal record exceeded the size bound.
+    #[error("journal record exceeds {max} bytes: {actual} bytes")]
+    JournalRecordTooLarge {
+        /// Maximum accepted bytes.
+        max: usize,
+        /// Actual record length.
+        actual: usize,
+    },
+    /// An operation identifier failed validation.
+    #[error("invalid operation identifier: {reason}")]
+    InvalidOperationId {
+        /// A short, human-readable reason.
+        reason: &'static str,
+    },
+    /// An idempotency key failed validation.
+    #[error("invalid idempotency key: {reason}")]
+    InvalidIdempotencyKey {
+        /// A short, human-readable reason.
+        reason: &'static str,
+    },
+    /// A journal phase name is unknown.
+    #[error("invalid journal phase: {value}")]
+    InvalidJournalPhase {
+        /// The rejected value.
+        value: String,
+    },
+    /// A journal record failed validation.
+    #[error("invalid journal record: {reason}")]
+    InvalidJournalRecord {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// A complete journal line is malformed.
+    #[error("journal is corrupt: {detail}")]
+    JournalCorrupt {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
+    /// The active pointer exceeded the encoded size bound.
+    #[error("active pointer exceeds {max} bytes: {actual} bytes")]
+    ActivePointerTooLarge {
+        /// Maximum accepted bytes.
+        max: usize,
+        /// Actual input length.
+        actual: usize,
+    },
+    /// The active pointer failed validation.
+    #[error("invalid active pointer: {reason}")]
+    InvalidActivePointer {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// A tree identifier failed validation.
+    #[error("invalid tree identifier: {reason}")]
+    InvalidTreeId {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// An atomic filesystem write failed.
+    #[error("atomic write failed: {detail}")]
+    AtomicWrite {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
     /// A filesystem read failed.
     #[error("I/O error: {detail}")]
     Io {
@@ -310,5 +422,15 @@ impl UpdaterError {
             detail.push('…');
         }
         detail
+    }
+
+    /// Maps a `serde_json` error to a typed parse error.
+    pub(crate) fn from_json(error: serde_json::Error) -> Self {
+        let detail = Self::bounded_detail(error.to_string());
+        if detail.starts_with("duplicate field") || detail.starts_with("unknown field") {
+            Self::UnknownOrDuplicateField { detail }
+        } else {
+            Self::MalformedJson { detail }
+        }
     }
 }

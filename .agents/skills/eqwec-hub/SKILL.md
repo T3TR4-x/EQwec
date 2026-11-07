@@ -9,8 +9,8 @@ Hub is the launcher, package manager, installer, updater, repair tool, and insta
 
 ## Status and authority
 
-- The Phase 2 Cargo workspace exists, but no Hub crate or application exists. Every path and crate below is planned. Verify the current repository before editing and report drift instead of creating empty scaffolding.
-- No Hub feature is implemented or validated. Do not describe planned behavior as shipped.
+- The Cargo workspace exists with `eqwec-core`, `eqwec-security`, and `eqwec-updater`. The verification core and durable-state primitives are implemented; no Hub application, installer, or launcher UI exists. Verify the current repository before editing and report drift instead of creating empty scaffolding.
+- Manifest, trust-store, package verification, registry, journal, layout, and active-pointer primitives are implemented and tested. Install, update, rollback, repair, and uninstall orchestration are not. Do not describe planned behavior as shipped.
 - `eqwec-engineering-core` governs architecture, security baseline, Git, versions, and documentation. `eqwec-quality-control` governs gates and evidence. This skill adds Hub domain rules and may not weaken either one.
 - Discover real commands, paths, and formats from `AGENTS.md`, CI, and the workspace. Do not invent commands, schemas, or test results.
 
@@ -35,8 +35,8 @@ Do not use it for:
 | Path | Owner | State | Rule |
 |---|---|---|---|
 | `apps/eqwec-hub` | Hub | Planned | Product entry point, launcher UI, Hub policy, self-update orchestration. |
-| `crates/eqwec-updater` | Hub-owned, shared API | Planned | Generic download, verification, staging, activation, and rollback engine. No Hub UI or product-specific policy. |
-| `crates/eqwec-security` | Security owner | Planned | Cryptographic verification, path safety, permission checks. Hub consumes; do not reimplement. |
+| `crates/eqwec-updater` | Hub-owned, shared API | Exists: verification and durable-state primitives | Generic download, verification, staging, activation, and rollback engine. No Hub UI or product-specific policy. |
+| `crates/eqwec-security` | Security owner | Exists: digest, signature, key id, safe path | Cryptographic verification, path safety, permission checks. Hub consumes; do not reimplement. |
 | `crates/eqwec-storage` | Storage owner | Planned | Atomic writes, tenant/profile-scoped persistence. Hub uses it for registry, journal, and cache. |
 | `crates/eqwec-config` | Config owner | Planned | Configuration loading, validation, migration. Hub uses it for channel and launcher settings. |
 | `crates/eqwec-ipc` | IPC owner | Planned | Versioned transport and message primitives. Hub owns only its message types and authorization rules. |

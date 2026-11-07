@@ -195,6 +195,45 @@ Findings:
 
 Gate decision: verification core `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
 
+## Task: Hub durable-state primitives (registry, journal, layout, active pointer)
+
+**Date:** 2026-11-07
+**Branch:** `dev-hub`
+**Scope:** `atomic.rs`, `layout.rs`, `journal.rs`, `registry.rs`, `active.rs`, error variants, and schema reconciliation. **No activation orchestration, installer, UI, or fixture product.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Bounded files, typed errors, atomic replacement, fail-closed corrupt journal, no `unsafe`, scoped Ukrainian commit policy |
+| `eqwec-quality-control` | APPLIED | 103 local tests pass; activation and install acceptance kept `BLOCKED`; no CI claim |
+| `eqwec-hub` | APPLIED | Schema §4–§7 implemented; journal recovery mapping; layout containment; active-pointer rules |
+| `security-audit` | APPLIED | Traversal and unnormalized-path rejection, size bounds, partial-line handling, fail-closed malformed records |
+| `skill-creator` | APPLIED | `eqwec-hub` status text and crate table corrected to the real workspace state; validators rerun |
+| `code-review` (Matt Pocock) | APPLIED | Diff reviewed for path normalization, temp-file cleanup, and recovery correctness |
+| Other product skills | AVAILABLE_NOT_RELEVANT | No path in those products was touched |
+
+## Quality-control report for the durable-state task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | ADR-0011 and schema §4–§7 read; branch `dev-hub`; worktree inspected |
+| Implementation | PASS for primitives | Registry, journal, layout, active pointer, and atomic write implemented with bounds |
+| Verification | PASS locally; activation `BLOCKED` | `cargo test --workspace --all-features --locked`: 104 passed, 0 failed; fmt, clippy, build, audit, deny exit 0; docs gate 0 failures; skills 10/10 |
+| Performance | NOT_APPLICABLE | No runtime product workload |
+| Security | PASS for implemented boundary | Unnormalized/relative roots, traversal trees, duplicate/unsorted records, oversized files, partial and corrupt journal lines, unknown fields, and invalid phases are rejected |
+| Merge | PENDING | Commit not yet created |
+| Release | NOT_APPLICABLE | No artifact; versions remain `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| High | Activation transaction, recovery orchestration, and fault injection do not exist | Open; install/update/rollback acceptance `BLOCKED` |
+| High | No fixture product or signed v1/v2 packages | Open; H-E2E scenarios `BLOCKED` |
+| Medium | Registry and journal retention/pruning are specified but not enforced by a runtime | Open; needs the activation engine |
+| Low | `Path::components()` normalizes `.`; lexical checks now cover it | Fixed; regression test added |
+
+Gate decision: durable-state primitives `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
+
 ## Template for future tasks
 
 | Skill | State | Evidence |

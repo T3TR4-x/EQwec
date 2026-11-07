@@ -387,8 +387,7 @@ A failed write leaves the previous registry intact. A partial temporary file is 
     "from_version": "0.0.9",
     "to_version": "0.1.0",
     "channel": "stable",
-    "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-    "error_code": null
+    "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 }
 ```
@@ -399,7 +398,7 @@ Field rules:
 - `idempotency_key` is 1–128 characters from `A-Z a-z 0-9 . _ : -`, starts and ends alphanumeric.
 - `product_id` is a valid `ProductId`.
 - `phase` is one of the values in §5.3.
-- `context` is optional. When present, it has only the fields shown; unknown fields are rejected; `error_code` is present only for `failed`.
+- `context` is optional. When present, it has only the fields shown; unknown fields are rejected. `channel` and `package_sha256` are required; `from_version` and `to_version` may be omitted; `error_code` is present only for `failed` and is rejected for every other phase.
 - `from_version` and `to_version` are SemVer strings.
 - `package_sha256` is 64 lowercase hex characters.
 - A terminal record repeats the same `operation_id` and `idempotency_key` as the opening `intent`.
@@ -576,14 +575,16 @@ Last verified: 2026-11-07 on macOS 26.7.2 arm64 with Rust 1.99.1.
 | Ed25519 and SHA-256 primitives | `PASS` | `crates/eqwec-security`; RFC 8032 vector, strict verification, weak-key rejection, SHA-256 known-answer tests |
 | Package size and hash verification | `PASS` for reader and in-memory paths | `crates/eqwec-updater/src/package.rs`; truncation, size-mismatch, and hash-mismatch tests pass |
 | Fixed canonicalization and signature vector | `PASS` | OpenSSL-generated Ed25519 vector from a non-production seed; exact payload, public key, and signature asserted in `tests/verification.rs` |
-| Registry v1 | `BLOCKED` | Not implemented |
-| Journal v1 and recovery | `BLOCKED` | Not implemented |
-| Installation layout and activation | `BLOCKED` | Not implemented |
+| Registry v1 | `PASS` for parse, serialize, atomic write, and layout containment | `crates/eqwec-updater/src/registry.rs`; round-trip, sort, duplicate, oversize, traversal, and atomic-write tests pass |
+| Journal v1 | `PASS` for record, append, read, and recovery mapping | `crates/eqwec-updater/src/journal.rs`; phase, partial-line, corrupt-line, size-bound, and recovery-action tests pass |
+| Installation layout | `PASS` for path construction and lexical validation | `crates/eqwec-updater/src/layout.rs`; normalized-absolute, containment, tree-id, and root-rejection tests pass |
+| Active pointer | `PASS` for parse and atomic replacement | `crates/eqwec-updater/src/active.rs`; round-trip, unknown-field, oversize, and atomic-write tests pass |
+| Activation transaction and recovery orchestration | `BLOCKED` | Primitives exist; no fault-injected activation engine |
 | Platform fixtures | `BLOCKED` | macOS, Windows, and Linux fixture installs do not exist |
 
-Verification command: `cargo test --workspace --all-features --locked` — 76 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
+Verification command: `cargo test --workspace --all-features --locked` — 104 tests passed, 0 failed. `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo fmt --all -- --check`, `cargo audit`, and `cargo deny check` all exited 0.
 
-This table is updated with real command output when an area is implemented. Parsing and cryptographic verification are not evidence of a working installer. Install, update, rollback, repair, and uninstall remain `BLOCKED` until the registry, journal, and activation engine exist and pass fault injection.
+This table is updated with real command output when an area is implemented. Parsing, cryptographic verification, and durable-state primitives are not evidence of a working installer. Install, update, rollback, repair, and uninstall remain `BLOCKED` until the activation engine exists and passes fault injection.
 
 ## 11. Change control
 

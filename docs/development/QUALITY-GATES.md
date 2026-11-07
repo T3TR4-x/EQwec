@@ -128,8 +128,10 @@ For a performance result, also record hardware, workload, baseline, target, obse
 | `cargo fmt --check` | PASS | `cargo fmt --all -- --check`, exit 0, 2026-11-07 |
 | `cargo clippy` | PASS | `cargo clippy --workspace --all-targets --all-features -- -D warnings`, exit 0 |
 | `cargo build` | PASS | `cargo build --workspace --all-targets --locked`, exit 0 |
-| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 76 tests passed, 0 failed |
+| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 104 tests passed, 0 failed |
 | Hub manifest/trust/package verification | PASS | 19 integration tests in `crates/eqwec-updater/tests/verification.rs`, including a fixed OpenSSL-generated Ed25519 vector |
+| Hub registry/journal/layout/active-pointer primitives | PASS | `registry.rs`, `journal.rs`, `layout.rs`, `active.rs`, `atomic.rs`; unit tests cover round-trip, bounds, traversal, partial lines, and atomic replacement |
+| Hub activation transaction and recovery | BLOCKED | No orchestration layer or fault-injection harness |
 | `cargo audit` | PASS | `cargo audit`, exit 0; 0 advisories across 41 locked dependencies |
 | `cargo deny check` | PASS | `cargo deny check`, exit 0; advisories, bans, licenses, sources ok |
 | CI pipeline | BLOCKED | `.github/workflows/ci.yml` exists; never executed because no remote exists |
