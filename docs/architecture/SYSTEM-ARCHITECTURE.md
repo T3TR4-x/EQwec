@@ -218,20 +218,23 @@ See `docs/security/THREAT-MODEL.md` and `docs/security/SECURITY-BASELINE.md`.
 
 ## 11. Open decisions
 
-| Decision | State | Required ADR |
+| Decision | State | ADR |
 |---|---|---|
-| GUI framework and rendering stack | Research in progress | ADR-0002 |
-| Browser engine foundation | Research in progress | ADR-0003 |
-| Media decode/encode and codec policy | Research in progress | ADR-0004 |
-| Audio backend and plugin hosting | Research in progress | ADR-0005 |
-| Project serialization format | Not decided | ADR-0006 |
-| Packaging and signing per platform | Not decided | ADR-0007 |
-| Original project license | Not decided; owner approval required | ADR-0008 |
-| Crash reporting and diagnostics | Not decided | ADR-0009 |
-| Plugin/extension trust model | Not decided | ADR-0010 |
+| GUI framework and rendering stack | ACCEPTED with a cross-platform prototype gate | ADR-0002 |
+| Browser engine foundation | ACCEPTED with a prototype and legal gate | ADR-0003 |
+| Media decode/encode and codec policy | PROPOSED; not normative; legal gate | ADR-0004 |
+| Audio backend and plugin hosting | ACCEPTED with a real-time prototype gate | ADR-0005 |
+| Project serialization format | ACCEPTED | ADR-0006 |
+| Packaging and signing per platform | ACCEPTED with a release gate; keys and tooling do not exist | ADR-0007 |
+| Original project license | PROPOSED; owner approval required | ADR-0008 |
+| Crash reporting and diagnostics | ACCEPTED with an implementation gate | ADR-0009 |
+| Plugin/extension trust model | ACCEPTED with prototype and isolation gates | ADR-0010 |
+
+Technology selections are recorded in `docs/architecture/TECHNOLOGY-SELECTION.md`. Feasibility verdicts and the recommended sequence are in `docs/research/FEASIBILITY.md`.
 
 ## 12. Current state
 
 - No `Cargo.toml`, `apps/`, `crates/`, CI, installer, or release artifact exists.
 - This document describes the approved target, not implemented behavior.
-- The architecture gate remains open until the technology ADRs and this document are reviewed together.
+- ADR-0001 through ADR-0010 are recorded. ADR-0004 and ADR-0008 remain `PROPOSED`; the other ADRs carry explicit prototype, legal, or release gates.
+- The architecture gate is `PASS` for the planning baseline: the target architecture, dependency direction, security boundaries, and ADR set exist and agree. Runtime architecture verification is `BLOCKED` until the workspace and prototypes exist.
