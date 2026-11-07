@@ -7,8 +7,8 @@ This is the canonical instruction file for every AI agent working in the EQwec r
 - **Project:** EQwec — *Engineer Quality with Empathy to Customer*.
 - **Repository:** `~/Documents/EQwec` (resolve the actual home directory; do not hardcode a username).
 - **Architecture:** Rust-first modular monorepo with a Cargo workspace. Native-first, cross-platform, security-first.
-- **Current phase:** Phase 2 — workspace baseline. Version `0.0.0`. **No product is implemented.**
-- **Actual repository contents today:** `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `.github/workflows/ci.yml`, `crates/eqwec-core/`, `docs/`, `.agents/skills/`, `scripts/`, `README.md`, and this file. There is **no** `apps/`, product crate, installer, or release artifact yet.
+- **Current phase:** Phase 3 — Hub MVP in progress on `dev-hub`. Version `0.0.0`. **No product application is implemented.** The Phase 2 CI gate remains `BLOCKED` because no remote exists.
+- **Actual repository contents today:** `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `.github/workflows/ci.yml`, `crates/eqwec-core/`, `crates/eqwec-security/`, `crates/eqwec-updater/`, `docs/`, `.agents/skills/`, `scripts/`, `README.md`, and this file. There is **no** `apps/`, product application, installer, or release artifact yet.
 - **Environment used for current evidence:** macOS on Apple silicon. Windows and Linux are planned targets, not verified platforms.
 
 Never describe a planned capability as implemented. Never invent a command, path, version, test result, benchmark, or release.
@@ -193,10 +193,10 @@ A task is complete only when:
 
 - **SKILLS_GATE:** PASS for the bootstrap scope. All 10 packages exist, validate, and are discoverable; trigger and scenario evidence is recorded in `docs/development/SKILLS-AUDIT.md`. Runtime product end-to-end scenarios are `BLOCKED` until product code exists.
 - **DOCUMENTATION_GATE:** PASS for the planning scope. `python3 scripts/check-docs.py --gate` returned 0 failures on 2026-11-07. Research, architecture, security, performance, and development documents exist.
-- **ARCHITECTURE_GATE:** PASS for the planning baseline. ADR-0001 through ADR-0010 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. Runtime verification is `BLOCKED` until prototypes exist.
+- **ARCHITECTURE_GATE:** PASS for the planning baseline. ADR-0001 through ADR-0011 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. Runtime verification is `BLOCKED` until prototypes exist.
 - **SECURITY_GATE:** PASS for the planning baseline. `docs/security/THREAT-MODEL.md` and `SECURITY-BASELINE.md` exist. Product-specific runtime controls, isolation tests, and fuzzing are `BLOCKED` until implementation.
 - **WORKSPACE_GATE:** PASS locally on macOS for format, clippy, build, test, audit, and deny. CI execution is `BLOCKED` because no remote exists.
-- **PRODUCT_IMPLEMENTATION:** `BLOCKED` until the Phase 2 gate closes and the Hub MVP work begins on `dev-hub`. Planning documents and `eqwec-core` are not product code.
+- **PRODUCT_IMPLEMENTATION:** Hub verification core implemented on `dev-hub` (`eqwec-security`, `eqwec-updater`): bounded manifest v1, trust-store policy, strict Ed25519, and package size/hash verification, with 76 workspace tests passing locally. Hub installer, registry, journal, activation, UI, and every other product are `BLOCKED`. Planning documents and verification crates are not a working product.
 - **PLATFORM VERIFICATION:** `BLOCKED` for Windows and Linux; only macOS on Apple silicon has been exercised.
 - **RELEASE_GATE:** `BLOCKED`. No remote, signing keys, certificates, notarization account, installer, or release channel exists.
 

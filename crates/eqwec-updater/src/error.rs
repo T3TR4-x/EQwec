@@ -1,0 +1,314 @@
+//! Typed errors for manifest, trust, and package verification.
+
+use eqwec_core::Channel;
+use eqwec_security::SecurityError;
+use thiserror::Error;
+
+/// Maximum length of a diagnostic detail string.
+const MAX_DETAIL_LEN: usize = 200;
+
+/// An error produced while parsing or verifying Hub metadata.
+#[derive(Clone, Debug, Eq, Error, PartialEq)]
+#[non_exhaustive]
+pub enum UpdaterError {
+    /// The manifest exceeded the encoded size bound.
+    #[error("manifest exceeds {max} bytes: {actual} bytes")]
+    ManifestTooLarge {
+        /// Maximum accepted bytes.
+        max: usize,
+        /// Actual input length.
+        actual: usize,
+    },
+    /// The trust store exceeded the encoded size bound.
+    #[error("trust store exceeds {max} bytes: {actual} bytes")]
+    TrustStoreTooLarge {
+        /// Maximum accepted bytes.
+        max: usize,
+        /// Actual input length.
+        actual: usize,
+    },
+    /// The input was not valid UTF-8.
+    #[error("input is not valid UTF-8")]
+    InvalidUtf8,
+    /// The JSON was syntactically invalid or had the wrong type.
+    #[error("malformed JSON: {detail}")]
+    MalformedJson {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
+    /// A duplicate or unknown field was present.
+    #[error("duplicate or unknown field: {detail}")]
+    UnknownOrDuplicateField {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
+    /// Non-whitespace data followed the JSON document.
+    #[error("trailing data after the JSON document")]
+    TrailingData,
+    /// The schema version is not supported.
+    #[error("unsupported schema version {found}; supported version is {supported}")]
+    UnsupportedSchemaVersion {
+        /// Version found in the document.
+        found: u64,
+        /// Version supported by this implementation.
+        supported: u64,
+    },
+    /// A product identifier failed validation.
+    #[error("invalid product identifier: {reason}")]
+    InvalidProductId {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// A semantic version failed validation.
+    #[error("invalid semantic version: {value}")]
+    InvalidVersion {
+        /// The rejected value.
+        value: String,
+    },
+    /// A version constraint failed validation.
+    #[error("invalid version constraint: {value}")]
+    InvalidVersionConstraint {
+        /// The rejected value.
+        value: String,
+    },
+    /// A release channel name is unknown.
+    #[error("invalid release channel: {value}")]
+    InvalidChannel {
+        /// The rejected value.
+        value: String,
+    },
+    /// A platform name is unknown.
+    #[error("invalid platform: {value}")]
+    InvalidPlatform {
+        /// The rejected value.
+        value: String,
+    },
+    /// An architecture name is unknown.
+    #[error("invalid architecture: {value}")]
+    InvalidArchitecture {
+        /// The rejected value.
+        value: String,
+    },
+    /// The minimum platform string failed validation.
+    #[error("invalid minimum platform string")]
+    InvalidMinimumPlatform,
+    /// The package source URL failed validation.
+    #[error("invalid package source URL: {reason}")]
+    InvalidPackageSource {
+        /// A short, human-readable reason.
+        reason: &'static str,
+    },
+    /// The package size is outside the accepted range.
+    #[error("invalid package size: {size}")]
+    InvalidPackageSize {
+        /// The rejected size.
+        size: u64,
+    },
+    /// A package hash failed validation.
+    #[error("invalid package hash: {reason}")]
+    InvalidHash {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// A dependency failed validation.
+    #[error("invalid dependency: {reason}")]
+    InvalidDependency {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// Too many dependencies were present.
+    #[error("too many dependencies: {actual}; maximum is {max}")]
+    TooManyDependencies {
+        /// Maximum accepted count.
+        max: usize,
+        /// Actual count.
+        actual: usize,
+    },
+    /// The metadata sequence is invalid.
+    #[error("metadata sequence must be at least 1")]
+    InvalidSequence,
+    /// A timestamp failed validation.
+    #[error("invalid timestamp: {value}")]
+    InvalidTimestamp {
+        /// The rejected value or a short reason.
+        value: String,
+    },
+    /// Release notes failed validation.
+    #[error("invalid release notes: {reason}")]
+    InvalidReleaseNotes {
+        /// A short, human-readable reason.
+        reason: &'static str,
+    },
+    /// A signature field failed validation.
+    #[error("invalid signature field: {reason}")]
+    InvalidSignatureField {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// The manifest validity window is invalid.
+    #[error("manifest validity window must be positive and at most 366 days")]
+    InvalidValidityWindow,
+    /// The signing time is outside the manifest validity window.
+    #[error("signing time is outside the manifest validity window")]
+    InvalidSigningTime,
+    /// The manifest channel does not match the requested channel.
+    #[error("channel mismatch: requested {expected}, manifest declares {found}")]
+    ChannelMismatch {
+        /// Requested channel.
+        expected: Channel,
+        /// Manifest channel.
+        found: Channel,
+    },
+    /// The manifest target does not match the requested target.
+    #[error("target mismatch: requested {expected}, manifest declares {found}")]
+    TargetMismatch {
+        /// Requested target.
+        expected: String,
+        /// Manifest target.
+        found: String,
+    },
+    /// The manifest is not yet valid.
+    #[error("manifest is not yet valid")]
+    ManifestNotYetValid,
+    /// The manifest has expired.
+    #[error("manifest has expired")]
+    ManifestExpired,
+    /// The metadata sequence regressed.
+    #[error("metadata sequence regression: minimum {minimum}, found {found}")]
+    MetadataSequenceRegression {
+        /// Minimum accepted sequence.
+        minimum: u64,
+        /// Sequence found in the manifest.
+        found: u64,
+    },
+    /// The signing key is not in the trust store.
+    #[error("unknown signing key: {key_id}")]
+    UnknownSigningKey {
+        /// The rejected key identifier.
+        key_id: String,
+    },
+    /// The signing key is revoked.
+    #[error("signing key is revoked: {key_id}")]
+    SigningKeyRevoked {
+        /// The revoked key identifier.
+        key_id: String,
+    },
+    /// The signing key epoch does not match.
+    #[error("signing key epoch mismatch: expected {expected}, found {found}")]
+    SigningKeyEpochMismatch {
+        /// Trust-store epoch.
+        expected: u64,
+        /// Manifest epoch.
+        found: u64,
+    },
+    /// The signing key is not allowed for the manifest channel.
+    #[error("signing key {key_id} is not allowed for channel {channel}")]
+    SigningKeyChannelNotAllowed {
+        /// The key identifier.
+        key_id: String,
+        /// The rejected channel.
+        channel: Channel,
+    },
+    /// The signing key is not yet valid at the signing time.
+    #[error("signing key is not yet valid")]
+    SigningKeyNotYetValid,
+    /// The signing key has expired at the signing time.
+    #[error("signing key has expired")]
+    SigningKeyExpired,
+    /// The signature algorithm is not supported.
+    #[error("unsupported signature algorithm: {algorithm}")]
+    SignatureAlgorithmUnsupported {
+        /// The rejected algorithm.
+        algorithm: String,
+    },
+    /// The signature is invalid.
+    #[error("signature verification failed")]
+    SignatureInvalid,
+    /// A security primitive failed.
+    #[error(transparent)]
+    Security(#[from] SecurityError),
+    /// The package is larger than the accepted maximum.
+    #[error("package exceeds {max} bytes: {actual} bytes")]
+    PackageTooLarge {
+        /// Maximum accepted bytes.
+        max: u64,
+        /// Actual bytes observed.
+        actual: u64,
+    },
+    /// The package size does not match the manifest.
+    #[error("package size mismatch: expected {expected}, got {actual}")]
+    PackageSizeMismatch {
+        /// Expected size.
+        expected: u64,
+        /// Actual size.
+        actual: u64,
+    },
+    /// The package ended before the declared size.
+    #[error("package truncated: expected {expected}, got {actual}")]
+    PackageTruncated {
+        /// Expected size.
+        expected: u64,
+        /// Actual size.
+        actual: u64,
+    },
+    /// The package hash does not match the manifest.
+    #[error("package hash mismatch: expected {expected}, got {actual}")]
+    PackageHashMismatch {
+        /// Expected lowercase hex digest.
+        expected: String,
+        /// Actual lowercase hex digest.
+        actual: String,
+    },
+    /// A trust store has too many keys.
+    #[error("trust store has {actual} keys; maximum is {max}")]
+    TooManyTrustKeys {
+        /// Maximum accepted count.
+        max: usize,
+        /// Actual count.
+        actual: usize,
+    },
+    /// A trust-store key identifier is duplicated.
+    #[error("duplicate trust-store key: {key_id}")]
+    DuplicateTrustKey {
+        /// The duplicated key identifier.
+        key_id: String,
+    },
+    /// A trust-store key failed validation.
+    #[error("invalid trust-store key: {reason}")]
+    InvalidTrustKey {
+        /// A short, human-readable reason.
+        reason: String,
+    },
+    /// Trust-store keys are not sorted by key identifier.
+    #[error("trust-store keys must be sorted by key_id")]
+    TrustStoreOrder,
+    /// A filesystem read failed.
+    #[error("I/O error: {detail}")]
+    Io {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
+    /// The system clock is unavailable or outside the supported range.
+    #[error("clock error: {detail}")]
+    Clock {
+        /// Bounded diagnostic detail.
+        detail: String,
+    },
+}
+
+impl UpdaterError {
+    /// Creates a bounded diagnostic detail string.
+    #[must_use]
+    pub(crate) fn bounded_detail(detail: impl Into<String>) -> String {
+        let mut detail = detail.into();
+        if detail.len() > MAX_DETAIL_LEN {
+            let mut boundary = MAX_DETAIL_LEN;
+            while !detail.is_char_boundary(boundary) {
+                boundary -= 1;
+            }
+            detail.truncate(boundary);
+            detail.push('…');
+        }
+        detail
+    }
+}

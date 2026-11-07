@@ -128,12 +128,14 @@ For a performance result, also record hardware, workload, baseline, target, obse
 | `cargo fmt --check` | PASS | `cargo fmt --all -- --check`, exit 0, 2026-11-07 |
 | `cargo clippy` | PASS | `cargo clippy --workspace --all-targets --all-features -- -D warnings`, exit 0 |
 | `cargo build` | PASS | `cargo build --workspace --all-targets --locked`, exit 0 |
-| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 17 tests passed |
-| `cargo audit` | PASS | `cargo audit`, exit 0; no advisories for the single workspace crate |
+| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 76 tests passed, 0 failed |
+| Hub manifest/trust/package verification | PASS | 19 integration tests in `crates/eqwec-updater/tests/verification.rs`, including a fixed OpenSSL-generated Ed25519 vector |
+| `cargo audit` | PASS | `cargo audit`, exit 0; 0 advisories across 41 locked dependencies |
 | `cargo deny check` | PASS | `cargo deny check`, exit 0; advisories, bans, licenses, sources ok |
 | CI pipeline | BLOCKED | `.github/workflows/ci.yml` exists; never executed because no remote exists |
+| Hub install/update/rollback acceptance | BLOCKED | Registry, journal, activation, installer, and fixture product do not exist |
 | Packaging/signing checks | BLOCKED | No product artifact |
-| Benchmarks | BLOCKED | No runtime code or fixtures |
+| Benchmarks | BLOCKED | No runtime product fixture |
 
 A `BLOCKED` check is not a failure of the project at the planning stage, but it must remain visible and must be executed before the relevant release gate.
 

@@ -1,10 +1,10 @@
 # EQwec Hub — Product Specification
 
-- **Status:** DRAFT. Not approved. Depends on the GUI/rendering ADR, packaging ADR, and security review.
+- **Status:** DRAFT product requirements. The Hub v1 wire formats and layout are normative in `docs/product-specs/eqwec-hub-schemas.md`; implementation status is tracked there and in `docs/development/QUALITY-GATES.md`.
 - **Version:** `0.0.0` (planning).
 - **Owner:** Hub product workstream.
 - **Skill:** `.agents/skills/eqwec-hub/SKILL.md`.
-- **Related:** `docs/architecture/SYSTEM-ARCHITECTURE.md`, `docs/security/THREAT-MODEL.md`, `docs/development/ROADMAP.md`.
+- **Related:** `docs/product-specs/eqwec-hub-schemas.md`, `docs/adr/0011-hub-manifest-registry-and-layout.md`, `docs/architecture/SYSTEM-ARCHITECTURE.md`, `docs/security/THREAT-MODEL.md`, `docs/development/ROADMAP.md`.
 
 ## 1. Problem and target user
 
@@ -87,7 +87,7 @@ Requirements:
 - Reject duplicate keys, unknown critical fields, inconsistent lengths, and trailing data.
 - The signature covers source, size, hashes, target, channel, dependencies, and minimum platform.
 - No executable logic, scripts, or arbitrary commands.
-- Schema and canonicalization require an ADR before implementation.
+- Schema, canonicalization, and validation order are defined in `docs/product-specs/eqwec-hub-schemas.md` and ADR-0011.
 
 ### 5.3 Download and verification
 
@@ -139,7 +139,7 @@ Requirements:
 
 ## 6. Installation layout (planned)
 
-The exact layout requires an ADR. Constraints:
+The exact layout is normative in `docs/product-specs/eqwec-hub-schemas.md` and ADR-0011. Constraints:
 
 - Per-user data and cache directories follow platform conventions (XDG on Linux, known folders on Windows, Application Support on macOS).
 - Active, staging, download temp, rollback retention, logs, and cache are separated.

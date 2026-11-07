@@ -52,19 +52,28 @@ Gate: reproducible local build and passing baseline checks. No product feature y
 
 ## Phase 3 — EQwec Hub MVP
 
-**State:** not started.
+**State:** in progress on `dev-hub`. Verification core implemented; installer and transaction engine not started.
 
-Scope:
+Completed:
+
+- Normative manifest, trust-store, registry, journal, and layout schemas (ADR-0011 and `docs/product-specs/eqwec-hub-schemas.md`).
+- Bounded manifest v1 parsing, canonical byte generation, and exact fixed-vector test.
+- Pinned trust-store parsing with channel, epoch, revocation, and key-window policy.
+- Strict Ed25519 and SHA-256 primitives with RFC 8032 and known-answer tests.
+- Package size and hash verification for reader and in-memory paths.
+- 76 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
+
+Remaining:
 
 - Native launcher UI.
-- Versioned, signed product manifest.
 - Local installation registry.
-- Verified download and package integrity.
-- Transactional install, launch, update, rollback, repair, uninstall.
-- Offline install and interrupted-operation recovery.
+- Journal, atomic activation, rollback, repair, and uninstall.
+- Verified download transport and offline install.
+- Interrupted-operation recovery with fault injection.
 - Diagnostics with redaction.
+- A real fixture product installed, launched, updated, and removed on each claimed platform.
 
-Acceptance: install, verify, launch, update, interrupt/recover, repair, roll back, and uninstall a real fixture application on each claimed platform.
+Acceptance: install, verify, launch, update, interrupt/recover, repair, roll back, and uninstall a real fixture application on each claimed platform. This remains `BLOCKED` until the remaining items exist and pass.
 
 Why first: Hub establishes package trust, versioning, installation, and update infrastructure that the ecosystem needs. It is smaller than a browser or creative editor and its security model is well bounded.
 

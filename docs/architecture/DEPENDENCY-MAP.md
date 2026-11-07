@@ -1,6 +1,6 @@
 # Dependency Map
 
-**Status:** planning baseline. No third-party dependency is approved yet. Candidate technologies are under research and legal review.
+**Status:** planning baseline with an admitted verification core. The six dependencies in §9 are admitted for manifest, trust, and package verification. GUI, media, audio, browser, and packaging technologies remain candidates under research and legal review.
 
 ## 1. Internal dependency direction
 
@@ -115,16 +115,33 @@ Do not add a dependency for a few lines of trivial code. Do not vendor a fork wi
 
 ## 8. Current state
 
+Last verified: 2026-11-07.
+
 | Item | State |
 |---|---|
 | Cargo workspace | Exists: resolver 3, edition 2024, Rust 1.99.1, members `crates/*` |
-| Workspace crates | `eqwec-core` only; no third-party dependencies |
-| Approved dependencies | None beyond the standard library; ADR directions are not dependency approvals |
-| Lockfile | `Cargo.lock` committed |
+| Workspace crates | `eqwec-core`, `eqwec-security`, `eqwec-updater`; six direct third-party dependencies |
+| Approved dependencies | The six direct dependencies in §9 passed advisory, license, ban, and source checks on 2026-11-07 |
+| Lockfile | `Cargo.lock` committed; 41 locked packages |
 | SBOM | None |
 | License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel |
 | Technology selection | Planning baseline: `docs/architecture/TECHNOLOGY-SELECTION.md` |
-| ADR set | ADR-0001 through ADR-0010 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
-| Advisory/license CI | Configured in `.github/workflows/ci.yml`; execution status recorded in `docs/development/QUALITY-GATES.md` |
+| ADR set | ADR-0001 through ADR-0011 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
+| Advisory/license CI | Configured in `.github/workflows/ci.yml`; local commands pass, CI execution `BLOCKED` because no remote exists |
 
-This map is a planning artifact. It must be updated with exact versions, licenses, and owners before the first dependency is added.
+## 9. Admitted dependencies
+
+These are the only third-party direct dependencies admitted so far. Admission covers the exact locked version for local verification; a version update requires a fresh advisory and license check. Workspace crates still have no `license` field because ADR-0008 is `PROPOSED`; `deny.toml` exempts private workspace crates only.
+
+| Crate | Declared | Locked | License | Purpose | Used by |
+|---|---|---|---|---|---|
+| `ed25519-dalek` | 3.0.0 | 3.0.0 | BSD-3-Clause | Strict Ed25519 verification | `eqwec-security` |
+| `sha2` | 0.11.1 | 0.11.1 | MIT OR Apache-2.0 | SHA-256 digests | `eqwec-security`, `eqwec-updater` |
+| `serde` | 1.0.228 | 1.0.229 | MIT OR Apache-2.0 | Derive deserialization for wire structs | `eqwec-updater` |
+| `serde_json` | 1.0.150 | 1.0.154 | MIT OR Apache-2.0 | Bounded JSON parsing | `eqwec-updater` |
+| `semver` | 1.0.28 | 1.0.28 | MIT OR Apache-2.0 | Version and constraint validation | `eqwec-updater` |
+| `thiserror` | 2.0.18 | 2.0.21 | MIT OR Apache-2.0 | Typed error definitions | `eqwec-security`, `eqwec-updater` |
+
+`cargo deny check` reported `advisories ok, bans ok, licenses ok, sources ok` on 2026-11-07. The duplicate `syn` 2.x/3.x warning is accepted because the two versions are isolated to proc-macro expansion.
+
+This map is updated whenever a direct dependency is added, removed, or upgraded.

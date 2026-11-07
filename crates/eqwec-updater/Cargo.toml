@@ -1,0 +1,25 @@
+[package]
+name = "eqwec-updater"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+description = "Manifest verification, trust policy, and package integrity for EQwec Hub"
+
+[dependencies]
+eqwec-core.workspace = true
+eqwec-security.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+ed25519-dalek.workspace = true
+eqwec-core.workspace = true
+eqwec-security.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

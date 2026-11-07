@@ -42,6 +42,7 @@ Never delete an ADR. If a decision changes, write a new one and mark the old one
 | [0008](0008-original-project-license.md) | Original project license | PROPOSED; owner approval required |
 | [0009](0009-crash-reporting-and-diagnostics.md) | Crash reporting and diagnostics | ACCEPTED with implementation gate |
 | [0010](0010-plugin-and-extension-trust.md) | Plugin and extension trust model | ACCEPTED with prototype and isolation gates |
+| [0011](0011-hub-manifest-registry-and-layout.md) | Hub manifest, registry, journal, and layout | ACCEPTED with implementation gates |
 
 An ADR marked "with a gate" is normative as a direction, but the gated work is `BLOCKED` until its stated evidence exists. A `PROPOSED` ADR is not normative.
 

@@ -44,6 +44,7 @@ REQUIRED = [
     "docs/development/QUALITY-GATES.md",
     "docs/development/SKILL-USAGE.md",
     "docs/development/SKILL-TRIGGER-CASES.json",
+    "docs/product-specs/eqwec-hub-schemas.md",
 ]
 
 SECRET_PATTERNS = [

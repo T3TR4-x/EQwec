@@ -153,6 +153,48 @@ Findings:
 
 Gate decision: workspace baseline `PASS` locally. The Phase 2 gate is not closed until CI runs and `dev-hub` exists.
 
+## Task: Hub verification core (manifest, trust, package)
+
+**Date:** 2026-11-07
+**Branch:** `dev-hub`
+**Scope:** ADR-0011, normative Hub schemas, `eqwec-security`, `eqwec-updater`, fixed signature vector, and integration tests. **No installer, registry, journal, UI, or product code.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Fail-closed parsing, bounded input, typed errors, `forbid(unsafe_code)`, dependency admission, scoped Ukrainian commit policy |
+| `eqwec-quality-control` | APPLIED | Local gate evidence recorded; install acceptance kept `BLOCKED`; fixed vector independently generated with OpenSSL |
+| `eqwec-hub` | APPLIED | ADR-0011, `eqwec-hub-schemas.md`, manifest/trust/package implementation, rollback and activation rules |
+| `security-audit` | APPLIED | Duplicate/unknown field rejection, strict Ed25519, weak-key rejection, path traversal rules, revocation and epoch checks, key-custody limits |
+| `skill-creator` | AVAILABLE_NOT_RELEVANT | No skill file changed in this task |
+| `code-review` (Matt Pocock) | APPLIED | Diff reviewed for private-field leakage, canonicalization order, and test coverage gaps |
+| `ponytail`, `karpathy-guidelines` | AVAILABLE_NOT_RELEVANT | Implementation followed the schema directly; no refactor or design exploration |
+| `eqwec-browser`, `eqwec-photocraft`, `eqwec-vectorcraft`, `eqwec-filmcraft`, `eqwec-effectcraft`, `eqwec-craftanything`, `eqwec-audiocraft` | AVAILABLE_NOT_RELEVANT | No path in those products was touched |
+| `research`, UI skills, `playwright` | AVAILABLE_NOT_RELEVANT | No research question, UI, or browser test in this scope |
+
+## Quality-control report for the Hub verification task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | ADR-0011 and schema doc read first; branch `dev-hub` at `0cc8d59`; no unrelated worktree changes |
+| Implementation | PASS for verification core | Three crates; six admitted dependencies; no installer or filesystem mutation claimed |
+| Verification | PASS locally; install acceptance `BLOCKED` | `cargo test --workspace --all-features --locked`: 76 passed, 0 failed; fmt, clippy, build, audit, deny exit 0; docs gate 0 failures; skills 10/10 |
+| Performance | NOT_APPLICABLE | No runtime product workload or benchmark |
+| Security | PASS for implemented boundary | Fixed OpenSSL vector, tampered payload/signature, wrong channel/target/key/epoch, revoked key, expired key, sequence regression, truncation, size and hash mismatch all rejected |
+| Merge | PENDING | Commit not yet created at the time of writing |
+| Release | NOT_APPLICABLE | No artifact; versions remain `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| High | Registry, journal, atomic activation, installer, and fixture product do not exist | Open; install/update/rollback acceptance `BLOCKED` |
+| High | CI has never executed; local-only evidence | Open; `BLOCKED` on a remote |
+| High | Trust-store update signing and root-key custody do not exist | Open; on-disk trust updates `BLOCKED` |
+| Medium | Windows and Linux were not exercised | Open; `BLOCKED` |
+| Low | `cargo deny` reports duplicate `syn` 2.x/3.x | Accepted; isolated to proc-macro expansion |
+
+Gate decision: verification core `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
+
 ## Template for future tasks
 
 | Skill | State | Evidence |
