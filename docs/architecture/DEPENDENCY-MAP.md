@@ -67,8 +67,8 @@ The following are candidates for evaluation. None is approved, versioned, or lic
 | Crypto | RustCrypto, ring, aws-lc-rs, platform stores | Pending security review; no homegrown crypto |
 | IPC | Unix sockets/named pipes, shared memory | Pending ADR; authentication and bounds |
 | Logging | tracing, log | Redaction and bounded output are project requirements |
-| Testing | cargo-nextest, proptest, cargo-fuzz, criterion | Pending CI baseline |
-| Security tooling | cargo-audit, cargo-deny, secret scanners | Pending CI baseline |
+| Testing | cargo-nextest, proptest, cargo-fuzz, criterion | Not yet adopted |
+| Security tooling | cargo-audit, cargo-deny, secret scanners | `cargo-audit` and `cargo-deny` run locally and in CI; secret scanning not adopted |
 | Packaging | WiX/MSIX, Apple notarization, deb/rpm/AppImage/Flatpak/Snap | Pending ADR-0007 |
 
 ## 4. Dependency admission policy
@@ -127,7 +127,7 @@ Last verified: 2026-11-07.
 | License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel |
 | Technology selection | Planning baseline: `docs/architecture/TECHNOLOGY-SELECTION.md` |
 | ADR set | ADR-0001 through ADR-0012 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
-| Advisory/license CI | Configured in `.github/workflows/ci.yml`; local commands pass, CI execution `BLOCKED` because no remote exists |
+| Advisory/license CI | PASS in GitHub Actions run `42389844319` on commit `c066d67`; local commands also pass |
 
 ## 9. Admitted dependencies
 

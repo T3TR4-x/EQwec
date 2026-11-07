@@ -361,6 +361,42 @@ Findings:
 
 Gate decision: fixture workflow `PASS` locally. Hub MVP acceptance remains `BLOCKED`.
 
+## Task: First GitHub Actions run and Windows portability fixes
+
+**Date:** 2026-11-07
+**Branch:** `dev-hub`, fast-forwarded to `integration`
+**Scope:** Windows clippy fixes in `atomic.rs` and `staging.rs`, platform-neutral path fixtures in `layout.rs` and `registry.rs`, CI run `42389844319`, and status reconciliation in the root documents and gate reports. **No production behavior change.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Inspected branch and worktree, kept the fix scoped, used typed test paths, and recorded the real CI result without inventing platform acceptance |
+| `eqwec-quality-control` | APPLIED | Failure logs from run `42388967215` reproduced locally by Windows-target clippy; final run `42389844319` passed all five jobs; product acceptance kept `BLOCKED` |
+| `eqwec-hub` | APPLIED | Only Hub workspace crates and fixture-adjacent tests were touched; no Hub capability was claimed beyond the tested workflow |
+| Other product skills | AVAILABLE_NOT_RELEVANT | No path in another product was touched |
+| UI, browser, research, and Playwright skills | AVAILABLE_NOT_RELEVANT | No UI, browser test, or research question in this scope |
+
+## Quality-control report for the CI task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | Branch `dev-hub` at `9df033d`; worktree inspected; Windows failure logs from run `42388967215` read before editing |
+| Implementation | PASS | `PathBuf` import scoped to tests; `collect_directories` gated to Unix; mode assertions run on all platforms; layout and registry tests derive absolute paths from `temp_dir()` |
+| Verification | PASS | Local fmt, clippy, build, and 163 tests pass; Windows-target clippy passes; GitHub Actions run `42389844319` on commit `c066d67` passed macOS, Ubuntu, Windows, advisories, and licenses/bans |
+| Performance | NOT_APPLICABLE | No runtime or benchmark change |
+| Security | PASS | `validate_absolute` was not weakened; Windows tests now exercise real absolute-path validation instead of failing before the intended assertion |
+| Merge | PASS | Commits `288b27a` and `c066d67` on `dev-hub`; `integration` fast-forwarded to `c066d67` |
+| Release | NOT_APPLICABLE | No artifact; version remains `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| Medium | GitHub did not discover `.github/workflows/ci.yml` until the default branch changed and a workflow file was created through the API | Worked around; the temporary probe was removed in `2fa0203` |
+| Low | Windows verification is compile-only locally; runtime test execution depends on GitHub-hosted runners | Accepted; run `42389844319` is the runtime evidence |
+| High | Windows and Linux product-runtime acceptance remains impossible because no Hub application or installer exists | Open; `BLOCKED` |
+
+Gate decision: CI `PASS` for commit `c066d67`. Hub MVP acceptance remains `BLOCKED`.
+
 ## Template for future tasks
 
 | Skill | State | Evidence |

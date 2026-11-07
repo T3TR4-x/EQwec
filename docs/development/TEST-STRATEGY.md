@@ -1,6 +1,6 @@
 # Test Strategy
 
-**Status:** approved strategy. The Phase 2 workspace and a minimal test harness exist (`crates/eqwec-core`, 17 tests). Product-level integration, fixture, performance, and platform tests remain `BLOCKED` until the corresponding product code exists.
+**Status:** approved strategy. The workspace now contains `eqwec-core`, `eqwec-security`, `eqwec-updater`, and the non-published `eqwec-hub-fixture` with 163 tests. Workspace tests run on macOS, Ubuntu, and Windows in CI. Product-level installer acceptance, benchmarks, and fuzzing remain `BLOCKED` until the corresponding product code exists.
 
 ## 1. Principles
 
@@ -83,7 +83,7 @@ The product skill is authoritative for the detailed success criteria. This table
 - Use release builds for release claims. Debug-build numbers are not release evidence.
 - Do not compare incompatible memory metrics across operating systems.
 
-## 9. CI baseline (configured, not executed)
+## 9. CI baseline (executed)
 
 ```text
 format -> lint -> license/advisory -> build -> unit -> integration
@@ -95,12 +95,11 @@ format -> lint -> license/advisory -> build -> unit -> integration
 - Cache dependencies without allowing stale or compromised artifacts to bypass verification.
 - Run platform-specific jobs for Windows, macOS, and Linux where the change is platform-sensitive.
 - Publish test reports and artifacts with retention appropriate to the release.
-- The workflow has never executed because the repository has no remote. `CI_EXECUTION` is `BLOCKED`.
+- GitHub Actions run `42389844319` on commit `c066d67` passed all five jobs: tests on macOS, Ubuntu, and Windows, plus advisories and licenses/bans. `CI_EXECUTION` is `PASS` for this commit.
 
 ## 10. Current state
 
-- The Phase 2 workspace exists with `eqwec-core` and 17 passing tests.
-- `.github/workflows/ci.yml` is configured for format, clippy, build, test, audit, and deny on a three-OS matrix; it has never executed because the repository has no remote.
+- The Phase 2 workspace exists with `eqwec-core`, `eqwec-security`, `eqwec-updater`, and the non-published `eqwec-hub-fixture`; 163 workspace tests pass.
+- `.github/workflows/ci.yml` runs on a three-OS matrix and passed on 2026-11-07.
 - Local evidence: fmt, clippy, build, test, audit, and deny pass on macOS 26.7.2 arm64 with Rust 1.99.1.
-- No product test, fixture corpus, integration test, benchmark, or platform test exists.
-- The first product workspace baseline must add fixture licensing, fault-injection, and platform test commands before product implementation is declared complete.
+- The fixture corpus and three in-process Hub end-to-end tests exist; platform product acceptance, benchmarks, and fuzzing do not.

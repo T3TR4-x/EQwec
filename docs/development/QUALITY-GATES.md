@@ -137,8 +137,8 @@ For a performance result, also record hardware, workload, baseline, target, obse
 | Hub installer and launcher | BLOCKED | No download transport, uninstaller, installer packaging, or UI |
 | `cargo audit` | PASS | `cargo audit`, exit 0; 0 advisories across 64 locked dependencies |
 | `cargo deny check` | PASS | `cargo deny check`, exit 0; advisories, bans, licenses, sources ok |
-| CI pipeline | BLOCKED | `.github/workflows/ci.yml` exists; never executed because no remote exists |
-| Hub install/update/rollback platform acceptance | BLOCKED | Only the macOS in-process fixture runs; download transport, uninstall, installer, launcher, and Windows/Linux fixture runs do not exist |
+| CI pipeline | PASS | GitHub Actions run `42389844319` on commit `c066d67`: all five jobs succeeded (`test` on macOS, Ubuntu, Windows; `advisories`; `licenses and bans`) |
+| Hub install/update/rollback platform acceptance | BLOCKED | The in-process fixture tests run on all three CI platforms; download transport, uninstall, installer, launcher, and platform packaging do not exist |
 | Packaging/signing checks | BLOCKED | No product artifact |
 | Benchmarks | BLOCKED | No runtime product fixture |
 
@@ -148,9 +148,9 @@ A `BLOCKED` check is not a failure of the project at the planning stage, but it 
 
 The author should not be the only reviewer of a high-risk change. When a separate agent or human reviewer is available, use it. If self-review is unavoidable, state that independence was limited and apply the same evidence standard.
 
-## 7. CI design (configured, not executed)
+## 7. CI execution
 
-The workspace exists and `.github/workflows/ci.yml` is configured. The remote does not exist, so the workflow has never run. When it runs, it should execute, in order:
+The workspace exists and `.github/workflows/ci.yml` runs on GitHub Actions. Run `42389844319` on commit `c066d67` passed all five jobs: format, clippy, build, and tests on macOS, Ubuntu, and Windows, plus advisory and license/ban checks. The pipeline executes, in order:
 
 ```text
 format -> lint -> license/advisory -> build -> unit -> integration

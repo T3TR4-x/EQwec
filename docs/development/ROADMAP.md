@@ -35,15 +35,15 @@ Outcome: `PASS` for planning. ADR-0004 and ADR-0008 remain `PROPOSED`; codec/DRM
 
 ## Phase 2 — Architecture and repository baseline
 
-**State:** in progress. Workspace, `eqwec-core`, CI configuration, local advisory/license checks, and `dev-hub` exist; the gate is not closed until CI executes.
+**State:** complete for the workspace baseline. Workspace, `eqwec-core`, CI configuration, advisory/license checks, and `dev-hub` exist; GitHub Actions run `42389844319` passed all jobs on macOS, Ubuntu, and Windows.
 
 Deliverables:
 
 - Approved `SYSTEM-ARCHITECTURE.md` and `DEPENDENCY-MAP.md`.
 - Accepted ADRs for the first implementation decisions.
 - Cargo workspace with a pinned toolchain. **Done.**
-- Minimal shared crates with real APIs and tests. **`eqwec-core` done; 17 tests pass.**
-- CI baseline: format, lint, build, test, advisory/license checks. **Configured; never executed because no remote exists.**
+- Minimal shared crates with real APIs and tests. **`eqwec-core`, `eqwec-security`, and `eqwec-updater` done; 163 workspace tests pass.**
+- CI baseline: format, lint, build, test, advisory/license checks. **Done; GitHub Actions run `42389844319` passed on all three platforms.**
 - `dev-*` and `production` branch creation from the approved baseline. **`dev-hub` created; `production` deferred until a verified release.**
 - Initial version metadata at `0.0.0`. **Done.**
 - Documentation and security gates reviewed against the actual workspace. **Done.**
@@ -52,7 +52,7 @@ Gate: reproducible local build and passing baseline checks. No product feature y
 
 ## Phase 3 — EQwec Hub MVP
 
-**State:** in progress on `dev-hub`. Verification core, durable-state primitives, the in-process activation engine, bounded package staging, and a non-production fixture product with in-process macOS end-to-end tests implemented; download transport, installer orchestration, uninstall, and launcher not started.
+**State:** in progress on `dev-hub`. Verification core, durable-state primitives, the in-process activation engine, bounded package staging, and a non-production fixture product with in-process end-to-end tests implemented; download transport, installer orchestration, uninstall, and launcher not started.
 
 Completed:
 
@@ -66,8 +66,8 @@ Completed:
 - Installation layout and atomic `active.json` pointer primitives.
 - Activation engine for fresh install, update, rollback, and startup recovery, with five fault-injection points and a single-in-flight-operation invariant.
 - Bounded ZIP/ZIP64 package validation and extraction into a durable staging tree, including path, mode, header-confusion, ratio, size, and timeout rejection with partial-tree cleanup.
-- A real non-production fixture product (`tests/fixtures/eqwec-hub`) with v1 and v2 executables and signed packages. Three in-process macOS tests install, launch, update, roll back, reject a tampered package, and recover an interrupted activation.
-- 163 workspace tests pass; fmt, clippy, build, audit, and deny pass locally.
+- A real non-production fixture product (`tests/fixtures/eqwec-hub`) with v1 and v2 executables and signed packages. Three in-process tests install, launch, update, roll back, reject a tampered package, and recover an interrupted activation.
+- 163 workspace tests pass; fmt, clippy, build, audit, and deny pass locally and in GitHub Actions run `42389844319` on macOS, Ubuntu, and Windows.
 
 Remaining:
 
@@ -183,6 +183,6 @@ Products release independently. The ecosystem is not "finished" until each produ
 - ADR-0004 (media/codecs) and ADR-0008 (project license) are `PROPOSED`, not normative. Codec/patent and DRM decisions require counsel; the project license requires owner approval.
 - Hub verification, durable-state, activation, and staging crates and an in-process fixture workflow exist, but no product application, installer, uninstaller, or launcher exists.
 - GUI accessibility, text input, browser integration, and audio real-time behavior are `UNVERIFIED` until their prototypes run.
-- No remote, signing infrastructure, or release channel exists.
-- Windows and Linux are planned targets but have not been tested in this environment.
+- No signing infrastructure, installer, or release channel exists.
+- Windows and Linux workspace tests run in CI; their product runtime has not been exercised.
 - The competitor, legal, and feasibility reviews are planning evidence, not implementation approval.

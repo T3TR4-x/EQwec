@@ -13,7 +13,7 @@
 
 The ecosystem is **technically feasible but not yet de-risked**. Every product has a credible implementation path using the selected Rust-first stack, and no product requires an unsolved research breakthrough. The binding constraints are organizational and legal, not algorithmic:
 
-1. **Breadth is the largest risk.** Eight product families, including a browser and a package manager, are planned with only a Phase 2 workspace, no CI execution, no installer, and no release artifact. The sequence must be depth-first: Hub, then one creative product, then the rest.
+1. **Breadth is the largest risk.** Eight product families, including a browser and a package manager, are planned with only a Phase 2 workspace, one passing three-OS CI run, no installer, and no release artifact. The sequence must be depth-first: Hub, then one creative product, then the rest.
 2. **The browser is the highest-risk product.** CEF provides Chromium-class compatibility without a fork, but EQwec becomes responsible for engine rebuilds, security response, codecs, DRM, and a large installer. This is a permanent operating cost, not a one-time integration.
 3. **Codec and DRM licensing is unresolved.** H.264, AAC, HEVC, ProRes, and DNxHR cannot ship by default until counsel or an authorized licensing decision exists. AV1, VP9, Opus, FLAC, PNG, JPEG, and WebP provide a royalty-free first-release path.
 4. **Audio real-time correctness is unproven.** CPAL and out-of-process CLAP/VST3 hosting are credible, but no EQwec measurement exists. The audio callback contract and plugin crash isolation must be proven before AudioCraft work.
@@ -36,7 +36,7 @@ Limits:
 - No EQwec product exists. No performance, compatibility, or reliability claim in this document is measured.
 - Competitor behavior is taken from official documentation only, as recorded in `COMPETITOR-ANALYSIS.md`.
 - Legal conclusions are `BLOCKED` pending counsel; this document is not legal advice.
-- Platform verification was performed on macOS on Apple silicon only. Windows and Linux are planned targets, not verified platforms.
+- Local verification was performed on macOS on Apple silicon. GitHub Actions also runs the workspace tests on Ubuntu and Windows, but no product runtime has been accepted on those platforms.
 - Numeric targets in `PERFORMANCE-STRATEGY.md` are hypotheses until a benchmark harness exists.
 
 ## 3. Cross-cutting findings
@@ -45,7 +45,7 @@ Limits:
 
 `OBSERVED`/`ASSUMPTION`: The accepted ADRs define one coherent stack: Rust, `egui`/`eframe`, `wgpu`, `kurbo`/`lyon`/`cosmic-text`, FFmpeg under LGPL-only, CPAL, CLAP-first plugin hosting, a versioned project bundle, and signed native packages. Each choice has a documented fallback. This reduces integration risk compared with per-product stacks.
 
-The common foundation is now a workspace with one dependency-free crate. The next evidence must be the Hub trust chain: signed manifest, verified download, transactional install/update/rollback, and fault injection. CI must run on all three platforms before platform claims are made.
+The common foundation is now a workspace with three crates and a non-published fixture. The next evidence must be the Hub trust chain: signed manifest, verified download, transactional install/update/rollback, and fault injection. Workspace CI now runs on all three platforms; product-runtime acceptance on Windows and Linux remains to be built.
 
 ### 3.2 Trust and update chain
 
@@ -90,7 +90,7 @@ The common foundation is now a workspace with one dependency-free crate. The nex
 - A launcher that installs other applications conflicts with store sandbox models; document the limitation.
 - Interrupted-update recovery must be proven with fault injection.
 
-**Blockers:** no remote, signing keys, certificates, notarization account, or release channel. All release steps `BLOCKED`.
+**Blockers:** signing keys, certificates, notarization account, and release channel. All release steps `BLOCKED`.
 
 **First proof:** install, verify, launch, update, kill mid-update, recover, repair, roll back, and uninstall a fixture application on macOS, then Windows and Linux.
 
@@ -260,7 +260,7 @@ This order is a recommendation, not a commitment. It can change only with record
 | Documentation | Required research, architecture, security, performance, and development docs exist and pass structural checks | `PASS`; `check-docs.py --gate` returned 0 failures on 2026-11-07 |
 | Architecture | ADRs for GUI, browser, media, audio, storage, packaging, license, diagnostics, and plugin trust are recorded | `PASS` with open gates inside ADRs |
 | Security | Threat model and baseline exist; product-specific boundaries reviewed | `PASS` for planning baseline; runtime `BLOCKED` |
-| Workspace | Cargo workspace builds, tests, lints, and checks advisories/licenses | `PASS` locally on macOS; CI execution `BLOCKED` — no remote |
+| Workspace | Cargo workspace builds, tests, lints, and checks advisories/licenses | `PASS` locally on macOS and in GitHub Actions run `42389844319` on macOS, Ubuntu, and Windows |
 | Hub release | Install/update/rollback/repair/uninstall verified on claimed platforms | `BLOCKED` — no implementation |
 | Browser prototype | Sandbox, isolation, session restore, packaging, measurements | `BLOCKED` — no prototype |
 | Media legal | Codec/patent and DRM decisions recorded | `BLOCKED` — counsel required |
@@ -277,10 +277,10 @@ This order is a recommendation, not a commitment. It can change only with record
 | Architecture | `PASS` with open decisions | ADR-0001 through ADR-0010 recorded; 0004 and 0008 remain `PROPOSED` |
 | Security baseline | `PASS` for planning | Threat model and baseline exist; runtime verification `BLOCKED` |
 | Performance | `PASS` for methodology | Strategy exists; no benchmark `BLOCKED` |
-| Workspace | `PASS` locally | Cargo workspace; 17 tests; fmt, clippy, build, audit, and deny pass; CI not executed |
+| Workspace | `PASS` locally and in CI | Cargo workspace; 163 tests; fmt, clippy, build, audit, and deny pass; GitHub Actions run `42389844319` passed on macOS, Ubuntu, and Windows |
 | Product implementation | `BLOCKED` | Gates above must pass first |
-| Windows/Linux verification | `BLOCKED` | Only macOS tested |
-| Release | `BLOCKED` | No remote, keys, signing, or channel |
+| Windows/Linux verification | `PASS` for workspace tests; product acceptance `BLOCKED` | CI runs the workspace tests; no Hub application or installer exists to accept |
+| Release | `BLOCKED` | No keys, signing, installer, or channel |
 
 ## 9. Open decisions
 
@@ -289,7 +289,6 @@ This order is a recommendation, not a commitment. It can change only with record
 | Accept ADR-0008 project license | Project owner | Distribution and contribution |
 | Accept or amend ADR-0004 codec policy | Owner and counsel | Browser and media features |
 | Choose FFmpeg linkage model for first release | Engineering and counsel | FilmCraft/EffectCraft export |
-| Approve CI provider and remote | Owner | Workspace baseline |
 | Approve signing key custody | Owner | Any release |
 | Select GUI prototype platforms and hardware profiles | Engineering | GUI gate |
 | Define audio latency and xrun budgets | Engineering | Audio gate |
