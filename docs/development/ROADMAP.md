@@ -35,7 +35,7 @@ Outcome: `PASS` for planning. ADR-0004 and ADR-0008 remain `PROPOSED`; codec/DRM
 
 ## Phase 2 — Architecture and repository baseline
 
-**State:** in progress. Workspace, `eqwec-core`, CI configuration, and local advisory/license checks exist; the gate is not closed until `dev-hub` is created and CI executes.
+**State:** in progress. Workspace, `eqwec-core`, CI configuration, local advisory/license checks, and `dev-hub` exist; the gate is not closed until CI executes.
 
 Deliverables:
 
@@ -44,7 +44,7 @@ Deliverables:
 - Cargo workspace with a pinned toolchain. **Done.**
 - Minimal shared crates with real APIs and tests. **`eqwec-core` done; 17 tests pass.**
 - CI baseline: format, lint, build, test, advisory/license checks. **Configured; never executed because no remote exists.**
-- `dev-*` and `production` branch creation from the approved baseline. **`dev-hub` next; `production` deferred until a verified release.**
+- `dev-*` and `production` branch creation from the approved baseline. **`dev-hub` created; `production` deferred until a verified release.**
 - Initial version metadata at `0.0.0`. **Done.**
 - Documentation and security gates reviewed against the actual workspace. **Done.**
 
