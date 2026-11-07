@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "note": "Static description-coverage cases. They prove that each skill's trigger contract mentions the domain terms for positive prompts and the exclusion terms for negative prompts. They do NOT prove model activation; agent-level probes are recorded in SKILLS-AUDIT.md.",
+  "skills": {
+    "eqwec-engineering-core": {
+      "positive": [
+        {
+          "id": "core-pos-1",
+          "prompt": "Add a shared crate for atomic project writes and review the Cargo workspace boundaries.",
+          "terms": ["architecture", "shared crate", "repository"],
+          "min_hits": 2
+        },
+        {
+          "id": "core-pos-2",
+          "prompt": "Write a Ukrainian Conventional Commit and decide whether the product version should be bumped.",
+          "terms": ["git", "versioning", "documentation"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "core-neg-1",
+          "prompt": "Fix a typo in an unrelated open-source repository.",
+          "terms": ["unrelated repositories"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-quality-control": {
+      "positive": [
+        {
+          "id": "qc-pos-1",
+          "prompt": "Review this diff before merge and decide PASS, FAIL or BLOCKED.",
+          "terms": ["review", "merge", "PASS"],
+          "min_hits": 2
+        },
+        {
+          "id": "qc-pos-2",
+          "prompt": "Check whether the performance regression blocks the release.",
+          "terms": ["performance", "release", "regression"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "qc-neg-1",
+          "prompt": "Explain the architecture of a photo editor to a new user.",
+          "terms": ["self-approve", "evidence"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-hub": {
+      "positive": [
+        {
+          "id": "hub-pos-1",
+          "prompt": "The signed update manifest is accepted with a revoked key; fix package verification and rollback.",
+          "terms": ["update", "manifest", "package", "rollback"],
+          "min_hits": 3
+        },
+        {
+          "id": "hub-pos-2",
+          "prompt": "An interrupted install leaves a mixed version tree; make repair and uninstall transactional.",
+          "terms": ["install", "repair", "uninstall"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "hub-neg-1",
+          "prompt": "Change the exposure brush in PhotoCraft.",
+          "terms": ["another eqwec product"],
+          "min_hits": 1
+        },
+        {
+          "id": "hub-neg-2",
+          "prompt": "Fix a generic Rust iterator warning in a scratch project.",
+          "terms": ["unrelated repositories"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-browser": {
+      "positive": [
+        {
+          "id": "browser-pos-1",
+          "prompt": "Tabs restore into the wrong profile after restart; inspect session persistence and renderer IPC.",
+          "terms": ["profiles", "tabs", "sessions", "ipc"],
+          "min_hits": 2
+        },
+        {
+          "id": "browser-pos-2",
+          "prompt": "Measure memory after discarding inactive tabs without weakening site isolation.",
+          "terms": ["memory", "chromium", "security"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "browser-neg-1",
+          "prompt": "Add a gradient fill to a VectorCraft path.",
+          "terms": ["hub", "creative products"],
+          "min_hits": 1
+        },
+        {
+          "id": "browser-neg-2",
+          "prompt": "Refactor a generic logging crate with no browser consumer.",
+          "terms": ["outside browser-owned paths"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-photocraft": {
+      "positive": [
+        {
+          "id": "photo-pos-1",
+          "prompt": "A non-destructive curves adjustment loses its mask after reopening the photo project.",
+          "terms": ["non-destructive", "adjustments", "masks", "project"],
+          "min_hits": 3
+        },
+        {
+          "id": "photo-pos-2",
+          "prompt": "Reduce tiled rendering memory while preserving color management and RAW decode quality.",
+          "terms": ["tiled rendering", "color management", "raw"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "photo-neg-1",
+          "prompt": "Fix a Bézier boolean operation in VectorCraft.",
+          "terms": ["vectorcraft"],
+          "min_hits": 1
+        },
+        {
+          "id": "photo-neg-2",
+          "prompt": "Change a shared crate with no photo-specific behavior.",
+          "terms": ["no photo-specific behavior"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-vectorcraft": {
+      "positive": [
+        {
+          "id": "vector-pos-1",
+          "prompt": "Boolean subtract produces self-intersecting garbage on coincident nodes; fix path geometry and hit-testing.",
+          "terms": ["boolean", "path", "geometry", "hit-testing"],
+          "min_hits": 3
+        },
+        {
+          "id": "vector-pos-2",
+          "prompt": "SVG import loses gradient strokes and text-on-path; verify round-trip fidelity and export.",
+          "terms": ["svg", "gradient", "stroke", "export"],
+          "min_hits": 3
+        }
+      ],
+      "negative": [
+        {
+          "id": "vector-neg-1",
+          "prompt": "Apply a RAW denoise filter in PhotoCraft.",
+          "terms": ["photocraft", "filmcraft"],
+          "min_hits": 1
+        },
+        {
+          "id": "vector-neg-2",
+          "prompt": "Fix timeline A/V sync in FilmCraft.",
+          "terms": ["filmcraft"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-filmcraft": {
+      "positive": [
+        {
+          "id": "film-pos-1",
+          "prompt": "Timeline audio drifts from video after a ripple trim; fix A/V sync and frame accuracy.",
+          "terms": ["timeline", "a/v sync", "trim"],
+          "min_hits": 2
+        },
+        {
+          "id": "film-pos-2",
+          "prompt": "Export renders black frames when the proxy cache is invalidated.",
+          "terms": ["export", "proxy", "cache", "render"],
+          "min_hits": 3
+        }
+      ],
+      "negative": [
+        {
+          "id": "film-neg-1",
+          "prompt": "Fix an audio callback xrun in AudioCraft.",
+          "terms": ["other eqwec products", "audio"],
+          "min_hits": 1
+        },
+        {
+          "id": "film-neg-2",
+          "prompt": "Change repository policy with no FilmCraft path.",
+          "terms": ["repository policy alone"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-effectcraft": {
+      "positive": [
+        {
+          "id": "effect-pos-1",
+          "prompt": "A keyframed GPU effect shows a stale frame after a parameter change; fix cache invalidation.",
+          "terms": ["keyframe", "gpu", "cache invalidation"],
+          "min_hits": 2
+        },
+        {
+          "id": "effect-pos-2",
+          "prompt": "The compositing node graph deadlocks when FilmCraft interchange is re-imported.",
+          "terms": ["compositing", "node", "filmcraft", "interchange"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "effect-neg-1",
+          "prompt": "Fix FilmCraft-only playback stutter.",
+          "terms": ["filmcraft-only"],
+          "min_hits": 1
+        },
+        {
+          "id": "effect-neg-2",
+          "prompt": "Tune an AudioCraft DSP compressor.",
+          "terms": ["audiocraft dsp"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-craftanything": {
+      "positive": [
+        {
+          "id": "craft-pos-1",
+          "prompt": "A workspace asset opens in the wrong editor and loses provenance; fix canonical document ownership.",
+          "terms": ["workspace", "asset", "canonical document ownership", "provenance"],
+          "min_hits": 3
+        },
+        {
+          "id": "craft-pos-2",
+          "prompt": "Two products edit the same interchange package and overwrite each other; define conflict handling.",
+          "terms": ["interchange", "conflict", "ipc"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "craft-neg-1",
+          "prompt": "Implement a brush engine inside PhotoCraft.",
+          "terms": ["editor internals", "photocraft"],
+          "min_hits": 1
+        },
+        {
+          "id": "craft-neg-2",
+          "prompt": "Turn CraftAnything into a universal editor with every tool.",
+          "terms": ["universal editor"],
+          "min_hits": 1
+        }
+      ]
+    },
+    "eqwec-audiocraft": {
+      "positive": [
+        {
+          "id": "audio-pos-1",
+          "prompt": "The real-time audio callback allocates and causes xruns at 64-sample buffers.",
+          "terms": ["real-time", "callback", "xrun"],
+          "min_hits": 2
+        },
+        {
+          "id": "audio-pos-2",
+          "prompt": "A hosted plugin crashes the DAW during render; harden plugin hosting and project recovery.",
+          "terms": ["plugin", "render", "project"],
+          "min_hits": 2
+        }
+      ],
+      "negative": [
+        {
+          "id": "audio-neg-1",
+          "prompt": "Fix a FilmCraft timeline transition.",
+          "terms": ["unrelated products"],
+          "min_hits": 1
+        },
+        {
+          "id": "audio-neg-2",
+          "prompt": "Change a generic UI-only component with no audio consumer.",
+          "terms": ["generic ui-only"],
+          "min_hits": 1
+        }
+      ]
+    }
+  }
+}

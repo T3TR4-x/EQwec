@@ -1,0 +1,27 @@
+# Rust build output
+/target/
+**/target/
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local secrets and environment
+.env
+.env.*
+!.env.example
+
+# Python tooling used by repository scripts
+__pycache__/
+*.pyc
+.venv/
+.venv-skillcheck/
+
+# Local logs and temporary artifacts
+*.log
+/tmp/
