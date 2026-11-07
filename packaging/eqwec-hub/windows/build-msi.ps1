@@ -16,9 +16,27 @@ $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x64" }
 Push-Location $root
 try {
     cargo build --release --locked -p eqwec-hub
+    if ($LASTEXITCODE -ne 0) {
+        throw "cargo build failed with exit code $LASTEXITCODE"
+    }
 
-    if (-not (Get-Command wix -ErrorAction SilentlyContinue)) {
-        dotnet tool install --global wix
+    # WiX v5+ requires the OSMF EULA; v4 is the last freely usable line.
+    $wixVersion = "4.0.6"
+    $wix = Get-Command wix -ErrorAction SilentlyContinue
+    $wixIsV4 = $false
+    if ($wix) {
+        $reported = & wix --version 2>$null
+        $wixIsV4 = $LASTEXITCODE -eq 0 -and "$reported" -match '^4\.'
+    }
+    if (-not $wixIsV4) {
+        if ($wix) {
+            dotnet tool update --global wix --version $wixVersion
+        } else {
+            dotnet tool install --global wix --version $wixVersion
+        }
+        if ($LASTEXITCODE -ne 0) {
+            throw "WiX $wixVersion installation failed with exit code $LASTEXITCODE"
+        }
         $env:PATH = "$env:USERPROFILE\.dotnet\tools;$env:PATH"
     }
 
@@ -31,6 +49,9 @@ try {
         -d ProductVersion=$msiVersion `
         -d BinaryPath=(Join-Path $root "target/release/eqwec-hub.exe") `
         -o $msi
+    if ($LASTEXITCODE -ne 0) {
+        throw "wix build failed with exit code $LASTEXITCODE"
+    }
 
     Write-Output "MSI: $msi"
 } finally {
