@@ -34,7 +34,7 @@ This document separates three evidence classes:
 - **Assumption:** a planning judgment that follows from verified facts but is not itself measured.
 - **UNVERIFIED:** a claim that could not be confirmed from a primary source or requires a prototype. Unverified claims are excluded from the recommendation.
 
-No numeric performance, memory, or installer measurements are asserted. The repository has no Cargo workspace and no browser prototype, so such measurements are `BLOCKED`. Qualitative ratings are used deliberately; numeric scores without a workload and a baseline would be false precision.
+No numeric performance, memory, or installer measurements are asserted. The repository has a Phase 2 Cargo workspace but no browser prototype, so such measurements are `BLOCKED`. Qualitative ratings are used deliberately; numeric scores without a workload and a baseline would be false precision.
 
 ## 3. Evaluation criteria
 
@@ -70,7 +70,7 @@ No numeric performance, memory, or installer measurements are asserted. The repo
 
 A fork such as Brave's Chromium tree provides the deepest control: EQwec could change browser behavior below the embedding API, ship its own update channel, and integrate proprietary codecs and DRM directly. Brave is the useful architectural reference. It is MPL-2.0, ships major releases roughly every two weeks, and aims to deliver Chromium security fixes within about 24 hours. Its public rebase documentation also shows the real cost: manual patch-conflict resolution, toolchain rebuilds, QA, and security review on every Chromium milestone.
 
-That cost is not a one-time integration. It is a permanent browser-platform organization with rebase engineers, release engineers, crash triage, and a security response process. For a bootstrap-phase project with no workspace, no CI, and no browser prototype, starting with a fork would front-load the highest-risk work before product demand is proven.
+That cost is not a one-time integration. It is a permanent browser-platform organization with rebase engineers, release engineers, crash triage, and a security response process. For a project with only a Phase 2 workspace, no CI execution, and no browser prototype, starting with a fork would front-load the highest-risk work before product demand is proven.
 
 Arc is a cautionary reference rather than a model. Its official site states that Arc is being sunset on 2026-12-22. The product is proprietary, so its architecture cannot be reused, and its outcome shows that a differentiated browser UX does not by itself guarantee a durable maintenance model.
 

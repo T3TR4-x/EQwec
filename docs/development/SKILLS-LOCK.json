@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-07T12:49:53Z",
+  "generated_at": "2026-11-07T13:31:07Z",
   "repository": "EQwec",
   "branch": "integration",
   "policy": {
@@ -356,7 +356,7 @@
     {
       "name": "eqwec-engineering-core",
       "path": ".agents/skills/eqwec-engineering-core/SKILL.md",
-      "sha256": "4f7650fbdc5ff200a7d2449de91cbd73fbaad4d37e0f8914fc09280eece4a32d",
+      "sha256": "e9aaa5e06232329ed0de59c43584660edcc6a09bdd58b4fc7332cd27d84f4645",
       "lines": 167,
       "status": "VALIDATED_STATIC"
     },
@@ -370,49 +370,49 @@
     {
       "name": "eqwec-hub",
       "path": ".agents/skills/eqwec-hub/SKILL.md",
-      "sha256": "4e4f3118fa89ef048516d02656d37ed31ac9a6deb21fe308a5fc04b1a118d472",
+      "sha256": "d09e0040eaaa224ec05039361cf0a37bd7eacf7cd5204747be91e39a667c3cb2",
       "lines": 327,
       "status": "VALIDATED_STATIC"
     },
     {
       "name": "eqwec-browser",
       "path": ".agents/skills/eqwec-browser/SKILL.md",
-      "sha256": "4a1cf0ba2e6deea2e4a4daa88a6c3e8769a9ac9fce7c938f14a0b926d3deec50",
+      "sha256": "5c5902a0304f91de901955d58fd5cf671e703f38f888b2edf00bcdd704e4b603",
       "lines": 282,
       "status": "VALIDATED_STATIC"
     },
     {
       "name": "eqwec-photocraft",
       "path": ".agents/skills/eqwec-photocraft/SKILL.md",
-      "sha256": "330d2c7e6de8125938ac6cab6519584073b74df11befc6097e8e5fba083889ca",
+      "sha256": "15cdab8e33933ca2d52d18bc5e8fa608172cf5d7cbd743dd3d213c778ae0953a",
       "lines": 260,
       "status": "VALIDATED_STATIC"
     },
     {
       "name": "eqwec-vectorcraft",
       "path": ".agents/skills/eqwec-vectorcraft/SKILL.md",
-      "sha256": "93620e5d6a981fabadde071be4a108f719f1a25e9d75d5604c597878c1bf65a4",
+      "sha256": "16d6a9e00818d49dbecf5e284e4329721c61489b0ce60f93e7cd466ac04ce4a6",
       "lines": 305,
       "status": "VALIDATED_STATIC"
     },
     {
       "name": "eqwec-filmcraft",
       "path": ".agents/skills/eqwec-filmcraft/SKILL.md",
-      "sha256": "864f016aaf75844420d0fc0c02a7ae6e0157aa4066434cc9a0a300fe912c291f",
+      "sha256": "b4c0fb9d88ff886c9ea409c2280ba38c1d683b7bf60b1cf9fdcd566eeee140b6",
       "lines": 317,
       "status": "VALIDATED_STATIC"
     },
     {
       "name": "eqwec-effectcraft",
       "path": ".agents/skills/eqwec-effectcraft/SKILL.md",
-      "sha256": "ba1d2715a47f511156271f81dba5bcd4763227684552330fe78d4ad9ad615136",
+      "sha256": "338c15735c0713f9454ab4cf04cf1b02015774bbb5b95e9b1d68177fd3ae060e",
       "lines": 249,
       "status": "VALIDATED_STATIC"
     },
     {
       "name": "eqwec-craftanything",
       "path": ".agents/skills/eqwec-craftanything/SKILL.md",
-      "sha256": "16be691f2c15cae7bb695ec2a4146523537718758b7fd3e2939b0f9d092a68d0",
+      "sha256": "c177b06bd9c0a0ec85a12e3c55b2904a50316bc79bcc455e645824a1e9c4b18e",
       "lines": 208,
       "status": "VALIDATED_STATIC"
     },

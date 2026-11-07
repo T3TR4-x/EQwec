@@ -13,7 +13,7 @@
 
 The ecosystem is **technically feasible but not yet de-risked**. Every product has a credible implementation path using the selected Rust-first stack, and no product requires an unsolved research breakthrough. The binding constraints are organizational and legal, not algorithmic:
 
-1. **Breadth is the largest risk.** Eight product families, including a browser and a package manager, are planned before a Cargo workspace, CI pipeline, installer, or release artifact exists. The sequence must be depth-first: Hub, then one creative product, then the rest.
+1. **Breadth is the largest risk.** Eight product families, including a browser and a package manager, are planned with only a Phase 2 workspace, no CI execution, no installer, and no release artifact. The sequence must be depth-first: Hub, then one creative product, then the rest.
 2. **The browser is the highest-risk product.** CEF provides Chromium-class compatibility without a fork, but EQwec becomes responsible for engine rebuilds, security response, codecs, DRM, and a large installer. This is a permanent operating cost, not a one-time integration.
 3. **Codec and DRM licensing is unresolved.** H.264, AAC, HEVC, ProRes, and DNxHR cannot ship by default until counsel or an authorized licensing decision exists. AV1, VP9, Opus, FLAC, PNG, JPEG, and WebP provide a royalty-free first-release path.
 4. **Audio real-time correctness is unproven.** CPAL and out-of-process CLAP/VST3 hosting are credible, but no EQwec measurement exists. The audio callback contract and plugin crash isolation must be proven before AudioCraft work.
@@ -45,7 +45,7 @@ Limits:
 
 `OBSERVED`/`ASSUMPTION`: The accepted ADRs define one coherent stack: Rust, `egui`/`eframe`, `wgpu`, `kurbo`/`lyon`/`cosmic-text`, FFmpeg under LGPL-only, CPAL, CLAP-first plugin hosting, a versioned project bundle, and signed native packages. Each choice has a documented fallback. This reduces integration risk compared with per-product stacks.
 
-The common foundation is not yet code. The first real evidence will be a Cargo workspace with pinned toolchain, minimal shared crates, and CI that runs format, lint, build, test, advisory, and license checks.
+The common foundation is now a workspace with one dependency-free crate. The next evidence must be the Hub trust chain: signed manifest, verified download, transactional install/update/rollback, and fault injection. CI must run on all three platforms before platform claims are made.
 
 ### 3.2 Trust and update chain
 
@@ -243,7 +243,7 @@ The common foundation is not yet code. The first real evidence will be a Cargo w
 
 ## 6. Recommended sequence
 
-1. **Phase 2 — Workspace baseline.** Cargo workspace, pinned toolchain, minimal shared crates, CI, license/advisory checks, `dev-*` and `production` branches. No product feature.
+1. **Phase 2 — Workspace baseline (in progress).** Cargo workspace, pinned toolchain, `eqwec-core`, CI configuration, local advisory/license checks. `dev-hub` next; `production` only after a verified release. No product feature.
 2. **Phase 3 — Hub MVP.** Signed manifest, registry, transactional install/update/rollback/repair/uninstall, offline bundles, diagnostics. First real trust chain.
 3. **Phase 4 — Browser prototype.** CEF integration, isolation, session restore, packaging, measurements. Do not expand features before the gate.
 4. **Phase 5 — Creative foundation.** Document lifecycle, undo, assets, project serialization, migrations, design tokens.
@@ -260,7 +260,7 @@ This order is a recommendation, not a commitment. It can change only with record
 | Documentation | Required research, architecture, security, performance, and development docs exist and pass structural checks | `PASS`; `check-docs.py --gate` returned 0 failures on 2026-11-07 |
 | Architecture | ADRs for GUI, browser, media, audio, storage, packaging, license, diagnostics, and plugin trust are recorded | `PASS` with open gates inside ADRs |
 | Security | Threat model and baseline exist; product-specific boundaries reviewed | `PASS` for planning baseline; runtime `BLOCKED` |
-| Workspace | Cargo workspace builds, tests, lints, and checks advisories/licenses | `BLOCKED` — no workspace |
+| Workspace | Cargo workspace builds, tests, lints, and checks advisories/licenses | `PASS` locally on macOS; CI execution `BLOCKED` — no remote |
 | Hub release | Install/update/rollback/repair/uninstall verified on claimed platforms | `BLOCKED` — no implementation |
 | Browser prototype | Sandbox, isolation, session restore, packaging, measurements | `BLOCKED` — no prototype |
 | Media legal | Codec/patent and DRM decisions recorded | `BLOCKED` — counsel required |
@@ -277,7 +277,7 @@ This order is a recommendation, not a commitment. It can change only with record
 | Architecture | `PASS` with open decisions | ADR-0001 through ADR-0010 recorded; 0004 and 0008 remain `PROPOSED` |
 | Security baseline | `PASS` for planning | Threat model and baseline exist; runtime verification `BLOCKED` |
 | Performance | `PASS` for methodology | Strategy exists; no benchmark `BLOCKED` |
-| Workspace | `BLOCKED` | No `Cargo.toml`, crate, app, or CI |
+| Workspace | `PASS` locally | Cargo workspace; 17 tests; fmt, clippy, build, audit, and deny pass; CI not executed |
 | Product implementation | `BLOCKED` | Gates above must pass first |
 | Windows/Linux verification | `BLOCKED` | Only macOS tested |
 | Release | `BLOCKED` | No remote, keys, signing, or channel |

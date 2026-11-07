@@ -444,7 +444,7 @@ Compatibility is a spectrum. EQwec should publish three tiers for every format: 
 | Team capacity | High | High | Sequence one product at a time, reuse shared infrastructure, delete non-essential scope |
 | Breadth before depth | High | High | Gate each phase; do not start a new product before the previous vertical slice is defensible |
 
-Breadth is the compounding risk: eight product families, including two platform-scale products, are planned while the repository still has no Cargo workspace. Interchange and legal exposure compound it, because PSD, AI, FCPXML, AAF, VST3, AU, AAX, codecs, and C2PA each carry technical and legal obligations. Real-time and render quality cannot be validated without a benchmark harness and representative workloads; without that harness, performance claims and regressions are indistinguishable.
+Breadth is the compounding risk: eight product families, including two platform-scale products, are planned while the repository has only a Phase 2 workspace with one dependency-free crate and no product code. Interchange and legal exposure compound it, because PSD, AI, FCPXML, AAF, VST3, AU, AAX, codecs, and C2PA each carry technical and legal obligations. Real-time and render quality cannot be validated without a benchmark harness and representative workloads; without that harness, performance claims and regressions are indistinguishable.
 
 **Accessibility evidence used**
 

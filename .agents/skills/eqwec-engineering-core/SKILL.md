@@ -23,7 +23,7 @@ Implement the simplest architecture that correctly satisfies the requirement, re
 
 ## Repository and ownership map
 
-The approved default is a Rust-first modular monorepo with a Cargo workspace. The exact paths and crate names must match `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md` once those documents exist. Until then, treat this map as planned and verify it against the repository:
+The approved default is a Rust-first modular monorepo with a Cargo workspace. The exact paths and crate names must match `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md`. Treat this map as planned and verify it against the repository:
 
 - `apps/eqwec-hub`, `apps/eqwec-browser`, `apps/photocraft`, `apps/vectorcraft`, `apps/filmcraft`, `apps/effectcraft`, `apps/craftanything`, `apps/audiocraft` — independently buildable product entry points.
 - `crates/eqwec-core` — shared domain primitives, typed identifiers, error and result conventions.

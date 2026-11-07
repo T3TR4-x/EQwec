@@ -21,8 +21,8 @@
 
 ## Repository constraints
 
-- Current phase: bootstrap and planning at `0.0.0`. No product implementation exists.
-- Do not create `Cargo.toml`, `apps/`, `crates/`, installers, or product features until the skills, documentation, architecture, and security gates pass.
+- Current phase: Phase 2 workspace baseline at `0.0.0`. No product implementation exists.
+- Do not create `apps/`, product crates, installers, or product features until the Phase 2 gate closes and the Hub acceptance workflow begins. Shared infrastructure changes still require an owner, tests, and an impacted-document update.
 - `main` contains only `README.md`. Never add skills, `AGENTS.md`, `CLAUDE.md`, or technical documents to `main`.
 - Work on `integration` or an appropriate scoped branch. Inspect the worktree before switching, staging, merging, or rebasing.
 - Never force-push or rewrite shared history without explicit authorization.
@@ -47,6 +47,6 @@ python3 -m venv .venv-skillcheck
   --validator ~/.agents/skills/skill-creator/scripts/quick_validate.py
 ```
 
-There is no Cargo workspace yet, so Rust build, lint, and test commands are `BLOCKED` until it exists.
+The Cargo workspace exists. The verified local commands are `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo build --workspace --all-targets --locked`, and `cargo test --workspace --all-features --locked`. CI has not executed because the repository has no remote.
 
 If this file and `AGENTS.md` disagree, `AGENTS.md` wins. Report the conflict and fix this file.

@@ -10,7 +10,7 @@
 
 EQwec plans eight native desktop products: Hub, Browser, PhotoCraft, VectorCraft, FilmCraft, EffectCraft, CraftAnything, and AudioCraft. They share a need for a responsive, accessible, keyboard-first desktop UI with custom canvases, docked panels, inspectors, timelines, and node graphs. They must run on Windows, macOS, and Linux without bundling a browser runtime for application chrome.
 
-The UI choice is expensive to reverse. It determines the design system, accessibility path, text input behavior, rendering integration, packaging size, and the skills required to build every product. The project has no Cargo workspace and no prototype, so the decision must separate the architectural direction from the prototype evidence that can confirm or reject it.
+The UI choice is expensive to reverse. It determines the design system, accessibility path, text input behavior, rendering integration, packaging size, and the skills required to build every product. The project has a Phase 2 Cargo workspace but no GUI prototype, so the decision must separate the architectural direction from the prototype evidence that can confirm or reject it.
 
 ## 2. Requirements
 

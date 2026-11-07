@@ -1,6 +1,6 @@
 # Test Strategy
 
-**Status:** approved strategy. No test harness exists yet; all Rust test commands are `BLOCKED` until the Cargo workspace is created.
+**Status:** approved strategy. The Phase 2 workspace and a minimal test harness exist (`crates/eqwec-core`, 17 tests). Product-level integration, fixture, performance, and platform tests remain `BLOCKED` until the corresponding product code exists.
 
 ## 1. Principles
 
@@ -83,21 +83,24 @@ The product skill is authoritative for the detailed success criteria. This table
 - Use release builds for release claims. Debug-build numbers are not release evidence.
 - Do not compare incompatible memory metrics across operating systems.
 
-## 9. CI plan (not implemented)
+## 9. CI baseline (configured, not executed)
 
 ```text
 format -> lint -> license/advisory -> build -> unit -> integration
 -> security -> platform tests -> packaging validation -> release approval
 ```
 
+- `.github/workflows/ci.yml` implements format, clippy, build, test, audit, and deny jobs on an Ubuntu/macOS/Windows matrix.
 - Use a pinned toolchain and `Cargo.lock`.
 - Cache dependencies without allowing stale or compromised artifacts to bypass verification.
 - Run platform-specific jobs for Windows, macOS, and Linux where the change is platform-sensitive.
 - Publish test reports and artifacts with retention appropriate to the release.
+- The workflow has never executed because the repository has no remote. `CI_EXECUTION` is `BLOCKED`.
 
 ## 10. Current state
 
-- No `Cargo.toml`, test directory, fixture, CI configuration, or benchmark harness exists.
-- No test has been executed for product code.
-- `python3 scripts/verify-skills.py` is the only executable project check today.
-- The first workspace baseline must include a minimal but real test harness and a documented command set before product implementation is declared complete.
+- The Phase 2 workspace exists with `eqwec-core` and 17 passing tests.
+- `.github/workflows/ci.yml` is configured for format, clippy, build, test, audit, and deny on a three-OS matrix; it has never executed because the repository has no remote.
+- Local evidence: fmt, clippy, build, test, audit, and deny pass on macOS 26.7.2 arm64 with Rust 1.99.1.
+- No product test, fixture corpus, integration test, benchmark, or platform test exists.
+- The first product workspace baseline must add fixture licensing, fault-injection, and platform test commands before product implementation is declared complete.

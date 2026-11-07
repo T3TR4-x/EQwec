@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-07
 **Branch:** `integration`
 **Scope:** mandatory external skills, the 10 project-owned EQwec skills, discovery, validation, trigger behavior, and scenario coverage.
-**Gate decision:** `SKILLS_GATE = PASS` for the bootstrap scope. Runtime product scenarios are `BLOCKED` because no product workspace exists; they are not counted as passed. See §8.
+**Gate decision:** `SKILLS_GATE = PASS` for the bootstrap scope. The Phase 2 Cargo workspace exists, but runtime product scenarios are `BLOCKED` because no product code exists; they are not counted as passed. See §8.
 
 ## 1. Result summary
 
@@ -21,7 +21,7 @@
 | Realistic + edge scenario coverage | PASS (instruction coverage) | §7; runtime execution `BLOCKED` |
 | Version-controlled registry | PASS after commit | Commit recorded in §9 |
 
-**No product code exists.** The repository has no `Cargo.toml`, `apps/`, `crates/`, CI pipeline, installer, or release artifact. All product paths in the skills are explicitly marked planned.
+**No product code exists.** The repository has a Phase 2 `Cargo.toml`, `crates/eqwec-core/`, `Cargo.lock`, and `.github/workflows/ci.yml`, but no `apps/`, product crate, installer, or release artifact. All product paths in the skills are explicitly marked planned.
 
 ## 2. Environment
 
@@ -31,7 +31,7 @@
 | Agent | OpenCode 2.2.5 |
 | Project skill discovery | `.agents/skills/<name>/SKILL.md` |
 | Global skill discovery | `~/.agents/skills/` |
-| Rust | 1.99.1; Cargo 1.99.1; no workspace yet |
+| Rust | 1.99.1; Cargo 1.99.1; Phase 2 workspace exists |
 | Python | system `python3`; PyYAML is **not** installed there |
 | Validation environment | temporary venv with PyYAML 6.x, used only for `quick_validate.py` |
 | In-repo validation recipe | `python3 -m venv .venv-skillcheck` + `scripts/skill-validation-requirements.txt` |
@@ -152,7 +152,7 @@ Harness-level automatic activation (the exact routing decision the runtime makes
 
 ## 7. Scenario tests (instruction coverage)
 
-No product workspace exists, so runtime end-to-end scenarios cannot execute. Each skill was tested at the instruction level: does it prescribe the controls needed for a realistic task and a failure/edge task? Verdict `PASS (instruction coverage)` means the required procedure and evidence are present; it does **not** mean the product behavior was executed.
+No product code exists; the Phase 2 workspace contains only `eqwec-core`. Runtime end-to-end scenarios therefore cannot execute. Each skill was tested at the instruction level: does it prescribe the controls needed for a realistic task and a failure/edge task? Verdict `PASS (instruction coverage)` means the required procedure and evidence are present; it does **not** mean the product behavior was executed.
 
 | Skill | Realistic scenario | Edge / failure scenario | Evidence sections | Verdict |
 |---|---|---|---|---|
@@ -167,7 +167,7 @@ No product workspace exists, so runtime end-to-end scenarios cannot execute. Eac
 | `eqwec-craftanything` | Asset opens in its canonical owner and keeps provenance | Two products overwrite the same interchange package | Ownership split; invariants; conflict handling; E2E workflows | PASS (instruction coverage) |
 | `eqwec-audiocraft` | No allocation or blocking in the real-time callback at 64 samples | Hosted plugin crashes during render; project recovery | Real-time invariants; plugin containment; E2E workflows | PASS (instruction coverage) |
 
-Runtime product scenarios remain `BLOCKED` until the workspace exists. They must be executed before the affected product's release gate; they are not waived.
+Runtime product scenarios remain `BLOCKED` until product code exists. They must be executed before the affected product's release gate; they are not waived.
 
 ## 8. Conflicts, overlaps, and gate decision
 
@@ -190,12 +190,12 @@ Conditions met: all 10 packages exist, validate, are discoverable, have trigger/
 Explicit limitations, not counted as passes:
 
 - Harness-level automatic activation is not instrumented: `BLOCKED`.
-- Runtime product end-to-end scenarios are `BLOCKED` until the workspace exists.
+- Runtime product end-to-end scenarios are `BLOCKED` until product code exists.
 - Playwright CLI execution is `BLOCKED` until the binary is verified.
 - Skill Creator's Claude-based eval loop is `BLOCKED` under OpenCode; schema validation is `PASS`.
 - Some external licenses and upstream commits are not pinned; recorded as release-risk, not as a skills-gate failure.
 
-This gate authorizes the research and architecture planning phases. It does **not** authorize product implementation: `DOCUMENTATION_GATE`, `ARCHITECTURE_GATE`, and `SECURITY_GATE` remain open.
+This gate authorizes the research and architecture planning phases. It does **not** authorize product implementation; the Phase 2 workspace gate and the Hub acceptance workflow must close first.
 
 ## 9. Traceability
 

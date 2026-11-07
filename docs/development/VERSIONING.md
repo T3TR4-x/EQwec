@@ -78,7 +78,7 @@ Per product, maintain:
 - Engine/dependency versions where applicable (Chromium, codecs, audio backend).
 - Compatibility notes and known limitations.
 
-Synchronization must be checked by a deterministic script once the workspace exists. Until then, no version metadata exists to synchronize.
+Synchronization must be checked by a deterministic script as crates are added. Today only `eqwec-core` exists, so there is no cross-crate version set to synchronize.
 
 ## 7. Tags and signing
 
@@ -102,6 +102,6 @@ No release record, no release.
 
 ## 9. Current state
 
-- No product has a `Cargo.toml`, release manifest, changelog, or tag.
+- No product has a `Cargo.toml`, release manifest, changelog, or tag. Only the shared `eqwec-core` crate exists, at `0.0.0`.
 - No version has been bumped beyond `0.0.0`.
 - Version tooling is `BLOCKED` until the workspace exists; do not invent commands.

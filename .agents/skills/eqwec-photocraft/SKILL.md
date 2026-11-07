@@ -28,7 +28,7 @@ Load `eqwec-engineering-core` first, and `eqwec-quality-control` before changing
 
 ## 1. Ownership and paths
 
-As of this writing, `apps/` and `crates/` do not exist. Every path below is **planned**. Confirm names against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md` when they exist. Do not create an empty crate merely to match this table.
+As of this writing, `apps/` does not exist and `crates/` contains only `eqwec-core`. Every path below is **planned**. Confirm names against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md`. Do not create an empty crate merely to match this table.
 
 | Path | Status | Owner and responsibility |
 |---|---|---|

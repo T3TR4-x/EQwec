@@ -9,7 +9,7 @@ EffectCraft is EQwec's planned compositing, animation, and visual-effects produc
 
 ## Current state
 
-EffectCraft is planned. The workspace currently has no `apps/`, `crates/`, `Cargo.toml`, or architecture documents. Treat every path, crate, schema, and workflow below as a design requirement, not as evidence of implementation. Before coding, verify names against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md` when they exist. If they are missing or contradict the code, report the drift; do not invent a structure or a passing command.
+EffectCraft is planned. The workspace currently has no `apps/` or EffectCraft crate; only `crates/eqwec-core` and the architecture documents exist. Treat every path, crate, schema, and workflow below as a design requirement, not as evidence of implementation. Before coding, verify names against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md`. If they contradict the code, report the drift; do not invent a structure or a passing command.
 
 ## Activation and non-triggers
 

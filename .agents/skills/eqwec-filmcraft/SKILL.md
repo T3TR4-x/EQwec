@@ -7,7 +7,7 @@ description: Use when implementing, reviewing, or testing FilmCraft non-linear e
 
 FilmCraft is the non-linear video editor: import, arrange, trim, composite, play back, and render video with synchronized audio.
 
-**Status:** FilmCraft is planned. The workspace, apps, and crates named below do not exist yet. This skill states required design and verification, not implemented capability. Verify every path against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md` once those documents exist; if they disagree with this skill, stop and report the drift.
+**Status:** FilmCraft is planned. The apps and product crates named below do not exist yet; the Phase 2 workspace exists. This skill states required design and verification, not implemented capability. Verify every path against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md`; if they disagree with this skill, stop and report the drift.
 
 ## Scope and activation
 

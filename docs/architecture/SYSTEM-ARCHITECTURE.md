@@ -1,6 +1,6 @@
 # System Architecture
 
-**Status:** planning baseline. Technology choices marked "pending ADR" are not approved. No Cargo workspace, application, or crate exists.
+**Status:** planning baseline with a Phase 2 workspace. ADR-0001 through ADR-0010 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. `crates/eqwec-core` exists; no application or product crate exists.
 
 ## 1. Goals
 
@@ -234,7 +234,7 @@ Technology selections are recorded in `docs/architecture/TECHNOLOGY-SELECTION.md
 
 ## 12. Current state
 
-- No `Cargo.toml`, `apps/`, `crates/`, CI, installer, or release artifact exists.
+- `Cargo.toml`, `Cargo.lock`, `crates/eqwec-core/`, and `.github/workflows/ci.yml` exist. There is no `apps/`, product crate, installer, or release artifact.
 - This document describes the approved target, not implemented behavior.
 - ADR-0001 through ADR-0010 are recorded. ADR-0004 and ADR-0008 remain `PROPOSED`; the other ADRs carry explicit prototype, legal, or release gates.
 - The architecture gate is `PASS` for the planning baseline: the target architecture, dependency direction, security boundaries, and ADR set exist and agree. Runtime architecture verification is `BLOCKED` until the workspace and prototypes exist.

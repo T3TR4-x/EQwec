@@ -117,13 +117,14 @@ Do not add a dependency for a few lines of trivial code. Do not vendor a fork wi
 
 | Item | State |
 |---|---|
-| Cargo workspace | Does not exist |
-| Approved dependencies | None; ADR directions are not dependency approvals |
-| Lockfile | None |
+| Cargo workspace | Exists: resolver 3, edition 2024, Rust 1.99.1, members `crates/*` |
+| Workspace crates | `eqwec-core` only; no third-party dependencies |
+| Approved dependencies | None beyond the standard library; ADR directions are not dependency approvals |
+| Lockfile | `Cargo.lock` committed |
 | SBOM | None |
 | License inventory | Planning review complete: `docs/research/LEGAL-LICENSE-REVIEW.md`; codec/DRM items `BLOCKED` pending counsel |
 | Technology selection | Planning baseline: `docs/architecture/TECHNOLOGY-SELECTION.md` |
 | ADR set | ADR-0001 through ADR-0010 recorded; ADR-0004 and ADR-0008 are `PROPOSED` |
-| Advisory/license CI | `BLOCKED` until workspace and CI exist |
+| Advisory/license CI | Configured in `.github/workflows/ci.yml`; execution status recorded in `docs/development/QUALITY-GATES.md` |
 
 This map is a planning artifact. It must be updated with exact versions, licenses, and owners before the first dependency is added.

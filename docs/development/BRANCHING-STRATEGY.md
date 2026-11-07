@@ -33,7 +33,7 @@
 
 - `main` is created first and contains only the README. It is never a development base.
 - `integration` is created from `main` and holds the workspace baseline.
-- `dev-<product>` branches are created from the current approved `integration` baseline in Phase 2, once the workspace exists. Creating empty long-lived branches earlier adds no value and risks divergence.
+- `dev-<product>` branches are created from the current approved `integration` baseline in Phase 2. The workspace now exists; `dev-hub` is the first product branch. Creating empty long-lived branches earlier adds no value and risks divergence.
 - `production` is created from the first approved release commit, not from an arbitrary development tip.
 - Protect `main`, `integration`, and `production` with review and CI checks once a remote and CI exist. Until then, local discipline and documented evidence apply.
 - Never commit directly to `main` or `production`. A README-only `main` update is a deliberate, reviewed commit.

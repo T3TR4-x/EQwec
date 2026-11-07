@@ -10,7 +10,7 @@
 
 EQwec Hub installs, updates, repairs, and removes products. Every artifact must be authentic, complete, and safe to activate. A compromised update is the highest-impact failure in the ecosystem: it can execute arbitrary code with the user's privileges and persist across releases.
 
-The project has no remote, signing keys, CI, installer, or release artifact. This ADR defines the packaging and signing architecture so implementation can proceed without inventing trust ad hoc.
+The project has no remote, signing keys, installer, or release artifact, and its CI workflow has never run. This ADR defines the packaging and signing architecture so implementation can proceed without inventing trust ad hoc.
 
 ## 2. Requirements
 

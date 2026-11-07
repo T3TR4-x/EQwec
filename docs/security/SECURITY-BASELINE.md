@@ -1,6 +1,6 @@
 # Security Baseline
 
-**Status:** approved baseline for planning. The ecosystem threat model exists (`docs/security/THREAT-MODEL.md`); product-specific runtime controls are not implemented. No product, Cargo workspace, or test harness exists, so every runtime security claim is `BLOCKED` until implementation evidence exists.
+**Status:** approved baseline for planning. The ecosystem threat model exists (`docs/security/THREAT-MODEL.md`); product-specific runtime controls are not implemented. The Phase 2 workspace and `eqwec-core` tests exist, but no product code, product test harness, or security control implementation exists, so every runtime security claim is `BLOCKED` until implementation evidence exists.
 
 ## 1. Security principles
 

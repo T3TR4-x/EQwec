@@ -7,12 +7,12 @@ description: "Use for any VectorCraft task covering vector document editing and 
 
 VectorCraft is the planned EQwec vector-graphics editor: artboards, Bézier path editing, fills, strokes, gradients, text-on-path, boolean operations, and SVG interoperability. This skill adds domain rules to `eqwec-engineering-core`; it never weakens core or quality rules.
 
-**Status: planned.** No Cargo workspace, `apps/vectorcraft`, VectorCraft crate, native project schema, SVG parser, renderer, or validated command exists. Every path, crate name, format, and workflow below is a design requirement, not evidence of implementation. Do not describe planned behavior as shipped.
+**Status: planned.** The Phase 2 Cargo workspace exists, but no `apps/vectorcraft`, VectorCraft crate, native project schema, SVG parser, renderer, or validated command exists. Every path, crate name, format, and workflow below is a design requirement, not evidence of implementation. Do not describe planned behavior as shipped.
 
 ## Status and authority
 
 - The repository is at version `0.0.0`; VectorCraft has no independent release. No feature is implemented or validated.
-- Verify every proposed path and crate name against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md` when they exist. Report drift; do not create empty crates to match this skill.
+- Verify every proposed path and crate name against `docs/architecture/SYSTEM-ARCHITECTURE.md` and `docs/architecture/DEPENDENCY-MAP.md`. Report drift; do not create empty crates to match this skill.
 - `eqwec-engineering-core` governs architecture, ownership, security, Git, versioning, and documentation. `eqwec-quality-control` governs gates and evidence. If this skill conflicts with core, core wins and the conflict is a skill defect.
 - Discover real commands, schemas, and test results from `AGENTS.md` and CI. Do not invent commands, compatibility claims, performance numbers, or passing results.
 - VectorCraft owns its native vector project format and vector semantics. Other products consume a documented export or interchange contract, never the live project.

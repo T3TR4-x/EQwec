@@ -35,18 +35,18 @@ Outcome: `PASS` for planning. ADR-0004 and ADR-0008 remain `PROPOSED`; codec/DRM
 
 ## Phase 2 — Architecture and repository baseline
 
-**State:** next. Not started.
+**State:** in progress. Workspace, `eqwec-core`, CI configuration, and local advisory/license checks exist; the gate is not closed until `dev-hub` is created and CI executes.
 
 Deliverables:
 
 - Approved `SYSTEM-ARCHITECTURE.md` and `DEPENDENCY-MAP.md`.
 - Accepted ADRs for the first implementation decisions.
-- Cargo workspace with a pinned toolchain.
-- Minimal shared crates with real APIs and tests.
-- CI baseline: format, lint, build, test, advisory/license checks.
-- `dev-*` and `production` branch creation from the approved baseline.
-- Initial version metadata at `0.0.0`.
-- Documentation and security gates reviewed against the actual workspace.
+- Cargo workspace with a pinned toolchain. **Done.**
+- Minimal shared crates with real APIs and tests. **`eqwec-core` done; 17 tests pass.**
+- CI baseline: format, lint, build, test, advisory/license checks. **Configured; never executed because no remote exists.**
+- `dev-*` and `production` branch creation from the approved baseline. **`dev-hub` next; `production` deferred until a verified release.**
+- Initial version metadata at `0.0.0`. **Done.**
+- Documentation and security gates reviewed against the actual workspace. **Done.**
 
 Gate: reproducible local build and passing baseline checks. No product feature yet.
 
@@ -168,7 +168,7 @@ Products release independently. The ecosystem is not "finished" until each produ
 ## Current blockers
 
 - ADR-0004 (media/codecs) and ADR-0008 (project license) are `PROPOSED`, not normative. Codec/patent and DRM decisions require counsel; the project license requires owner approval.
-- No Cargo workspace, CI, or product code exists.
+- No product code exists; the Phase 2 workspace and CI configuration exist.
 - GUI accessibility, text input, browser integration, and audio real-time behavior are `UNVERIFIED` until their prototypes run.
 - No remote, signing infrastructure, or release channel exists.
 - Windows and Linux are planned targets but have not been tested in this environment.

@@ -9,7 +9,7 @@ Hub is the launcher, package manager, installer, updater, repair tool, and insta
 
 ## Status and authority
 
-- The Cargo workspace does not exist yet. Every path and crate below is planned. Verify the current repository before editing and report drift instead of creating empty scaffolding.
+- The Phase 2 Cargo workspace exists, but no Hub crate or application exists. Every path and crate below is planned. Verify the current repository before editing and report drift instead of creating empty scaffolding.
 - No Hub feature is implemented or validated. Do not describe planned behavior as shipped.
 - `eqwec-engineering-core` governs architecture, security baseline, Git, versions, and documentation. `eqwec-quality-control` governs gates and evidence. This skill adds Hub domain rules and may not weaken either one.
 - Discover real commands, paths, and formats from `AGENTS.md`, CI, and the workspace. Do not invent commands, schemas, or test results.

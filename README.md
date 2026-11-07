@@ -6,9 +6,9 @@ EQwec is an independent ecosystem of professional desktop applications and a uni
 
 ## Status
 
-**Bootstrap and planning.** The project is at version `0.0.0`. No product has a usable release yet, and nothing in this repository should be treated as production-ready.
+**Phase 2 — workspace baseline.** The project is at version `0.0.0`. No product has a usable release yet, and nothing in this repository should be treated as production-ready.
 
-The mandatory engineering plan, architecture decision records, security baseline, and skill validation must be completed and reviewed before product implementation begins.
+The Cargo workspace, pinned toolchain, `eqwec-core` shared crate, and CI workflow exist on `integration`. The mandatory skills, research, architecture, and security gates have passed for the planning scope. Product implementation remains `BLOCKED` until the Phase 2 gate closes with local and CI evidence and the Hub MVP begins.
 
 ## Products
 

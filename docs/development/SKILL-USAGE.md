@@ -108,6 +108,51 @@ Findings:
 
 Gate decision: `PASS` for the planning scope. Product implementation remains `BLOCKED` until the workspace and prototype gates exist.
 
+## Task: Phase 2 workspace baseline
+
+**Date:** 2026-11-07
+**Branch:** `integration`
+**Scope:** Cargo workspace, pinned toolchain, `eqwec-core`, CI workflow, advisory/license policy, and stale-document reconciliation. **No product code.**
+
+| Skill | State | Evidence |
+|---|---|---|
+| `eqwec-engineering-core` | APPLIED | Resolver 3, edition 2024, pinned 1.99.1, `forbid(unsafe_code)`, typed errors, scoped Ukrainian commits |
+| `eqwec-quality-control` | APPLIED | Local gate evidence recorded in `QUALITY-GATES.md`; CI execution kept `BLOCKED`; no invented pass |
+| `eqwec-hub` | AVAILABLE_NOT_RELEVANT | No Hub crate, manifest, installer, or update path exists yet |
+| `eqwec-browser` | AVAILABLE_NOT_RELEVANT | No engine, IPC, profile, or session code touched |
+| `eqwec-photocraft` | AVAILABLE_NOT_RELEVANT | No photo document, mask, RAW, color, or export code touched |
+| `eqwec-vectorcraft` | AVAILABLE_NOT_RELEVANT | No geometry, SVG, renderer, or vector document code touched |
+| `eqwec-filmcraft` | AVAILABLE_NOT_RELEVANT | No timeline, media, render, or export code touched |
+| `eqwec-effectcraft` | AVAILABLE_NOT_RELEVANT | No compositing, keyframe, GPU, or cache code touched |
+| `eqwec-craftanything` | AVAILABLE_NOT_RELEVANT | No workspace, asset-exchange, provenance, or IPC code touched |
+| `eqwec-audiocraft` | AVAILABLE_NOT_RELEVANT | No audio, MIDI, plugin, or render code touched |
+| `skill-creator` | APPLIED | Skill status lines updated; `verify-skills.py` plus official `quick_validate.py` rerun, 10/10 valid |
+| `security-audit` | APPLIED | `deny.toml` scoped private-crate exemption, no third-party dependencies, unsafe code forbidden |
+| `code-review`, `ponytail`, `karpathy-guidelines`, `research`, UI skills, `playwright` | AVAILABLE_NOT_RELEVANT | No product diff, UI, browser test, or research task in this scope |
+
+## Quality-control report for the Phase 2 task
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| Pre-change | PASS | Branch and worktree inspected; no product code touched |
+| Implementation | PASS | Workspace, `eqwec-core`, 17 tests, CI workflow, `deny.toml`; diff scoped |
+| Verification | PASS locally; CI `BLOCKED` | `check-docs.py --gate` 0 failures; `verify-skills.py` 10/10; fmt, clippy, build, test, audit, and deny exit 0 |
+| Performance | NOT_APPLICABLE | No runtime product code or benchmark |
+| Security | PASS for baseline | No third-party dependencies; `unsafe_code = "forbid"`; advisory and license checks pass |
+| Merge | PENDING | Commit and diff review not yet completed at the time of writing |
+| Release | NOT_APPLICABLE | No product release; versions remain `0.0.0` |
+
+Findings:
+
+| Severity | Finding | State |
+|---|---|---|
+| High | CI has never executed; platform and pipeline behavior are unverified | Open; `BLOCKED` on a remote |
+| High | ADR-0008 is `PROPOSED`; `eqwec-core` has no license field and `deny.toml` exempts private crates only | Open; `BLOCKED` on owner |
+| Medium | Windows and Linux were not exercised locally | Open; `BLOCKED` |
+| Low | `cargo deny` reports unused license allowances because no third-party crate exists yet | Expected; recheck when dependencies are added |
+
+Gate decision: workspace baseline `PASS` locally. The Phase 2 gate is not closed until CI runs and `dev-hub` exists.
+
 ## Template for future tasks
 
 | Skill | State | Evidence |

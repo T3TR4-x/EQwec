@@ -7,7 +7,7 @@ description: Use for EQwec Browser work, including Chromium engine integration, 
 
 EQwec Browser is a Chromium-based browser whose application logic, orchestration, persistence, and native UI are Rust-owned; Chromium owns web rendering.
 
-Status: research and feasibility. The Cargo workspace does not exist yet; every path below is planned. No browser feature is implemented. This skill adds domain constraints and never weakens `eqwec-engineering-core`. Do not describe planned behavior as shipped.
+Status: research and feasibility. The Phase 2 Cargo workspace exists, but no browser crate or prototype exists; every path below is planned. No browser feature is implemented. This skill adds domain constraints and never weakens `eqwec-engineering-core`. Do not describe planned behavior as shipped.
 
 ## 1. Scope, ownership, activation
 

@@ -123,13 +123,15 @@ For a performance result, also record hardware, workload, baseline, target, obse
 
 | Check | State | Reason |
 |---|---|---|
-| Skill registry preflight | PASS | `python3 scripts/verify-skills.py` |
-| Official skill schema validation | PASS | `quick_validate.py` in a PyYAML environment |
-| `cargo fmt --check` | BLOCKED | No Cargo workspace |
-| `cargo clippy` | BLOCKED | No Cargo workspace |
-| `cargo test` | BLOCKED | No Cargo workspace |
-| `cargo audit` / `cargo deny` | BLOCKED | No workspace or dependency graph |
-| CI pipeline | BLOCKED | No CI configuration or remote |
+| Skill registry preflight | PASS | `python3 scripts/verify-skills.py` — 10 skills, 0 failures |
+| Official skill schema validation | PASS | `quick_validate.py` — 10/10 valid |
+| `cargo fmt --check` | PASS | `cargo fmt --all -- --check`, exit 0, 2026-11-07 |
+| `cargo clippy` | PASS | `cargo clippy --workspace --all-targets --all-features -- -D warnings`, exit 0 |
+| `cargo build` | PASS | `cargo build --workspace --all-targets --locked`, exit 0 |
+| `cargo test` | PASS | `cargo test --workspace --all-features --locked`, 17 tests passed |
+| `cargo audit` | PASS | `cargo audit`, exit 0; no advisories for the single workspace crate |
+| `cargo deny check` | PASS | `cargo deny check`, exit 0; advisories, bans, licenses, sources ok |
+| CI pipeline | BLOCKED | `.github/workflows/ci.yml` exists; never executed because no remote exists |
 | Packaging/signing checks | BLOCKED | No product artifact |
 | Benchmarks | BLOCKED | No runtime code or fixtures |
 
@@ -139,9 +141,9 @@ A `BLOCKED` check is not a failure of the project at the planning stage, but it 
 
 The author should not be the only reviewer of a high-risk change. When a separate agent or human reviewer is available, use it. If self-review is unavoidable, state that independence was limited and apply the same evidence standard.
 
-## 7. CI design (planned, not implemented)
+## 7. CI design (configured, not executed)
 
-When the workspace and remote exist, the pipeline should run, in order:
+The workspace exists and `.github/workflows/ci.yml` is configured. The remote does not exist, so the workflow has never run. When it runs, it should execute, in order:
 
 ```text
 format -> lint -> license/advisory -> build -> unit -> integration

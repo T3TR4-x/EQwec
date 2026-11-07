@@ -7,8 +7,8 @@ This is the canonical instruction file for every AI agent working in the EQwec r
 - **Project:** EQwec — *Engineer Quality with Empathy to Customer*.
 - **Repository:** `~/Documents/EQwec` (resolve the actual home directory; do not hardcode a username).
 - **Architecture:** Rust-first modular monorepo with a Cargo workspace. Native-first, cross-platform, security-first.
-- **Current phase:** Bootstrap and planning. Version `0.0.0`. **No product is implemented.**
-- **Actual repository contents today:** `README.md`, `.agents/skills/`, `docs/development/`, `scripts/verify-skills.py`, and this file. There is **no** `Cargo.toml`, `apps/`, `crates/`, CI pipeline, installer, or release artifact yet.
+- **Current phase:** Phase 2 — workspace baseline. Version `0.0.0`. **No product is implemented.**
+- **Actual repository contents today:** `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `.github/workflows/ci.yml`, `crates/eqwec-core/`, `docs/`, `.agents/skills/`, `scripts/`, `README.md`, and this file. There is **no** `apps/`, product crate, installer, or release artifact yet.
 - **Environment used for current evidence:** macOS on Apple silicon. Windows and Linux are planned targets, not verified platforms.
 
 Never describe a planned capability as implemented. Never invent a command, path, version, test result, benchmark, or release.
@@ -119,13 +119,25 @@ The official validator requires PyYAML. Without it, the script fails with a clea
 
 ## 7. Build, test, and quality commands
 
-There is no Cargo workspace yet. Therefore:
+The Cargo workspace exists. Verified on macOS 26.7.2 arm64 with Rust 1.99.1 on 2026-11-07:
 
-- `cargo build`, `cargo test`, `cargo clippy`, and `cargo fmt --check` are **BLOCKED** until the workspace exists.
-- There is no CI pipeline, installer, or benchmark harness yet.
-- The only executable project check today is `python3 scripts/verify-skills.py`.
+```bash
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo build --workspace --all-targets --locked
+cargo test --workspace --all-features --locked
+cargo audit
+cargo deny check
+python3 scripts/verify-skills.py
+python3 scripts/check-docs.py --gate
+```
 
-When the workspace is created, this section must be updated with the actual commands, and every command must be validated before being documented. Do not copy generic Cargo command lists and present them as verified project commands.
+- `cargo audit` and `cargo deny check` require the tools installed locally; CI installs them.
+- CI is configured in `.github/workflows/ci.yml` but has never run because the repository has no remote. Report `CI_EXECUTION: BLOCKED` until it runs.
+- There is no installer, packaging check, benchmark harness, or product test yet.
+- Windows and Linux are not verified locally.
+
+Do not copy generic command lists and present them as verified project commands.
 
 ## 8. Documentation lifecycle
 
@@ -179,11 +191,12 @@ A task is complete only when:
 
 ## 11. Current gate status
 
-- **SKILLS_GATE:** PASS for the bootstrap scope. All 10 packages exist, validate, and are discoverable; trigger and scenario evidence is recorded in `docs/development/SKILLS-AUDIT.md`. Runtime product end-to-end scenarios are `BLOCKED` until the Cargo workspace exists.
+- **SKILLS_GATE:** PASS for the bootstrap scope. All 10 packages exist, validate, and are discoverable; trigger and scenario evidence is recorded in `docs/development/SKILLS-AUDIT.md`. Runtime product end-to-end scenarios are `BLOCKED` until product code exists.
 - **DOCUMENTATION_GATE:** PASS for the planning scope. `python3 scripts/check-docs.py --gate` returned 0 failures on 2026-11-07. Research, architecture, security, performance, and development documents exist.
-- **ARCHITECTURE_GATE:** PASS for the planning baseline. ADR-0001 through ADR-0010 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. Runtime verification is `BLOCKED` until the workspace and prototypes exist.
+- **ARCHITECTURE_GATE:** PASS for the planning baseline. ADR-0001 through ADR-0010 are recorded; ADR-0004 and ADR-0008 remain `PROPOSED`. Runtime verification is `BLOCKED` until prototypes exist.
 - **SECURITY_GATE:** PASS for the planning baseline. `docs/security/THREAT-MODEL.md` and `SECURITY-BASELINE.md` exist. Product-specific runtime controls, isolation tests, and fuzzing are `BLOCKED` until implementation.
-- **PRODUCT_IMPLEMENTATION:** `BLOCKED` until the Cargo workspace, CI baseline, and the Phase 2 gate exist. Planning documents are not product code.
+- **WORKSPACE_GATE:** PASS locally on macOS for format, clippy, build, test, audit, and deny. CI execution is `BLOCKED` because no remote exists.
+- **PRODUCT_IMPLEMENTATION:** `BLOCKED` until the Phase 2 gate closes and the Hub MVP work begins on `dev-hub`. Planning documents and `eqwec-core` are not product code.
 - **PLATFORM VERIFICATION:** `BLOCKED` for Windows and Linux; only macOS on Apple silicon has been exercised.
 - **RELEASE_GATE:** `BLOCKED`. No remote, signing keys, certificates, notarization account, installer, or release channel exists.
 

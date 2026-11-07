@@ -7,7 +7,7 @@ description: Use when planning, implementing, reviewing, or documenting CraftAny
 
 CraftAnything is a flexible workspace that combines ArtCraft workflows (creative editing performed in the specialized products) with asset exchange and canonical document ownership. It organizes, links, previews, launches, and exchanges; it does not replace the editors that own the documents.
 
-**Status: planning only.** The repository is at `0.0.0`; `apps/` and `crates/` do not exist in this worktree. Every path, crate, schema, message family, and workflow below is planned. Verify against the repository before citing it, and never describe a planned capability as shipped.
+**Status: planning only.** The repository is at `0.0.0`; `apps/` does not exist and `crates/` contains only `eqwec-core`. Every path, crate, schema, message family, and workflow below is planned. Verify against the repository before citing it, and never describe a planned capability as shipped.
 
 ## Scope gate
 
@@ -18,7 +18,7 @@ Before implementation, record an ADR that defines the supported workspace workfl
 | Path | Role | State | Ownership |
 |---|---|---|---|
 | `apps/craftanything` | Workspace UI, orchestration, product discovery and launch, exchange flows | Planned | CraftAnything |
-| `crates/eqwec-core` | Typed identifiers, errors, result conventions | Planned | Shared; core owns the API |
+| `crates/eqwec-core` | Typed identifiers, errors, result conventions | Exists (Phase 2) | Shared; core owns the API |
 | `crates/eqwec-storage` | Tenant/profile-scoped project storage, atomic writes, journals | Planned | Shared |
 | `crates/eqwec-ipc` | Versioned IPC envelopes and trust boundaries | Planned | Shared |
 | `crates/eqwec-ui` | Design tokens and UI primitives, no product workflow logic | Planned | Shared |
